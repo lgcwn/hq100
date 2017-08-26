@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.PayListMapper">
+    <resultMap id="RM_payList" type="com.up72.hq.model.PayList">
+        <result property="id" column="ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="billType" column="BILL_TYPE"/>
+        <result property="payType" column="PAY_TYPE"/>
+        <result property="cardType" column="CARD_TYPE"/>
+        <result property="cardListId" column="CARD_LIST_ID"/>
+        <result property="money" column="MONEY"/>
+        <result property="addDate" column="ADD_DATE"/>
+        <result property="reMark" column="RE_MARK"/>
+        <result property="status" column="STATUS"/>
+        <result property="sn" column="SN"/>
+        <result property="balance" column="BALANCE"/>
+    </resultMap>
+
+    <sql id="payList_columns">
+        T.ID,T.MEMBER_ID,T.BILL_TYPE,T.PAY_TYPE,T.CARD_TYPE,T.CARD_LIST_ID,T.MONEY,T.ADD_DATE,T.RE_MARK,T.STATUS,T.SN,T.BALANCE
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PAY_LIST (
+         ID, MEMBER_ID, BILL_TYPE, PAY_TYPE, CARD_TYPE, CARD_LIST_ID, MONEY, ADD_DATE, RE_MARK, STATUS, SN, BALANCE
+        ) VALUES (
+         #{id}, #{memberId}, #{billType}, #{payType}, #{cardType}, #{cardListId}, #{money}, #{addDate}, #{reMark}, #{status}, #{sn}, #{balance}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_PAY_LIST AS T SET
+            T.MEMBER_ID = #{memberId} , T.BILL_TYPE = #{billType} , T.PAY_TYPE = #{payType} , T.CARD_TYPE = #{cardType} , T.CARD_LIST_ID = #{cardListId} , T.MONEY = #{money} , T.ADD_DATE = #{addDate} , T.RE_MARK = #{reMark} , T.STATUS = #{status} , T.SN = #{sn} , T.BALANCE = #{balance}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PAY_LIST WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_payList">
+        SELECT
+        <include refid="payList_columns"/>
+        FROM HQ_PAY_LIST AS T WHERE T.ID = #{id}
+    </select>
+
+
+    <select id="findBySnCode" resultMap="RM_payList">
+        SELECT
+        <include refid="payList_columns"/>
+        FROM HQ_PAY_LIST AS T WHERE T.SN = #{sn}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_payList">
+        SELECT
+        <include refid="payList_columns"/>
+        FROM HQ_PAY_LIST AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(billType)">AND T.BILL_TYPE = #{billType}</if>
+            <if test="@Ognl@isNotEmpty(payType)">AND T.PAY_TYPE = #{payType}</if>
+            <if test="@Ognl@isNotEmpty(cardType)">AND T.CARD_TYPE = #{cardType}</if>
+            <if test="@Ognl@isNotEmpty(cardListId)">AND T.CARD_LIST_ID = #{cardListId}</if>
+            <if test="@Ognl@isNotEmpty(money)">AND T.MONEY = #{money}</if>
+            <if test="@Ognl@isNotEmpty(addDate)">AND T.ADD_DATE = #{addDate}</if>
+            <if test="@Ognl@isNotEmpty(reMark)">AND T.RE_MARK = #{reMark}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+            <if test="@Ognl@isNotEmpty(sn)">AND T.SN = #{sn}</if>
+            <if test="@Ognl@isNotEmpty(balance)">AND T.BALANCE = #{balance}</if>
+        </where>
+    </select>
+
+
+</mapper>

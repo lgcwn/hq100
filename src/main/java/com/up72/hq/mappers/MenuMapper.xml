@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.MenuMapper">
+    <resultMap id="RM_menu" type="com.up72.hq.model.Menu">
+        <result property="id" column="ID" />
+        <result property="idPath" column="ID_PATH" />
+        <result property="rootId" column="ROOT_ID" />
+        <result property="parentId" column="PARENT_ID" />
+        <result property="name" column="NAME" />
+        <result property="icon" column="ICON" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="level" column="LEVEL" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="opType" column="OP_TYPE" />
+        <result property="isLeft" column="IS_LEFT" />
+        <result property="isNav" column="IS_NAV" />
+        <result property="pageUrl" column="PAGE_URL" />
+        <result property="permissionCode" column="PERMISSION_CODE" />
+        <result property="domain" column="DOMAIN" />
+        <result property="isDel" column="IS_DEL" />
+        <result property="isSystemMenu" column="IS_SYSTEM_MENU" />
+    </resultMap>
+    
+    <sql id="menu_columns">
+        T.ID,T.ID_PATH,T.ROOT_ID,T.PARENT_ID,T.NAME,T.ICON,T.SORT_ID,T.LEVEL,T.ADD_TIME,T.ADD_USER_ID,T.OP_TYPE,T.IS_LEFT,T.IS_NAV,T.PAGE_URL,T.PERMISSION_CODE,T.DOMAIN,T.IS_DEL,T.IS_SYSTEM_MENU
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_MENU (
+         ID, ID_PATH, ROOT_ID, PARENT_ID, NAME, ICON, SORT_ID, LEVEL, ADD_TIME, ADD_USER_ID, OP_TYPE, IS_LEFT, IS_NAV, PAGE_URL, PERMISSION_CODE, DOMAIN, IS_DEL, IS_SYSTEM_MENU
+        ) VALUES (
+         #{id}, #{idPath}, #{rootId}, #{parentId}, #{name}, #{icon}, #{sortId}, #{level}, #{addTime}, #{addUserId}, #{opType}, #{isLeft}, #{isNav}, #{pageUrl}, #{permissionCode}, #{domain}, #{isDel}, #{isSystemMenu}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_MENU AS T SET
+            T.ID_PATH = #{idPath} , T.ROOT_ID = #{rootId} , T.PARENT_ID = #{parentId} , T.NAME = #{name} , T.ICON = #{icon} , T.SORT_ID = #{sortId} , T.LEVEL = #{level} , T.ADD_TIME = #{addTime} , T.ADD_USER_ID = #{addUserId} , T.OP_TYPE = #{opType} , T.IS_LEFT = #{isLeft} , T.IS_NAV = #{isNav} , T.PAGE_URL = #{pageUrl} , T.PERMISSION_CODE = #{permissionCode} , T.DOMAIN = #{domain} , T.IS_DEL = #{isDel} , T.IS_SYSTEM_MENU = #{isSystemMenu}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_MENU WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_menu">
+        SELECT <include refid="menu_columns" /> FROM HQ_MENU AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_menu">
+     SELECT <include refid="menu_columns" />  FROM HQ_MENU AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(idPath)"> AND T.ID_PATH = #{idPath} </if>
+           <if test="@Ognl@isNotEmpty(rootId)"> AND T.ROOT_ID = #{rootId} </if>
+           <if test="@Ognl@isNotEmpty(parentId)"> AND T.PARENT_ID = #{parentId} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(icon)"> AND T.ICON = #{icon} </if>
+           <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+           <if test="@Ognl@isNotEmpty(level)"> AND T.LEVEL = #{level} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+           <if test="@Ognl@isNotEmpty(opType)"> AND T.OP_TYPE = #{opType} </if>
+           <if test="@Ognl@isNotEmpty(isLeft)"> AND T.IS_LEFT = #{isLeft} </if>
+           <if test="@Ognl@isNotEmpty(isNav)"> AND T.IS_NAV = #{isNav} </if>
+           <if test="@Ognl@isNotEmpty(pageUrl)"> AND T.PAGE_URL = #{pageUrl} </if>
+           <if test="@Ognl@isNotEmpty(permissionCode)"> AND T.PERMISSION_CODE = #{permissionCode} </if>
+           <if test="@Ognl@isNotEmpty(domain)"> AND T.DOMAIN = #{domain} </if>
+           <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+           <if test="@Ognl@isNotEmpty(isSystemMenu)"> AND T.IS_SYSTEM_MENU = #{isSystemMenu} </if>
+        </where>
+    </select>
+
+    
+</mapper>

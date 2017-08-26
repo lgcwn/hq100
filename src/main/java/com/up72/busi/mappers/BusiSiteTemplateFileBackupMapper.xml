@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiSiteTemplateFileBackupMapper">
+	<resultMap id="RM_busiSiteTemplateFileBackup" type="com.up72.busi.model.BusiSiteTemplateFileBackup">
+        <result property="id" column="ID" />
+        <result property="siteTemplateId" column="SITE_TEMPLATE_ID" />
+        <result property="siteTemplateFileId" column="SITE_TEMPLATE_FILE_ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="bakName" column="BAK_NAME" />
+        <result property="name" column="NAME" />
+        <result property="fileUrl" column="FILE_URL" />
+        <result property="content" column="CONTENT" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="addTime" column="ADD_TIME" />
+	</resultMap>
+	
+	<sql id="busiSiteTemplateFileBackup_columns">
+		T.ID,T.SITE_TEMPLATE_ID,T.SITE_TEMPLATE_FILE_ID,T.COMPANY_ID,T.BAK_NAME,T.NAME,T.FILE_URL,T.CONTENT,T.ADD_USER_ID,T.ADD_USER_NAME,T.ADD_TIME
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_SITE_TEMPLATE_FILE_BACKUP (
+         ID, SITE_TEMPLATE_ID, SITE_TEMPLATE_FILE_ID, COMPANY_ID, BAK_NAME, NAME, FILE_URL, CONTENT, ADD_USER_ID, ADD_USER_NAME, ADD_TIME
+        ) VALUES (
+         #{id}, #{siteTemplateId}, #{siteTemplateFileId}, #{companyId}, #{bakName}, #{name}, #{fileUrl}, #{content}, #{addUserId}, #{addUserName}, #{addTime}
+        )
+	</insert>
+    
+	<update id="update" >
+        UPDATE BUSI_SITE_TEMPLATE_FILE_BACKUP AS T SET
+	        T.SITE_TEMPLATE_ID = #{siteTemplateId} , T.SITE_TEMPLATE_FILE_ID = #{siteTemplateFileId} , T.COMPANY_ID = #{companyId} , T.BAK_NAME = #{bakName} , T.NAME = #{name} , T.FILE_URL = #{fileUrl} , T.CONTENT = #{content} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.ADD_TIME = #{addTime}  
+        WHERE T.ID = #{id}  
+	</update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_SITE_TEMPLATE_FILE_BACKUP WHERE ID = #{id} 
+    </delete>
+    
+    <select id="findById" resultMap="RM_busiSiteTemplateFileBackup">
+		SELECT <include refid="busiSiteTemplateFileBackup_columns" /> FROM BUSI_SITE_TEMPLATE_FILE_BACKUP  AS T WHERE T.ID = #{id} 
+	</select>
+	
+	<select id="findPage" parameterType="map" resultMap="RM_busiSiteTemplateFileBackup">
+	 SELECT <include refid="busiSiteTemplateFileBackup_columns" />  FROM BUSI_SITE_TEMPLATE_FILE_BACKUP AS T
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+	       <if test="@Ognl@isNotEmpty(siteTemplateId)"> AND T.SITE_TEMPLATE_ID = #{siteTemplateId} </if>
+	       <if test="@Ognl@isNotEmpty(siteTemplateFileId)"> AND T.SITE_TEMPLATE_FILE_ID = #{siteTemplateFileId} </if>
+	       <if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+	       <if test="@Ognl@isNotEmpty(bakName)"> AND T.BAK_NAME = #{bakName} </if>
+	       <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+	       <if test="@Ognl@isNotEmpty(fileUrl)"> AND T.FILE_URL = #{fileUrl} </if>
+	       <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+	       <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+	       <if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+	       <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+		</where>
+	</select>
+
+	<select id="findList" parameterType="map" resultMap="RM_busiSiteTemplateFileBackup">
+		SELECT <include refid="busiSiteTemplateFileBackup_columns" />  FROM BUSI_SITE_TEMPLATE_FILE_BACKUP AS T
+		<where>
+			<if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+			<if test="@Ognl@isNotEmpty(siteTemplateId)"> AND T.SITE_TEMPLATE_ID = #{siteTemplateId} </if>
+			<if test="@Ognl@isNotEmpty(siteTemplateFileId)"> AND T.SITE_TEMPLATE_FILE_ID = #{siteTemplateFileId} </if>
+			<if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+			<if test="@Ognl@isNotEmpty(bakName)"> AND T.BAK_NAME = #{bakName} </if>
+			<if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+			<if test="@Ognl@isNotEmpty(fileUrl)"> AND T.FILE_URL = #{fileUrl} </if>
+			<if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+			<if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+			<if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+			<if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+		</where>
+	</select>
+
+	
+
+    <delete id="deleteByCompanyId" parameterType="long">
+        DELETE FROM BUSI_SITE_TEMPLATE_FILE_BACKUP WHERE COMPANY_ID = #{companyId}
+    </delete>
+</mapper>

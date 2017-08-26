@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.VotePropsMapper">
+    <resultMap id="RM_voteProps" type="com.up72.hq.model.VoteProps">
+        <result property="id" column="ID" />
+        <result property="name" column="NAME" />
+        <result property="type" column="TYPE" />
+        <result property="costType" column="COST_TYPE" />
+        <result property="scroe" column="SCROE" />
+        <result property="img" column="IMG" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="enable" column="ENABLE" />
+        <result property="salesCnt" column="SALES_CNT" />
+        <result property="price" column="PRICE" />
+        <result property="remark" column="REMARK" />
+    </resultMap>
+    
+    <sql id="voteProps_columns">
+        T.ID,T.NAME,T.TYPE,T.COST_TYPE,T.SCROE,T.IMG,T.SORT_ID,T.ENABLE,T.SALES_CNT,T.PRICE,T.REMARK
+    </sql>
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE  CONCAT('%',#{name},'%') </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(costType)"> AND T.COST_TYPE = #{costType} </if>
+            <if test="@Ognl@isNotEmpty(scroe)"> AND T.SCROE = #{scroe} </if>
+            <if test="@Ognl@isNotEmpty(img)"> AND T.IMG = #{img} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+            <if test="@Ognl@isNotEmpty(enable)"> AND T.ENABLE = #{enable} </if>
+            <if test="@Ognl@isNotEmpty(salesCnt)"> AND T.SALES_CNT = #{salesCnt} </if>
+            <if test="@Ognl@isNotEmpty(price)"> AND T.PRICE = #{price} </if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_VOTE_PROPS (
+         ID, NAME, TYPE,COST_TYPE ,SCROE, IMG, SORT_ID, ENABLE, SALES_CNT, PRICE,REMARK
+        ) VALUES (
+         #{id}, #{name}, #{type}, #{costType}, #{scroe}, #{img}, #{sortId}, #{enable}, #{salesCnt}, #{price}, #{remark}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_VOTE_PROPS AS T SET
+            T.NAME = #{name} , T.TYPE = #{type} , T.COST_TYPE = #{costType} , T.SCROE = #{scroe} , T.IMG = #{img} , T.SORT_ID = #{sortId} ,
+             T.ENABLE = #{enable} , T.SALES_CNT = #{salesCnt} , T.PRICE = #{price}   , T.REMARK = #{remark}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_VOTE_PROPS WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_voteProps">
+        SELECT <include refid="voteProps_columns" /> FROM HQ_VOTE_PROPS AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_voteProps">
+     SELECT <include refid="voteProps_columns" />  FROM HQ_VOTE_PROPS AS T
+        <include refid="where_sql" />
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.OrderGoodsMapper">
+    <resultMap id="RM_OrderGoods" type="com.up72.hq.model.OrderGoods">
+        <result property="id" column="ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="goodsId" column="GOODS_ID" />
+        <result property="goodsPrice" column="GOODS_PRICE" />
+        <result property="goodsCount" column="GOODS_COUNT" />
+        <result property="goodsName" column="GOODS_NAME" />
+        <result property="createDate" column="CREATE_DATE" />
+        <result property="modifyDate" column="MODIFY_DATE" />
+        <result property="goodsImg" column="GOODS_IMG" />
+        <result property="refundTransactionNumber" column="REFUND_TRANSACTION_NUMBER" />
+        <result property="isRefund" column="IS_REFUND" />
+        <result property="isExchange" column="IS_EXCHANGE" />
+        <result property="commentStatus" column="COMMENT_STATUS" />
+        <result property="returnsStatus" column="RETURNS_STATUS" />
+        <result property="goodsSn" column="GOODS_SN" />
+        <result property="refundCount" column="REFUND_COUNT" />
+        <result property="reviewStatus" column="REVIEW_STATUS" />
+    </resultMap>
+
+    <resultMap id="RM_OrderGoodsResp" type="com.up72.hq.dto.resp.OrderGoodsResp" extends="RM_OrderGoods">
+        <result property="packingList" column="PACKING_LIST" />
+        <result property="goodsCommentStatus" column="goodsCommentStatus" />
+        <result property="commentScore" column="commentScore" />
+        <result property="specNames" column="SPEC_NAMES" />
+    </resultMap>
+    
+    <sql id="orderGoods_columns">
+        T.ID,T.ORDER_ID,T.GOODS_ID,T.GOODS_PRICE,T.GOODS_COUNT,T.GOODS_NAME,T.CREATE_DATE,T.MODIFY_DATE,T.GOODS_IMG,T.REFUND_TRANSACTION_NUMBER,T.IS_REFUND,T.IS_EXCHANGE,T.COMMENT_STATUS,T.RETURNS_STATUS,T.GOODS_SN,T.REFUND_COUNT,T.REVIEW_STATUS
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ORDER_GOODS (
+         ID, ORDER_ID, GOODS_ID, GOODS_PRICE, GOODS_COUNT, GOODS_NAME, CREATE_DATE, MODIFY_DATE, GOODS_IMG, REFUND_TRANSACTION_NUMBER, IS_REFUND, IS_EXCHANGE, COMMENT_STATUS, RETURNS_STATUS, GOODS_SN, REFUND_COUNT, REVIEW_STATUS
+        ) VALUES (
+         #{id}, #{orderId}, #{goodsId}, #{goodsPrice}, #{goodsCount}, #{goodsName}, #{createDate}, #{modifyDate}, #{goodsImg}, #{refundTransactionNumber}, #{isRefund}, #{isExchange}, #{commentStatus}, #{returnsStatus}, #{goodsSn}, #{refundCount}, #{reviewStatus}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ORDER_GOODS AS T SET
+            T.ORDER_ID = #{orderId} , T.GOODS_ID = #{goodsId} , T.GOODS_PRICE = #{goodsPrice} , T.GOODS_COUNT = #{goodsCount} , T.GOODS_NAME = #{goodsName} , T.CREATE_DATE = #{createDate} , T.MODIFY_DATE = #{modifyDate} , T.GOODS_IMG = #{goodsImg} , T.REFUND_TRANSACTION_NUMBER = #{refundTransactionNumber} , T.IS_REFUND = #{isRefund} , T.IS_EXCHANGE = #{isExchange} , T.COMMENT_STATUS = #{commentStatus} , T.RETURNS_STATUS = #{returnsStatus} , T.GOODS_SN = #{goodsSn} , T.REFUND_COUNT = #{refundCount} , T.REVIEW_STATUS = #{reviewStatus}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ORDER_GOODS WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_OrderGoods">
+        SELECT <include refid="orderGoods_columns" /> FROM HQ_ORDER_GOODS AS T WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findRespById" resultMap="RM_OrderGoodsResp">
+        SELECT <include refid="orderGoods_columns" />,P.PACKING_LIST AS PACKING_LIST
+        FROM HQ_ORDER_GOODS AS T
+        LEFT JOIN HQ_GOODS G ON G.ID = T.GOODS_ID
+        LEFT JOIN HQ_PROD P ON P.ID = G.PROD_ID
+        WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findByOrderId" resultMap="RM_OrderGoods">
+        SELECT <include refid="orderGoods_columns" /> FROM HQ_ORDER_GOODS AS T
+        WHERE  T.ORDER_ID = #{id}
+    </select>
+    <select id="findCommentResp" parameterType="map" resultMap="RM_OrderGoodsResp">
+        SELECT <include refid="orderGoods_columns" /> ,
+        (SELECT CO.STATUS FROM HQ_ORDER_GOODS_COMMENT CO WHERE CO.GOODS_ID = T.GOODS_ID AND CO.ORDER_ID = T.ORDER_ID) AS goodsCommentStatus,
+        (SELECT SL.SCORE FROM HQ_SCORE_LIST SL WHERE SL.SOURCE_TYPE = 3 AND SL.CONTENT_ID = T.ID AND SL.TYPE=0 AND SL.MEMBER_ID = #{memberId}) AS commentScore
+        FROM HQ_ORDER_GOODS AS T
+        LEFT JOIN HQ_ORDER AS O ON O.ID = T.ORDER_ID WHERE O.IS_DELETE = 0 AND O.SELLER_IS_DELETE = 0 AND O.ORDER_STATUS = 3
+        <if test="@Ognl@isNotEmpty(memberId)"> AND O.MEMBER_ID = #{memberId} </if>
+        <if test="@Ognl@isNotEmpty(commentStatus)"> AND T.COMMENT_STATUS = #{commentStatus} </if>
+        <if test="@Ognl@isNotEmpty(commentAll)"> AND T.COMMENT_STATUS != 0 </if>
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_OrderGoodsResp">
+        SELECT <include refid="orderGoods_columns" />,G.SPEC_NAMES   FROM HQ_ORDER_GOODS AS T LEFT  JOIN  HQ_GOODS AS G ON T.GOODS_ID=G.ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+            <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+            <if test="@Ognl@isNotEmpty(goodsPrice)"> AND T.GOODS_PRICE = #{goodsPrice} </if>
+            <if test="@Ognl@isNotEmpty(goodsCount)"> AND T.GOODS_COUNT = #{goodsCount} </if>
+            <if test="@Ognl@isNotEmpty(goodsName)"> AND T.GOODS_NAME = #{goodsName} </if>
+            <if test="@Ognl@isNotEmpty(createDate)"> AND T.CREATE_DATE = #{createDate} </if>
+            <if test="@Ognl@isNotEmpty(modifyDate)"> AND T.MODIFY_DATE = #{modifyDate} </if>
+            <if test="@Ognl@isNotEmpty(goodsImg)"> AND T.GOODS_IMG = #{goodsImg} </if>
+            <if test="@Ognl@isNotEmpty(refundTransactionNumber)"> AND T.REFUND_TRANSACTION_NUMBER = #{refundTransactionNumber} </if>
+            <if test="@Ognl@isNotEmpty(isRefund)"> AND T.IS_REFUND = #{isRefund} </if>
+            <if test="@Ognl@isNotEmpty(isExchange)"> AND T.IS_EXCHANGE = #{isExchange} </if>
+            <if test="@Ognl@isNotEmpty(commentStatus)"> AND T.COMMENT_STATUS = #{commentStatus} </if>
+            <if test="@Ognl@isNotEmpty(reviewStatus)"> AND T.REVIEW_STATUS = #{reviewStatus} </if>
+            <if test="@Ognl@isNotEmpty(returnsStatus)"> AND T.RETURNS_STATUS = #{returnsStatus} </if>
+        </where>
+    </select>
+
+    <select id="findOrderGoodsList" parameterType="com.up72.hq.model.OrderGoods" resultMap="RM_OrderGoods">
+        SELECT <include refid="orderGoods_columns" />  FROM HQ_ORDER_GOODS AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+            <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+            <if test="@Ognl@isNotEmpty(goodsPrice)"> AND T.GOODS_PRICE = #{goodsPrice} </if>
+            <if test="@Ognl@isNotEmpty(goodsCount)"> AND T.GOODS_COUNT = #{goodsCount} </if>
+            <if test="@Ognl@isNotEmpty(goodsName)"> AND T.GOODS_NAME = #{goodsName} </if>
+            <if test="@Ognl@isNotEmpty(createDate)"> AND T.CREATE_DATE = #{createDate} </if>
+            <if test="@Ognl@isNotEmpty(modifyDate)"> AND T.MODIFY_DATE = #{modifyDate} </if>
+            <if test="@Ognl@isNotEmpty(goodsImg)"> AND T.GOODS_IMG = #{goodsImg} </if>
+            <if test="@Ognl@isNotEmpty(refundTransactionNumber)"> AND T.REFUND_TRANSACTION_NUMBER = #{refundTransactionNumber} </if>
+            <if test="@Ognl@isNotEmpty(isRefund)"> AND T.IS_REFUND = #{isRefund} </if>
+            <if test="@Ognl@isNotEmpty(isExchange)"> AND T.IS_EXCHANGE = #{isExchange} </if>
+            <if test="@Ognl@isNotEmpty(commentStatus)"> AND T.COMMENT_STATUS = #{commentStatus} </if>
+            <if test="@Ognl@isNotEmpty(reviewStatus)"> AND T.REVIEW_STATUS = #{reviewStatus} </if>
+            <if test="@Ognl@isNotEmpty(returnsStatus)"> AND T.RETURNS_STATUS = #{returnsStatus} </if>
+        </where>
+    </select>
+
+
+
+</mapper>

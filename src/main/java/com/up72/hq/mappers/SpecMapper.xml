@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.SpecMapper">
+    <resultMap id="RM_Spec" type="com.up72.hq.model.Spec">
+        <result property="id" column="ID" />
+        <result property="catId" column="CAT_ID" />
+        <result property="name" column="NAME" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="isColor" column="IS_COLOR" />
+    </resultMap>
+
+    <resultMap id="RM_SpecResp" type="com.up72.hq.dto.resp.SpecResp" extends="RM_Spec">
+        <result property="catName" column="CAT_NAME" />
+        <collection property="specValueList" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.SpecValue" select="com.up72.hq.dao.SpecValueMapper.findListBySpecId"/>
+    </resultMap>
+
+    <resultMap id="RM_Spec2Resp" type="com.up72.hq.dto.resp.Spec2Resp" extends="RM_Spec">
+    </resultMap>
+
+    <sql id="Spec_columns">
+        T.ID,T.CAT_ID,T.NAME,T.SORT_ID,IS_COLOR
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_SPEC (
+        CAT_ID, NAME, SORT_ID,IS_COLOR
+        ) VALUES (
+        #{catId}, #{name}, #{sortId}, #{isColor}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_SPEC AS T SET T.CAT_ID = #{catId} , T.NAME = #{name} , T.SORT_ID = #{sortId}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_SPEC WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteByCatId" parameterType="long">
+        DELETE FROM HQ_SPEC WHERE CAT_ID = #{catId}
+    </delete>
+
+    <select id="findById" resultMap="RM_Spec">
+        SELECT <include refid="Spec_columns" /> FROM HQ_SPEC  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findRespById" resultMap="RM_SpecResp">
+        SELECT <include refid="Spec_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_SPEC  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_Spec">
+        SELECT <include refid="Spec_columns" />  FROM HQ_SPEC AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+        </where>
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_SpecResp">
+        SELECT <include refid="Spec_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_SPEC AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+        </where>
+        ORDER BY T.SORT_ID,T.ID ASC
+    </select>
+
+    <select id="cntUsing" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT(T.PROD_ID)) FROM HQ_PROD_SPEC AS T WHERE T.SPEC_ID=#{specId}
+    </select>
+
+    <select id="findListByCat" parameterType="map" resultMap="RM_SpecResp">
+        SELECT <include refid="Spec_columns" /> FROM HQ_SPEC AS T WHERE  T.CAT_ID=#{catId}
+        UNION ALL
+        (SELECT <include refid="Spec_columns" /> FROM HQ_SPEC AS T WHERE   T.CAT_ID=
+        (SELECT MAX(T.CAT_ID) FROM HQ_SPEC AS T WHERE T.CAT_ID != #{catId} AND FIND_IN_SET(T.CAT_ID,(SELECT C.ID_PATH FROM HQ_CAT AS C WHERE C.ID=#{catId})))
+        ORDER BY T.SORT_ID ASC)
+    </select>
+
+    <select id="findListByProdId" parameterType="long" resultMap="RM_Spec2Resp">
+        SELECT <include refid="Spec_columns" /> FROM HQ_SPEC AS T WHERE T.ID IN
+        (SELECT P.SPEC_ID FROM HQ_PROD_SPEC AS P WHERE P.PROD_ID=#{prodId})
+        ORDER BY T.ID ASC
+    </select>
+
+</mapper>

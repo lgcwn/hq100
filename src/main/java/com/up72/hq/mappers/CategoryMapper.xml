@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.CategoryMapper">
+    <resultMap id="RM_category" type="com.up72.hq.model.Category">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="name" column="NAME" />
+        <result property="parentId" column="PARENT_ID" />
+        <result property="rootId" column="ROOT_ID" />
+        <result property="level" column="LEVEL" />
+        <result property="idPath" column="ID_PATH" />
+        <result property="isEnable" column="IS_ENABLE" />
+        <result property="isDel" column="IS_DEL" />
+        <result property="issueCnt" column="ISSUE_CNT" />
+        <result property="notIssueCnt" column="NOT_ISSUE_CNT" />
+        <result property="auditingCnt" column="AUDITING_CNT" />
+        <result property="notAuditingCnt" column="NOT_AUDITING_CNT" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="templateIndex" column="TEMPLATE_INDEX" />
+        <result property="templateList" column="TEMPLATE_LIST" />
+        <result property="templateDetail" column="TEMPLATE_DETAIL" />
+        <result property="staticFilePath" column="STATIC_FILE_PATH" />
+        <result property="templateIndexWap" column="TEMPLATE_INDEX_WAP" />
+        <result property="templateListWap" column="TEMPLATE_LIST_WAP" />
+        <result property="templateDetailWap" column="TEMPLATE_DETAIL_WAP" />
+        <result property="staticFilePathWap" column="STATIC_FILE_PATH_WAP" />
+        <result property="isStatic" column="IS_STATIC" />
+        <result property="staticFileRule" column="STATIC_FILE_RULE" />
+    </resultMap>
+    
+    <sql id="category_columns">
+        T.ID,T.SITE_MENU_ID,T.COMPANY_ID,T.NAME,T.PARENT_ID,T.ROOT_ID,T.LEVEL,T.ID_PATH,T.IS_ENABLE,T.IS_DEL,T.ISSUE_CNT,T.NOT_ISSUE_CNT,T.AUDITING_CNT,T.NOT_AUDITING_CNT,T.ADD_USER_ID,T.ADD_USER_NAME,T.ADD_TIME,T.SORT_ID,T.TEMPLATE_INDEX,T.TEMPLATE_LIST,T.TEMPLATE_DETAIL,T.STATIC_FILE_PATH,T.TEMPLATE_INDEX_WAP,T.TEMPLATE_LIST_WAP,T.TEMPLATE_DETAIL_WAP,T.STATIC_FILE_PATH_WAP,T.IS_STATIC,T.STATIC_FILE_RULE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_CATEGORY (
+         ID, SITE_MENU_ID, COMPANY_ID, NAME, PARENT_ID, ROOT_ID, LEVEL, ID_PATH, IS_ENABLE, IS_DEL, ISSUE_CNT, NOT_ISSUE_CNT, AUDITING_CNT, NOT_AUDITING_CNT, ADD_USER_ID, ADD_USER_NAME, ADD_TIME, SORT_ID, TEMPLATE_INDEX, TEMPLATE_LIST, TEMPLATE_DETAIL, STATIC_FILE_PATH, TEMPLATE_INDEX_WAP, TEMPLATE_LIST_WAP, TEMPLATE_DETAIL_WAP, STATIC_FILE_PATH_WAP, IS_STATIC, STATIC_FILE_RULE
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{companyId}, #{name}, #{parentId}, #{rootId}, #{level}, #{idPath}, #{isEnable}, #{isDel}, #{issueCnt}, #{notIssueCnt}, #{auditingCnt}, #{notAuditingCnt}, #{addUserId}, #{addUserName}, #{addTime}, #{sortId}, #{templateIndex}, #{templateList}, #{templateDetail}, #{staticFilePath}, #{templateIndexWap}, #{templateListWap}, #{templateDetailWap}, #{staticFilePathWap}, #{isStatic}, #{staticFileRule}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE BUSI_CATEGORY AS T SET
+            T.SITE_MENU_ID = #{siteMenuId} , T.COMPANY_ID = #{companyId} , T.NAME = #{name} , T.PARENT_ID = #{parentId} , T.ROOT_ID = #{rootId} , T.LEVEL = #{level} , T.ID_PATH = #{idPath} , T.IS_ENABLE = #{isEnable} , T.IS_DEL = #{isDel} , T.ISSUE_CNT = #{issueCnt} , T.NOT_ISSUE_CNT = #{notIssueCnt} , T.AUDITING_CNT = #{auditingCnt} , T.NOT_AUDITING_CNT = #{notAuditingCnt} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.ADD_TIME = #{addTime} , T.SORT_ID = #{sortId} , T.TEMPLATE_INDEX = #{templateIndex} , T.TEMPLATE_LIST = #{templateList} , T.TEMPLATE_DETAIL = #{templateDetail} , T.STATIC_FILE_PATH = #{staticFilePath} , T.TEMPLATE_INDEX_WAP = #{templateIndexWap} , T.TEMPLATE_LIST_WAP = #{templateListWap} , T.TEMPLATE_DETAIL_WAP = #{templateDetailWap} , T.STATIC_FILE_PATH_WAP = #{staticFilePathWap} , T.IS_STATIC = #{isStatic} , T.STATIC_FILE_RULE = #{staticFileRule}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_CATEGORY WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_category">
+        SELECT <include refid="category_columns" /> FROM BUSI_CATEGORY AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_category">
+     SELECT <include refid="category_columns" />  FROM BUSI_CATEGORY AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+           <if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(parentId)"> AND T.PARENT_ID = #{parentId} </if>
+           <if test="@Ognl@isNotEmpty(rootId)"> AND T.ROOT_ID = #{rootId} </if>
+           <if test="@Ognl@isNotEmpty(level)"> AND T.LEVEL = #{level} </if>
+           <if test="@Ognl@isNotEmpty(idPath)"> AND T.ID_PATH = #{idPath} </if>
+           <if test="@Ognl@isNotEmpty(isEnable)"> AND T.IS_ENABLE = #{isEnable} </if>
+           <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+           <if test="@Ognl@isNotEmpty(issueCnt)"> AND T.ISSUE_CNT = #{issueCnt} </if>
+           <if test="@Ognl@isNotEmpty(notIssueCnt)"> AND T.NOT_ISSUE_CNT = #{notIssueCnt} </if>
+           <if test="@Ognl@isNotEmpty(auditingCnt)"> AND T.AUDITING_CNT = #{auditingCnt} </if>
+           <if test="@Ognl@isNotEmpty(notAuditingCnt)"> AND T.NOT_AUDITING_CNT = #{notAuditingCnt} </if>
+           <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+           <if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+           <if test="@Ognl@isNotEmpty(templateIndex)"> AND T.TEMPLATE_INDEX = #{templateIndex} </if>
+           <if test="@Ognl@isNotEmpty(templateList)"> AND T.TEMPLATE_LIST = #{templateList} </if>
+           <if test="@Ognl@isNotEmpty(templateDetail)"> AND T.TEMPLATE_DETAIL = #{templateDetail} </if>
+           <if test="@Ognl@isNotEmpty(staticFilePath)"> AND T.STATIC_FILE_PATH = #{staticFilePath} </if>
+           <if test="@Ognl@isNotEmpty(templateIndexWap)"> AND T.TEMPLATE_INDEX_WAP = #{templateIndexWap} </if>
+           <if test="@Ognl@isNotEmpty(templateListWap)"> AND T.TEMPLATE_LIST_WAP = #{templateListWap} </if>
+           <if test="@Ognl@isNotEmpty(templateDetailWap)"> AND T.TEMPLATE_DETAIL_WAP = #{templateDetailWap} </if>
+           <if test="@Ognl@isNotEmpty(staticFilePathWap)"> AND T.STATIC_FILE_PATH_WAP = #{staticFilePathWap} </if>
+           <if test="@Ognl@isNotEmpty(isStatic)"> AND T.IS_STATIC = #{isStatic} </if>
+           <if test="@Ognl@isNotEmpty(staticFileRule)"> AND T.STATIC_FILE_RULE = #{staticFileRule} </if>
+        </where>
+    </select>
+
+    
+</mapper>

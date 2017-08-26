@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.RuleCanvassMapper">
+    <resultMap id="RM_ruleCanvass" type="com.up72.hq.model.RuleCanvass">
+        <result property="id" column="ID" />
+        <result property="roleSelectId" column="ROLE_SELECT_ID" />
+        <result property="roleManagerId" column="ROLE_MANAGER_ID" />
+        <result property="status" column="STATUS" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="auditTime" column="AUDIT_TIME" />
+        <result property="content" column="CONTENT" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="rejectReason" column="REJECT_REASON" />
+    </resultMap>
+
+    <resultMap id="RM_ruleCanvassResp" type="com.up72.hq.dto.resp.RuleCanvassResp" extends="RM_ruleCanvass">
+        <result property="memberName" column="MEMBER_NAME" />
+        <result property="movieName" column="MOVIE_NAME" />
+        <result property="phone" column="PHONE" />
+        <result property="headImg" column="HEAD_IMG" />
+        <result property="roleName" column="ROLE_NAME" />
+    </resultMap>
+    
+    <sql id="ruleCanvass_columns">
+        T.ID,T.ROLE_SELECT_ID,T.ROLE_MANAGER_ID,T.STATUS,T.ADD_TIME,T.AUDIT_TIME,T.CONTENT,T.MEMBER_ID,T.REJECT_REASON
+    </sql>
+    
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(roleSelectId)"> AND T.ROLE_SELECT_ID = #{roleSelectId} </if>
+            <if test="@Ognl@isNotEmpty(roleManagerId)"> AND T.ROLE_MANAGER_ID = #{roleManagerId} </if>
+            <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+            <if test="@Ognl@isNotEmpty(statusIn)"> AND T.STATUS IN (${statusIn}) </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(auditTime)"> AND T.AUDIT_TIME = #{auditTime} </if>
+            <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(rejectReason)"> AND T.REJECT_REASON = #{rejectReason} </if>
+            <if test="@Ognl@isNotEmpty(memberName)"> AND C.NICK_NAME LIKE  CONCAT('%','${memberName}','%')</if>
+            <if test="@Ognl@isNotEmpty(phone)"> AND C.PHONE LIKE  CONCAT('%','${phone}','%')</if>
+            <if test="@Ognl@isNotEmpty(movieName)"> AND S.NAME  LIKE  CONCAT('%','${movieName}','%') </if>
+            <if test="@Ognl@isNotEmpty(roleName)"> AND M.NAME  LIKE  CONCAT('%','${roleName}','%') </if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_RULE_CANVASS (
+         ID, ROLE_SELECT_ID,ROLE_MANAGER_ID, STATUS, ADD_TIME, AUDIT_TIME, CONTENT, MEMBER_ID, REJECT_REASON
+        ) VALUES (
+         #{id}, #{roleSelectId},#{roleManagerId}, #{status}, #{addTime}, #{auditTime}, #{content}, #{memberId}, #{rejectReason}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_RULE_CANVASS AS T SET
+            T.ROLE_SELECT_ID = #{roleSelectId} ,T.ROLE_MANAGER_ID = #{roleManagerId} , T.STATUS = #{status} , T.ADD_TIME = #{addTime} , T.AUDIT_TIME = #{auditTime} , T.CONTENT = #{content} , T.MEMBER_ID = #{memberId} , T.REJECT_REASON = #{rejectReason}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_RULE_CANVASS WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_ruleCanvass">
+        SELECT <include refid="ruleCanvass_columns" /> FROM HQ_RULE_CANVASS AS T WHERE  T.ID = #{id}  
+    </select>
+    <select id="countNumber" resultType="Long" parameterType="map">
+        SELECT COUNT(*) FROM HQ_RULE_CANVASS AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_ruleCanvassResp">
+     SELECT <include refid="ruleCanvass_columns" />,C.NICK_NAME AS MEMBER_NAME , C.HEAD_IMG,C.PHONE,M.NAME AS ROLE_NAME,S.NAME AS MOVIE_NAME FROM HQ_RULE_CANVASS AS T
+        LEFT JOIN HQ_ROLE_SELECT AS S ON  S.ID=T.ROLE_SELECT_ID
+        LEFT  JOIN HQ_ROLE_MANAGER AS M ON   M.ID=T.ROLE_MANAGER_ID
+        LEFT JOIN HQ_MEMBER AS  C ON C.ID=T.MEMBER_ID
+        <include refid="where_sql" />
+        GROUP BY T.ID
+    </select>
+
+    <select id="orderByCanvassCntList"  resultMap="RM_ruleCanvassResp">
+     SELECT <include refid="ruleCanvass_columns" />
+        ,C.NICK_NAME AS MEMBER_NAME ,C.PHONE,M.NAME AS ROLE_NAME,S.NAME AS MOVIE_NAME,C.HEAD_IMG,COUNT(T.MEMBER_ID) AS CANVASS_CNT
+        FROM HQ_RULE_CANVASS AS T
+        LEFT JOIN HQ_ROLE_SELECT AS S ON  S.ID=T.ROLE_SELECT_ID
+        LEFT  JOIN HQ_ROLE_MANAGER AS M ON  M.ROLE_SELECT_ID=S.ID
+        LEFT JOIN HQ_MEMBER AS  C ON C.ID=T.MEMBER_ID WHERE  T.STATUS=2
+        GROUP BY T.MEMBER_ID ORDER BY  CANVASS_CNT DESC LIMIT 12
+    </select>
+
+</mapper>

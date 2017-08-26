@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.AdvertisingManagementMapper">
+    <resultMap id="RM_advertisingManagement" type="com.up72.hq.model.AdvertisingManagement">
+        <result property="id" column="id" />
+        <result property="name" column="NAME" />
+        <result property="columns" column="COLUMNS" />
+        <result property="types" column="TYPES" />
+    </resultMap>
+
+    <resultMap id="RM_advertisingManagementResp" type="com.up72.hq.dto.resp.AdvertisingManagementResp" extends="RM_advertisingManagement">
+        <result property="countImg" column="COUNT_IMG" />
+    </resultMap>
+    
+    <sql id="advertisingManagement_columns">
+        T.id,T.NAME,T.COLUMNS,T.TYPES
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ADVERTISING_MANAGEMENT (
+         id, NAME, COLUMNS, TYPES
+        ) VALUES (
+         #{id}, #{name}, #{columns}, #{types}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ADVERTISING_MANAGEMENT AS T SET
+            T.NAME = #{name} , T.COLUMNS = #{columns} , T.TYPES = #{types}  
+        WHERE T.id = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ADVERTISING_MANAGEMENT WHERE  id = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_advertisingManagement">
+        SELECT <include refid="advertisingManagement_columns" /> FROM HQ_ADVERTISING_MANAGEMENT AS T WHERE  T.id = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_advertisingManagement">
+     SELECT <include refid="advertisingManagement_columns" />  FROM HQ_ADVERTISING_MANAGEMENT AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.id = #{id} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE CONCAT('%',#{name},'%') </if>
+           <if test="@Ognl@isNotEmpty(columns)"> AND T.COLUMNS = #{columns} </if>
+           <if test="@Ognl@isNotEmpty(types)"> AND T.TYPES = #{types} </if>
+        </where>
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_advertisingManagementResp">
+        select T.* ,
+        (SELECT COUNT(*) FROM HQ_ADVERTISING_INFO I WHERE I.HQ_ADVERTISING_MANAGEMENT_ID = T.id AND I.IMG is not NULL)AS COUNT_IMG
+        from HQ_ADVERTISING_MANAGEMENT T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.id = #{id} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE CONCAT('%',#{name},'%')</if>
+            <if test="@Ognl@isNotEmpty(columns)"> AND T.COLUMNS = #{columns} </if>
+            <if test="@Ognl@isNotEmpty(types)"> AND T.TYPES = #{types} </if>
+        </where>
+    </select>
+</mapper>

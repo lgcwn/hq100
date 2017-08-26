@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.AttrMapper">
+    <resultMap id="RM_Attr" type="com.up72.hq.model.Attr">
+        <result property="id" column="ID" />
+        <result property="catId" column="CAT_ID" />
+        <result property="name" column="NAME" />
+        <result property="sortId" column="SORT_ID" />
+    </resultMap>
+
+    <resultMap id="RM_AttrResp" type="com.up72.hq.dto.resp.AttrResp" extends="RM_Attr">
+        <result property="catName" column="CAT_NAME" />
+        <collection property="attrValueList" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.AttrValue" select="com.up72.hq.dao.AttrValueMapper.findListByAttrId"/>
+    </resultMap>
+
+    <sql id="attr_columns">
+        T.ID,T.CAT_ID,T.NAME,T.SORT_ID
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ATTR (
+        CAT_ID, NAME, SORT_ID
+        ) VALUES (
+        #{catId}, #{name}, #{sortId}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_ATTR AS T SET T.CAT_ID = #{catId} , T.NAME = #{name} , T.SORT_ID = #{sortId}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ATTR WHERE ID = #{id}
+    </delete>
+
+    <select id="findById" resultMap="RM_Attr">
+        SELECT <include refid="attr_columns" /> FROM HQ_ATTR  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findAndOrderByIds" parameterType="java.lang.String" resultMap="RM_Attr">
+        SELECT <include refid="attr_columns" /> FROM HQ_ATTR  AS T WHERE T.ID in(${ids}) ORDER  BY field(T.ID,${ids})
+    </select>
+
+    <select id="findRespById" resultMap="RM_AttrResp">
+        SELECT <include refid="attr_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_ATTR  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_Attr">
+        SELECT <include refid="attr_columns" />  FROM HQ_ATTR AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+        </where>
+        ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_AttrResp">
+        SELECT <include refid="attr_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_ATTR AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+        </where>
+        ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="cntUsing" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT(T.PROD_ID)) FROM HQ_PROD_ATTR AS T WHERE T.ATTR_ID=#{attrId}
+    </select>
+
+    <select id="findListByCat" parameterType="map" resultMap="RM_AttrResp">
+        SELECT <include refid="attr_columns" /> FROM HQ_ATTR AS T WHERE T.CAT_ID=
+        (SELECT MAX(T.CAT_ID) FROM HQ_ATTR AS T WHERE FIND_IN_SET(T.CAT_ID,(SELECT C.ID_PATH FROM HQ_CAT AS C WHERE C.ID=#{catId})))
+        ORDER BY SORT_ID ASC
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.OrderPayLogMapper">
+    <resultMap id="RM_orderPayLog" type="com.up72.hq.model.OrderPayLog">
+        <result property="id" column="ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="payMoney" column="PAY_MONEY" />
+        <result property="payChannel" column="PAY_CHANNEL" />
+        <result property="payCardType" column="PAY_CARD_TYPE" />
+        <result property="paySn" column="PAY_SN" />
+        <result property="payTime" column="PAY_TIME" />
+        <result property="content" column="CONTENT" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="score" column="SCORE" />
+    </resultMap>
+    
+    <sql id="orderPayLog_columns">
+        T.ID,T.ORDER_ID,T.PAY_MONEY,T.PAY_CHANNEL,T.PAY_CARD_TYPE,T.PAY_SN,T.PAY_TIME,T.CONTENT,T.MEMBER_ID,T.SCORE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ORDER_PAY_LOG (
+         ID, ORDER_ID, PAY_MONEY, PAY_CHANNEL, PAY_CARD_TYPE, PAY_SN, PAY_TIME, CONTENT, MEMBER_ID, SCORE
+        ) VALUES (
+         #{id}, #{orderId}, #{payMoney}, #{payChannel}, #{payCardType}, #{paySn}, #{payTime}, #{content}, #{memberId}, #{score}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ORDER_PAY_LOG AS T SET
+            T.ORDER_ID = #{orderId} , T.PAY_MONEY = #{payMoney} , T.PAY_CHANNEL = #{payChannel} , T.PAY_CARD_TYPE = #{payCardType} , T.PAY_SN = #{paySn} , T.PAY_TIME = #{payTime} , T.CONTENT = #{content} , T.MEMBER_ID = #{memberId} , T.SCORE = #{score}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ORDER_PAY_LOG WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_orderPayLog">
+        SELECT <include refid="orderPayLog_columns" /> FROM HQ_ORDER_PAY_LOG AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_orderPayLog">
+     SELECT <include refid="orderPayLog_columns" />  FROM HQ_ORDER_PAY_LOG AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+           <if test="@Ognl@isNotEmpty(payMoney)"> AND T.PAY_MONEY = #{payMoney} </if>
+           <if test="@Ognl@isNotEmpty(payChannel)"> AND T.PAY_CHANNEL = #{payChannel} </if>
+           <if test="@Ognl@isNotEmpty(payCardType)"> AND T.PAY_CARD_TYPE = #{payCardType} </if>
+           <if test="@Ognl@isNotEmpty(paySn)"> AND T.PAY_SN = #{paySn} </if>
+           <if test="@Ognl@isNotEmpty(payTime)"> AND T.PAY_TIME = #{payTime} </if>
+           <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+           <if test="@Ognl@isNotEmpty(score)"> AND T.SCORE = #{score} </if>
+        </where>
+    </select>
+
+    
+</mapper>

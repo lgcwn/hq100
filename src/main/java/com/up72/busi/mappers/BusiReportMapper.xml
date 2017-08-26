@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiReportMapper">
+	<resultMap id="RM_busiReport" type="com.up72.busi.model.BusiReport">
+		<result property="id" column="ID" />
+		<result property="siteMenuId" column="SITE_MENU_ID" />
+		<result property="companyId" column="COMPANY_ID" />
+		<result property="totalCnt" column="TOTAL_CNT" />
+		<result property="issueCnt" column="ISSUE_CNT" />
+		<result property="sensitiveCount" column="SENSITIVE_COUNT" />
+		<result property="auditingCnt" column="AUDITING_CNT" />
+		<result property="notAuditingCnt" column="NOT_AUDITING_CNT" />
+		<result property="delCnt" column="DEL_CNT" />
+		<result property="reportDate" column="REPORT_DATE" />
+	</resultMap>
+
+	<resultMap id="RM_busiReportResp" type="com.up72.busi.dto.resp.BusiReportResp" extends="RM_busiReport">
+		<result property="wapTotalCnt" column="WAP_TOTAL_CNT" />
+		<result property="wapIssueCnt" column="WAP_ISSUE_CNT" />
+		<result property="wapSensitiveCount" column="WAP_SENSITIVE_COUNT" />
+		<result property="wapAuditingCnt" column="WAP_AUDITING_CNT" />
+		<result property="wapNotAuditingCnt" column="WAP_NOT_AUDITING_CNT" />
+		<result property="wapDelCnt" column="WAP_DEL_CNT" />
+	</resultMap>
+
+	<resultMap id="BusiReportInfoResp" type="com.up72.busi.dto.resp.BusiReportInfoResp" >
+		<result property="notIssueCnt" column="NOT_ISSUE_CNT" />
+		<result property="notAuditingCnt" column="NOT_AUDITING_CNT" />
+		<result property="wapNotIssueCnt" column="WAP_NOT_ISSUE_CNT" />
+		<result property="wapNotAuditingCnt" column="WAP_NOT_AUDITING_CNT" />
+		<result property="isAuditing" column="IS_AUDITING" />
+		<result property="issueSet" column="ISSUE_SET" />
+		<result property="categoryCnt" column="CATEGORY_CNT" />
+		<result property="labelCnt" column="LABEL_CNT" />
+	</resultMap>
+
+	<sql id="busiReport_columns">
+		T.ID,T.SITE_MENU_ID,T.COMPANY_ID,T.TOTAL_CNT,T.ISSUE_CNT,T.SENSITIVE_COUNT,T.AUDITING_CNT,T.NOT_AUDITING_CNT,T.DEL_CNT,T.REPORT_DATE
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO BUSI_REPORT (
+		ID, SITE_MENU_ID, COMPANY_ID, TOTAL_CNT, ISSUE_CNT, SENSITIVE_COUNT, AUDITING_CNT, NOT_AUDITING_CNT, DEL_CNT, REPORT_DATE
+		) VALUES (
+		#{id}, #{siteMenuId}, #{companyId}, #{totalCnt}, #{issueCnt}, #{sensitiveCount}, #{auditingCnt}, #{notAuditingCnt}, #{delCnt}, #{reportDate}
+		)
+	</insert>
+
+	<update id="update" >
+		UPDATE BUSI_REPORT AS T SET
+		T.SITE_MENU_ID = #{siteMenuId} , T.COMPANY_ID = #{companyId} , T.TOTAL_CNT = #{totalCnt} , T.ISSUE_CNT = #{issueCnt} , T.SENSITIVE_COUNT = #{sensitiveCount} , T.AUDITING_CNT = #{auditingCnt} , T.NOT_AUDITING_CNT = #{notAuditingCnt} , T.DEL_CNT = #{delCnt} , T.REPORT_DATE = #{reportDate}
+		WHERE T.ID = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM BUSI_REPORT WHERE ID = #{id}
+	</delete>
+
+	<select id="findById" resultMap="RM_busiReport">
+		SELECT <include refid="busiReport_columns" /> FROM BUSI_REPORT  AS T WHERE T.ID = #{id}
+	</select>
+
+	<select id="findPage" parameterType="map" resultMap="RM_busiReport">
+		SELECT <include refid="busiReport_columns" />  FROM BUSI_REPORT AS T
+		<where>
+			<if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+			<if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+			<if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+			<if test="@Ognl@isNotEmpty(totalCnt)"> AND T.TOTAL_CNT = #{totalCnt} </if>
+			<if test="@Ognl@isNotEmpty(issueCnt)"> AND T.ISSUE_CNT = #{issueCnt} </if>
+			<if test="@Ognl@isNotEmpty(sensitiveCount)"> AND T.SENSITIVE_COUNT = #{sensitiveCount} </if>
+			<if test="@Ognl@isNotEmpty(auditingCnt)"> AND T.AUDITING_CNT = #{auditingCnt} </if>
+			<if test="@Ognl@isNotEmpty(notAuditingCnt)"> AND T.NOT_AUDITING_CNT = #{notAuditingCnt} </if>
+			<if test="@Ognl@isNotEmpty(delCnt)"> AND T.DEL_CNT = #{delCnt} </if>
+			<if test="@Ognl@isNotEmpty(reportDate)"> AND T.REPORT_DATE = #{reportDate} </if>
+		</where>
+	</select>
+
+	<select id="findByUnique" parameterType="map" resultMap="RM_busiReport">
+		SELECT <include refid="busiReport_columns" />  FROM BUSI_REPORT AS T
+		WHERE T.SITE_MENU_ID = #{siteMenuId} AND T.REPORT_DATE = #{reportDate}
+	</select>
+
+	<!--PC端插入统计，如果指定了SITE_MENU_ID，则只插入对应ID的记录，否则插入所有的未统计过数据。（针对某一天）-->
+	<insert id="pcInsertByDate" parameterType="map">
+		INSERT INTO BUSI_REPORT (SITE_MENU_ID, COMPANY_ID, TOTAL_CNT, ISSUE_CNT, SENSITIVE_COUNT, AUDITING_CNT, NOT_AUDITING_CNT, DEL_CNT, REPORT_DATE,IS_PC)
+		SELECT T.ID AS SITE_MENU_ID,T.COMPANY_ID,
+		(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.SITE_MENU_ID=T.ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate} ) AS TOTAL_CNT,
+		(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_ISSUE=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS ISSUE_CNT,
+		(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_ISSUE=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS SENSITIVE_COUNT,
+		(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_AUDITING=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS AUDITING_CNT,
+		(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_AUDITING=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS NOT_AUDITING_CNT,
+		(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=1 AND RES.SITE_MENU_ID=T.ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate} ) AS DEL_CNT,
+		#{reportDate} AS REPORT_DATE,
+		1 AS IS_PC
+		FROM BUSI_SITE_MENU AS T WHERE T.IS_DEL=0
+		<if test="siteMenuId > 0">
+			AND T.ID=#{siteMenuId}
+		</if>
+		AND NOT EXISTS (SELECT 1 FROM BUSI_REPORT R WHERE CONCAT(R.SITE_MENU_ID,'_',R.REPORT_DATE,'_',R.IS_PC) = CONCAT(T.ID,'_',#{reportDate},'_',1))
+	</insert>
+
+	<!--PC端更新统计，如果指定了SITE_MENU_ID，则只更新对应ID的记录，否则更新所有的统计数据。（针对某一天）-->
+	<update id="pcUpdateByDate" parameterType="map">
+		UPDATE BUSI_REPORT T SET
+		T.TOTAL_CNT=(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.SITE_MENU_ID=T.SITE_MENU_ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate} ),
+		T.ISSUE_CNT=(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_ISSUE=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.SENSITIVE_COUNT=(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_ISSUE=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.AUDITING_CNT=(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_AUDITING=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.NOT_AUDITING_CNT=(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_AUDITING=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.DEL_CNT=(SELECT COUNT(1) FROM BUSI_RESOURCE RES WHERE RES.IS_DEL=1 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate})
+		WHERE T.REPORT_DATE=#{reportDate} AND T.IS_PC=1
+		<if test="siteMenuId > 0">
+			AND T.SITE_MENU_ID=#{siteMenuId}
+		</if>
+	</update>
+
+	<!--WAP端插入统计，如果指定了SITE_MENU_ID，则只插入对应ID的记录，否则插入所有的未统计过数据。（针对某一天）-->
+	<insert id="wapInsertByDate" parameterType="map">
+		INSERT INTO BUSI_REPORT (SITE_MENU_ID, COMPANY_ID, TOTAL_CNT, ISSUE_CNT, SENSITIVE_COUNT, AUDITING_CNT, NOT_AUDITING_CNT, DEL_CNT, REPORT_DATE,IS_PC)
+		SELECT T.ID AS SITE_MENU_ID,T.COMPANY_ID,
+		(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.SITE_MENU_ID=T.ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS TOTAL_CNT,
+		(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_ISSUE=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS ISSUE_CNT,
+		(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_ISSUE=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS SENSITIVE_COUNT,
+		(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_AUDITING=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS AUDITING_CNT,
+		(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.ID AND RES.IS_AUDITING=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}) AS NOT_AUDITING_CNT,
+		(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=1 AND RES.SITE_MENU_ID=T.ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate} ) AS DEL_CNT,
+		#{reportDate} AS REPORT_DATE,
+		0 AS IS_PC
+		FROM BUSI_SITE_MENU AS T WHERE T.IS_DEL=0
+		<if test="siteMenuId > 0">
+			AND T.ID=#{siteMenuId}
+		</if>
+		AND NOT EXISTS (SELECT 1 FROM BUSI_REPORT R WHERE CONCAT(R.SITE_MENU_ID,'_',R.REPORT_DATE,'_',R.IS_PC) = CONCAT(T.ID,'_',#{reportDate},'_',0))
+	</insert>
+
+	<!--WAP端更新统计，如果指定了SITE_MENU_ID，则只更新对应ID的记录，否则更新所有的统计数据。（针对某一天）-->
+	<update id="wapUpdateByDate" parameterType="map">
+		UPDATE BUSI_REPORT T SET
+		T.TOTAL_CNT=(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.SITE_MENU_ID=T.SITE_MENU_ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate} ),
+		T.ISSUE_CNT=(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_ISSUE=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.SENSITIVE_COUNT=(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_ISSUE=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.AUDITING_CNT=(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_AUDITING=1 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.NOT_AUDITING_CNT=(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=0 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND RES.IS_AUDITING=0 AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate}),
+		T.DEL_CNT=(SELECT COUNT(1) FROM BUSI_MOBILE_RESOURCE RES WHERE RES.IS_DEL=1 AND RES.SITE_MENU_ID=T.SITE_MENU_ID AND FROM_UNIXTIME(RES.ADD_TIME/1000,'%Y%m%d')=#{reportDate})
+		WHERE T.REPORT_DATE=#{reportDate} AND T.IS_PC=0
+		<if test="siteMenuId > 0">
+			AND T.SITE_MENU_ID=#{siteMenuId}
+		</if>
+	</update>
+
+	<select id="findRespList" parameterType="map" resultMap="RM_busiReportResp">
+		SELECT PC.ID,PC.REPORT_DATE,PC.TOTAL_CNT,PC.ISSUE_CNT,PC.SENSITIVE_COUNT,PC.AUDITING_CNT,PC.NOT_AUDITING_CNT,PC.DEL_CNT
+		FROM BUSI_REPORT AS PC
+		WHERE PC.SITE_MENU_ID=#{siteMenuId}
+		<if test="@Ognl@isNotEmpty(reportDateBegin)"> AND PC.REPORT_DATE >= #{reportDateBegin} </if>
+		<if test="@Ognl@isNotEmpty(reportDateEnd)"><![CDATA[    AND PC.REPORT_DATE <= #{reportDateEnd}  ]]></if>
+		ORDER BY PC.REPORT_DATE DESC
+		<if test="@Ognl@isNotEmpty(limit)"> LIMIT 0, #{limit} </if>
+	</select>
+
+	<select id="findReportInfo" parameterType="long" resultMap="BusiReportInfoResp">
+		SELECT
+		  (SELECT COUNT(1) FROM BUSI_RESOURCE AS R WHERE R.IS_DEL=0 AND R.IS_ISSUE=0 AND R.SITE_MENU_ID=T.ID) AS NOT_ISSUE_CNT,
+		  (SELECT COUNT(1) FROM BUSI_RESOURCE AS R WHERE R.IS_DEL=0 AND R.IS_AUDITING=0 AND R.SITE_MENU_ID=T.ID) AS NOT_AUDITING_CNT,
+		  0 AS WAP_NOT_ISSUE_CNT,
+		  0 AS WAP_NOT_AUDITING_CNT,
+		  I.IS_AUDITING,I.ISSUE_SET,
+			(SELECT COUNT(1) FROM BUSI_CATEGORY AS C WHERE C.IS_DEL=0 AND C.SITE_MENU_ID=T.ID) AS CATEGORY_CNT,
+		  (SELECT COUNT(1) FROM BUSI_LABEL AS L WHERE L.SITE_MENU_ID=T.ID) AS LABEL_CNT
+		FROM BUSI_SITE_MENU T
+		LEFT JOIN BUSI_ISSUE_SET AS I
+		ON T.ID=I.SITE_MENU_ID
+		WHERE T.ID=#{siteMenuId}
+	</select>
+
+
+	<delete id="deleteByCompanyId" parameterType="long">
+        DELETE FROM BUSI_REPORT WHERE COMPANY_ID = #{companyId}
+    </delete>
+</mapper>

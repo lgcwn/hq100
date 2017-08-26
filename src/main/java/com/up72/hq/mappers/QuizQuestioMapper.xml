@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.QuizQuestioMapper">
+    <resultMap id="RM_quizQuestio" type="com.up72.hq.model.QuizQuestio">
+        <result property="id" column="ID" />
+        <result property="quizId" column="QUIZ_ID" />
+        <result property="name" column="NAME" />
+        <result property="status" column="STATUS" />
+        <result property="selectId" column="SELECT_ID" />
+    </resultMap>
+    <resultMap id="RM_quizQuestioResp" type="com.up72.hq.dto.resp.QuizQuestioResp" extends="RM_quizQuestio">
+        <result property="memberNum" column="MEMBER_NUM" />
+        <result property="selectIdStr" column="SELECT_ID_STR" />
+        <association property="quizSelectList" column="ID" select="com.up72.hq.dao.QuizSelectMapper.findByQuestioId"   />
+    </resultMap>
+    <sql id="quizQuestio_columns">
+        T.ID,T.QUIZ_ID,T.NAME,T.STATUS,T.SELECT_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_QUIZ_QUESTIO (
+         ID, QUIZ_ID, NAME, STATUS,SELECT_ID
+        ) VALUES (
+         #{id}, #{quizId}, #{name}, #{status},#{selectId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_QUIZ_QUESTIO  T SET
+            T.QUIZ_ID = #{quizId} , T.NAME = #{name} , T.STATUS = #{status}  ,T.SELECT_ID = #{selectId}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_QUIZ_QUESTIO WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_quizQuestio">
+        SELECT <include refid="quizQuestio_columns" /> FROM HQ_QUIZ_QUESTIO  T WHERE  T.ID = #{id}
+    </select>
+    <select id="findByIdResp" resultMap="RM_quizQuestioResp">
+        SELECT <include refid="quizQuestio_columns" /> FROM HQ_QUIZ_QUESTIO  T
+        WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findByQuizId" resultMap="RM_quizQuestio">
+        SELECT <include refid="quizQuestio_columns" /> FROM HQ_QUIZ_QUESTIO  T WHERE  T.QUIZ_ID = #{quizId}
+    </select>
+    <select id="findByQuizIdResp" resultMap="RM_quizQuestioResp">
+        SELECT <include refid="quizQuestio_columns" /> FROM HQ_QUIZ_QUESTIO  T
+        WHERE  T.QUIZ_ID = #{quizId}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_quizQuestioResp">
+     SELECT <include refid="quizQuestio_columns" />,B.MEMBER_NUM,HQS.`NAME` AS SELECT_ID_STR FROM HQ_QUIZ_QUESTIO  T
+     LEFT JOIN (SELECT HQ_QUIZ_QUESTIO_ID,COUNT(*) AS MEMBER_NUM FROM HQ_QUIZ_ORDER  GROUP BY HQ_QUIZ_QUESTIO_ID) B ON B.HQ_QUIZ_QUESTIO_ID = T.ID
+     LEFT JOIN HQ_QUIZ_SELECT HQS ON HQS.ID = T.SELECT_ID
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(quizId)"> AND T.QUIZ_ID = #{quizId} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+        </where>
+    </select>
+
+    
+</mapper>

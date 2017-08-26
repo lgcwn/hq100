@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.CrowdOrderMapper">
+    <resultMap id="RM_Order" type="com.up72.hq.model.CrowdOrder">
+        <result property="id" column="ID" />
+        <result property="sn" column="SN" />
+        <result property="tradeNo" column="TRADE_NO" />
+        <result property="type" column="TYPE" />
+        <result property="orderStatus" column="ORDER_STATUS" />
+        <result property="payTime" column="PAY_TIME" />
+        <result property="deliveryTime" column="DELIVERY_TIME" />
+        <result property="receivingTime" column="RECEIVING_TIME" />
+        <result property="completeTime" column="COMPLETE_TIME" />
+        <result property="cancelTime" column="CANCEL_TIME" />
+        <result property="rejectTime" column="REJECT_TIME" />
+        <result property="shippingMethodsName" column="SHIPPING_METHODS_NAME" />
+        <result property="deliveryNumber" column="DELIVERY_NUMBER" />
+        <result property="transportCost" column="TRANSPORT_COST" />
+        <result property="payableGoodsAmount" column="PAYABLE_GOODS_AMOUNT" />
+        <result property="payableAmount" column="PAYABLE_AMOUNT" />
+        <result property="actualPayments" column="ACTUAL_PAYMENTS" />
+        <result property="isUseScore" column="IS_USE_SCORE" />
+        <result property="tbCount" column="TB_COUNT" />
+        <result property="scoreCount" column="SCORE_COUNT" />
+        <result property="consignee" column="CONSIGNEE" />
+        <result property="addressDetail" column="ADDRESS_DETAIL" />
+        <result property="zipCode" column="ZIP_CODE" />
+        <result property="mobilePhone" column="MOBILE_PHONE" />
+        <result property="fixedPhone" column="FIXED_PHONE" />
+        <result property="email" column="EMAIL" />
+        <result property="isInvoice" column="IS_INVOICE" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="expireDate" column="EXPIRE_DATE" />
+        <result property="isExpire" column="IS_EXPIRE" />
+        <result property="paymentDate" column="PAYMENT_DATE" />
+        <result property="modifyDate" column="MODIFY_DATE" />
+        <result property="modifyerId" column="MODIFYER_ID" />
+        <result property="isComment" column="IS_COMMENT" />
+        <result property="remark" column="REMARK" />
+        <result property="payChannel" column="PAY_CHANNEL" />
+        <result property="isDelete" column="IS_DELETE" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="autoReceivedTime" column="AUTO_RECEIVED_TIME" />
+        <result property="buyerExtendedReceived" column="BUYER_EXTENDED_RECEIVED" />
+        <result property="isPhoneOrder" column="IS_PHONE_ORDER" />
+    </resultMap>
+
+    <resultMap id="RM_OrderResp" type="com.up72.hq.dto.resp.CrowdOrderResp" extends="RM_Order">
+        <result property="goodsImg" column="GOODS_IMG" />
+        <result property="count" column="COUNT" />
+        <result property="refundStatus" column="refundStatus" />
+        <result property="refundAmount" column="refundAmount" />
+        <collection property="goodses" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.OrderGoods" select="com.up72.hq.dao.OrderGoodsMapper.findByOrderId"/>
+        <collection property="memberResp" column="MEMBER_ID" javaType="com.up72.hq.dto.resp.MemberResp" ofType="com.up72.hq.dto.resp.MemberResp" select="com.up72.hq.dao.MemberMapper.findById"/>
+    </resultMap>
+    <resultMap id="RM_OrderRespCrowd" type="com.up72.hq.dto.resp.CrowdOrderResp" extends="RM_Order">
+        <association property="crowdResp" column="CROWD_ID" select="com.up72.hq.dao.CrowdMapper.findRespById"/>
+    </resultMap>
+
+    <sql id="order_columns">
+        T.ID,T.SN,T.TRADE_NO,T.TYPE,T.ORDER_STATUS,T.PAY_TIME,T.DELIVERY_TIME,T.RECEIVING_TIME,T.COMPLETE_TIME,T.CANCEL_TIME,T.REJECT_TIME,T.SHIPPING_METHODS_NAME,T.DELIVERY_NUMBER,T.TRANSPORT_COST,T.PAYABLE_GOODS_AMOUNT,T.PAYABLE_AMOUNT,T.ACTUAL_PAYMENTS,T.IS_USE_SCORE,T.TB_COUNT,T.SCORE_COUNT,T.CONSIGNEE,T.ADDRESS_DETAIL,T.ZIP_CODE,T.MOBILE_PHONE,T.FIXED_PHONE,T.EMAIL,T.IS_INVOICE,T.ADD_TIME,T.EXPIRE_DATE,T.IS_EXPIRE,T.PAYMENT_DATE,T.MODIFY_DATE,T.MODIFYER_ID,T.IS_COMMENT,T.REMARK,T.PAY_CHANNEL,T.IS_DELETE,T.MEMBER_ID,T.AUTO_RECEIVED_TIME,T.BUYER_EXTENDED_RECEIVED,T.IS_PHONE_ORDER
+    </sql>
+    <sql id="order_exists">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(sn)"> AND T.SN = #{sn} </if>
+            <if test="@Ognl@isNotEmpty(tradeNo)"> AND T.TRADE_NO = #{tradeNo} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(orderStatusGt)"> AND T.ORDER_STATUS > #{orderStatusGt} </if>
+            <if test="@Ognl@isNotEmpty(orderStatus)"> AND T.ORDER_STATUS = #{orderStatus} </if>
+            <if test="@Ognl@isNotEmpty(orderStatusNot)"> AND T.ORDER_STATUS != 0 AND T.ORDER_STATUS != 3 AND T.ORDER_STATUS != 4 AND T.ORDER_STATUS != 5  AND T.ORDER_STATUS != 6  AND T.ORDER_STATUS != 7</if>
+            <if test="@Ognl@isNotEmpty(orderStatusReceipt)"> AND T.ORDER_STATUS != 0 AND T.ORDER_STATUS != 3 AND T.ORDER_STATUS != 4 AND T.ORDER_STATUS != 5    AND T.ORDER_STATUS != 7</if>
+            <if test="@Ognl@isNotEmpty(payTime)"> AND T.PAY_TIME = #{payTime} </if>
+            <if test="@Ognl@isNotEmpty(deliveryTime)"> AND T.DELIVERY_TIME = #{deliveryTime} </if>
+            <if test="@Ognl@isNotEmpty(receivingTime)"> AND T.RECEIVING_TIME = #{receivingTime} </if>
+            <if test="@Ognl@isNotEmpty(completeTime)"> AND T.COMPLETE_TIME = #{completeTime} </if>
+            <if test="@Ognl@isNotEmpty(cancelTime)"> AND T.CANCEL_TIME = #{cancelTime} </if>
+            <if test="@Ognl@isNotEmpty(rejectTime)"> AND T.REJECT_TIME = #{rejectTime} </if>
+            <if test="@Ognl@isNotEmpty(orderType)"> AND T.ORDER_TYPE = #{orderType} </if>
+            <if test="@Ognl@isNotEmpty(receivingType)"> AND T.RECEIVING_TYPE = #{receivingType} </if>
+            <if test="@Ognl@isNotEmpty(shippingMethodsId)"> AND T.SHIPPING_METHODS_ID = #{shippingMethodsId} </if>
+            <if test="@Ognl@isNotEmpty(shippingMethodsName)"> AND T.SHIPPING_METHODS_NAME = #{shippingMethodsName} </if>
+            <if test="@Ognl@isNotEmpty(deliveryNumber)"> AND T.DELIVERY_NUMBER = #{deliveryNumber} </if>
+            <if test="@Ognl@isNotEmpty(transportCost)"> AND T.TRANSPORT_COST = #{transportCost} </if>
+            <if test="@Ognl@isNotEmpty(payableGoodsAmount)"> AND T.PAYABLE_GOODS_AMOUNT = #{payableGoodsAmount} </if>
+            <if test="@Ognl@isNotEmpty(payableAmount)"> AND T.PAYABLE_AMOUNT = #{payableAmount} </if>
+            <if test="@Ognl@isNotEmpty(actualPayments)"> AND T.ACTUAL_PAYMENTS = #{actualPayments} </if>
+            <if test="@Ognl@isNotEmpty(isUseScore)"> AND T.IS_USE_SCORE = #{isUseScore} </if>
+            <if test="@Ognl@isNotEmpty(isUseCoupon)"> AND T.IS_USE_COUPON = #{isUseCoupon} </if>
+            <if test="@Ognl@isNotEmpty(scoreCount)"> AND T.SCORE_COUNT = #{scoreCount} </if>
+            <if test="@Ognl@isNotEmpty(couponId)"> AND T.COUPON_ID = #{couponId} </if>
+            <if test="@Ognl@isNotEmpty(consignee)"> AND T.CONSIGNEE = #{consignee} </if>
+            <if test="@Ognl@isNotEmpty(addressDetail)"> AND T.ADDRESS_DETAIL = #{addressDetail} </if>
+            <if test="@Ognl@isNotEmpty(zipCode)"> AND T.ZIP_CODE = #{zipCode} </if>
+            <if test="@Ognl@isNotEmpty(mobilePhone)"> AND T.MOBILE_PHONE = #{mobilePhone} </if>
+            <if test="@Ognl@isNotEmpty(fixedPhone)"> AND T.FIXED_PHONE = #{fixedPhone} </if>
+            <if test="@Ognl@isNotEmpty(email)"> AND T.EMAIL = #{email} </if>
+            <if test="@Ognl@isNotEmpty(isInvoice)"> AND T.IS_INVOICE = #{isInvoice} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(expireDate)"> AND T.EXPIRE_DATE = #{expireDate} </if>
+            <if test="@Ognl@isNotEmpty(isExpire)"> AND T.IS_EXPIRE = #{isExpire} </if>
+            <if test="@Ognl@isNotEmpty(paymentDate)"> AND T.PAYMENT_DATE = #{paymentDate} </if>
+            <if test="@Ognl@isNotEmpty(modifyDate)"> AND T.MODIFY_DATE = #{modifyDate} </if>
+            <if test="@Ognl@isNotEmpty(modifyerId)"> AND T.MODIFYER_ID = #{modifyerId} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(remark)"> AND T.REMARK = #{remark} </if>
+            <if test="@Ognl@isNotEmpty(isComment)"> AND T.IS_COMMENT = #{isComment} </if>
+            <if test="@Ognl@isNotEmpty(beginTime)">
+                 AND T.ADD_TIME &gt;= #{beginTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(endTime)">
+                 AND T.ADD_TIME &lt;= #{endTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(paymentStartTime)">
+                 AND T.PAYMENT_DATE &gt;= #{paymentStartTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(paymentEndTime)">
+                 AND T.PAYMENT_DATE  &lt;= #{paymentEndTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(autoReceivedTime)"> AND T.AUTO_RECEIVED_TIME = #{autoReceivedTime} </if>
+            <if test="@Ognl@isNotEmpty(buyerExtendedReceived)"> AND T.BUYER_EXTENDED_RECEIVED = #{buyerExtendedReceived}</if>
+            <if test="@Ognl@isNotEmpty(storageType)"> AND B.STORAGE_TYPE = #{storageType} </if>
+        </where>
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_CROWD_ORDER (
+         ID, SN, TRADE_NO, TYPE, ORDER_STATUS, PAY_TIME, DELIVERY_TIME, RECEIVING_TIME, COMPLETE_TIME, CANCEL_TIME, REJECT_TIME, SHIPPING_METHODS_NAME, DELIVERY_NUMBER, TRANSPORT_COST, PAYABLE_GOODS_AMOUNT, PAYABLE_AMOUNT, ACTUAL_PAYMENTS, IS_USE_SCORE, TB_COUNT, SCORE_COUNT, CONSIGNEE, ADDRESS_DETAIL, ZIP_CODE, MOBILE_PHONE, FIXED_PHONE, EMAIL, IS_INVOICE, ADD_TIME, EXPIRE_DATE, IS_EXPIRE, PAYMENT_DATE, MODIFY_DATE, MODIFYER_ID, IS_COMMENT, REMARK, PAY_CHANNEL, IS_DELETE, MEMBER_ID, AUTO_RECEIVED_TIME, BUYER_EXTENDED_RECEIVED, IS_PHONE_ORDER
+        ) VALUES (
+         #{id}, #{sn}, #{tradeNo}, #{type}, #{orderStatus}, #{payTime}, #{deliveryTime}, #{receivingTime}, #{completeTime}, #{cancelTime}, #{rejectTime}, #{shippingMethodsName}, #{deliveryNumber}, #{transportCost}, #{payableGoodsAmount}, #{payableAmount}, #{actualPayments}, #{isUseScore}, #{tbCount}, #{scoreCount}, #{consignee}, #{addressDetail}, #{zipCode}, #{mobilePhone}, #{fixedPhone}, #{email}, #{isInvoice}, #{addTime}, #{expireDate}, #{isExpire}, #{paymentDate}, #{modifyDate}, #{modifyerId}, #{isComment}, #{remark}, #{payChannel}, #{isDelete}, #{memberId}, #{autoReceivedTime}, #{buyerExtendedReceived}, #{isPhoneOrder}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_CROWD_ORDER AS T SET
+            T.SN = #{sn} , T.TRADE_NO = #{tradeNo} , T.TYPE = #{type} , T.ORDER_STATUS = #{orderStatus} , T.PAY_TIME = #{payTime} , T.DELIVERY_TIME = #{deliveryTime} , T.RECEIVING_TIME = #{receivingTime} , T.COMPLETE_TIME = #{completeTime} , T.CANCEL_TIME = #{cancelTime} , T.REJECT_TIME = #{rejectTime} , T.SHIPPING_METHODS_NAME = #{shippingMethodsName} , T.DELIVERY_NUMBER = #{deliveryNumber} , T.TRANSPORT_COST = #{transportCost} , T.PAYABLE_GOODS_AMOUNT = #{payableGoodsAmount} , T.PAYABLE_AMOUNT = #{payableAmount} , T.ACTUAL_PAYMENTS = #{actualPayments} , T.IS_USE_SCORE = #{isUseScore} , T.TB_COUNT = #{tbCount} , T.SCORE_COUNT = #{scoreCount} , T.CONSIGNEE = #{consignee} , T.ADDRESS_DETAIL = #{addressDetail} , T.ZIP_CODE = #{zipCode} , T.MOBILE_PHONE = #{mobilePhone} , T.FIXED_PHONE = #{fixedPhone} , T.EMAIL = #{email} , T.IS_INVOICE = #{isInvoice} , T.ADD_TIME = #{addTime} , T.EXPIRE_DATE = #{expireDate} , T.IS_EXPIRE = #{isExpire} , T.PAYMENT_DATE = #{paymentDate} , T.MODIFY_DATE = #{modifyDate} , T.MODIFYER_ID = #{modifyerId} , T.IS_COMMENT = #{isComment} , T.REMARK = #{remark} , T.PAY_CHANNEL = #{payChannel} , T.IS_DELETE = #{isDelete} , T.MEMBER_ID = #{memberId} , T.AUTO_RECEIVED_TIME = #{autoReceivedTime} , T.BUYER_EXTENDED_RECEIVED = #{buyerExtendedReceived} , T.IS_PHONE_ORDER = #{isPhoneOrder}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <update id="updateExpireOrder" parameterType="map">
+        UPDATE HQ_CROWD_ORDER AS T SET
+        T.ORDER_STATUS = #{orderStatus} , T.CANCEL_TIME = #{time} ,T.IS_EXPIRE = #{isExpire} , T.REMARK = #{remark}
+        WHERE T.EXPIRE_DATE &lt; #{time}
+        AND T.ORDER_STATUS = #{paramOrderStatus}
+        AND T.IS_EXPIRE = #{paramIsExpire}
+        AND T.IS_DELETE = #{paramIsDelete}
+    </update>
+
+    <update id="autoConfirmReceived" parameterType="map">
+        UPDATE HQ_CROWD_ORDER AS T SET
+        T.ORDER_STATUS = #{orderStatus}
+        WHERE T.AUTO_RECEIVED_TIME &lt; #{time}
+        AND T.ORDER_STATUS in ( ${paramOrderStatus} )
+        AND T.IS_DELETE = #{paramIsDelete}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_CROWD_ORDER WHERE  ID = #{id}  
+    </delete>
+    
+
+    <select id="findBySn" parameterType="String" resultMap="RM_OrderResp">
+        SELECT <include refid="order_columns" /> FROM HQ_CROWD_ORDER AS T WHERE  T.SN = #{sn}
+    </select>
+    <select id="findById" resultMap="RM_OrderResp">
+        SELECT <include refid="order_columns" /> FROM HQ_CROWD_ORDER AS T WHERE  T.ID = #{id}
+    </select>
+    <select id="findId" resultMap="RM_Order">
+        SELECT <include refid="order_columns" /> FROM HQ_CROWD_ORDER AS T WHERE  T.ID = #{id}
+    </select>
+    <select id="findByIdCrowd" resultMap="RM_OrderRespCrowd">
+        SELECT <include refid="order_columns" /> FROM HQ_CROWD_ORDER  T WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findByTradeNo" parameterType="map" resultMap="RM_Order">
+        SELECT <include refid="order_columns" /> FROM HQ_CROWD_ORDER AS T WHERE  T.TRADE_NO = #{tradeNo}
+    </select>
+
+
+    <select id="findPage" parameterType="map" resultMap="RM_Order">
+        SELECT <include refid="order_columns" />  FROM HQ_CROWD_ORDER AS T
+        <include refid="order_exists" />
+    </select>
+
+    <select id="findExpiredOrder" parameterType="map" resultMap="RM_Order">
+        SELECT <include refid="order_columns" />  FROM HQ_CROWD_ORDER AS T
+        WHERE T.EXPIRE_DATE &lt; #{time}
+        AND T.ORDER_STATUS = #{paramOrderStatus}
+        AND T.IS_EXPIRE = #{paramIsExpire}
+        AND T.IS_DELETE = #{paramIsDelete}
+    </select>
+
+    <select id="findPageResp" parameterType="map" resultMap="RM_OrderResp">
+        SELECT <include refid="order_columns" />  FROM HQ_CROWD_ORDER AS T
+        <include refid="order_exists" />
+    </select>
+    <select id="findCanCelOrder" parameterType="map" resultMap="RM_OrderResp">
+        SELECT <include refid="order_columns" />,L.RERUND_AMOUNT AS refundAmount,L.STATUS AS refundStatus FROM HQ_CROWD_ORDER AS T
+        LEFT JOIN HQ_CROWD_ORDER_PAY_LOG AS P ON P.ORDER_ID = T.ID
+        LEFT JOIN HQ_CROWD_ORDER_REFUND_LOG AS L ON L.ORDER_ID = T.ID
+        WHERE  T.HQ_USER_ID = #{UserId} and  T.ORDER_STATUS = 4  AND	!(T.PAY_TIME IS NULL) or T.HQ_USER_ID = #{UserId} and  T.ORDER_STATUS = 5 AND !(T.PAY_TIME  IS NULL)
+    </select>
+
+    <select id="findOrderLists" parameterType="com.up72.hq.model.Order" resultMap="RM_OrderResp">
+        SELECT <include refid="order_columns" />,O.GOODS_IMG AS GOODS_IMG   FROM HQ_CROWD_ORDER AS T
+        left join HQ_CROWD_ORDER_GOODS as O
+        on T.ID=O.ORDER_ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(sn)"> AND T.SN = #{sn} </if>
+            <if test="@Ognl@isNotEmpty(tradeNo)"> AND T.TRADE_NO = #{tradeNo} </if>
+            <if test="@Ognl@isNotEmpty(orderStatus)"> AND T.ORDER_STATUS = #{orderStatus} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(isComment)"> AND T.IS_COMMENT = #{isComment} </if>
+        </where>
+        group by T.ID
+        order by T.ADD_TIME DESC
+        limit 0,3
+    </select>
+
+    <select id="findnewOrder" parameterType="com.up72.hq.model.Order" resultMap="RM_Order">
+        SELECT <include refid="order_columns" /> FROM HQ_CROWD_ORDER AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(orderStatus)"> AND T.ORDER_STATUS = #{orderStatus} </if>
+            <if test="@Ognl@isNotEmpty(isExpire)"> AND T.IS_EXPIRE = #{isExpire} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+        </where>
+        order by T.PAY_TIME DESC
+    </select>
+
+    <select id="findOrderStatusSize" parameterType="com.up72.hq.model.Order" resultMap="RM_OrderResp">
+        SELECT <include refid="order_columns" />,O.GOODS_IMG AS GOODS_IMG   FROM HQ_CROWD_ORDER AS T
+        left join HQ_CROWD_ORDER_GOODS as O
+        on T.ID=O.ORDER_ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(sn)"> AND T.SN = #{sn} </if>
+            <if test="@Ognl@isNotEmpty(tradeNo)"> AND T.TRADE_NO = #{tradeNo} </if>
+            <if test="@Ognl@isNotEmpty(orderStatus)"> AND T.ORDER_STATUS = #{orderStatus} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(isComment)"> AND T.IS_COMMENT = #{isComment} </if>
+        </where>
+        group by T.ID
+    </select>
+
+
+
+    <select id="getOrderStatusCount" parameterType="map" resultMap="RM_OrderResp">
+        select ID,`ORDER_STATUS`,COUNT(ID) AS COUNT from HQ_CROWD_ORDER AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(shopkeeperId)"> AND T.SHOPKEEPER_ID = #{shopkeeperId} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+        </where>
+
+        GROUP BY `ORDER_STATUS`
+    </select>
+
+
+    <select id="getNewOrderCount" parameterType="map" resultType="Integer">
+        select COUNT(ID) AS COUNT from HQ_CROWD_ORDER AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND  to_days(FROM_UNIXTIME(T.ADD_TIME/1000,'%Y-%m-%d %H:%i:%S')) = to_days(now()) </if>
+            <if test="@Ognl@isNotEmpty(orderStatus)"> AND T.ORDER_STATUS = #{orderStatus} </if>
+        </where>
+
+    </select>
+
+    <select id="getOrderNotEvaluatedCount" parameterType="map" resultType="Integer">
+        select COUNT(ID) AS COUNT from HQ_CROWD_ORDER AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(shopkeeperId)"> AND T.SHOPKEEPER_ID = #{shopkeeperId} </if>
+            <if test="@Ognl@isNotEmpty(orderStatus)"> AND T.ORDER_STATUS = #{orderStatus} </if>
+            <if test="@Ognl@isNotEmpty(isComment)"> AND T.IS_COMMENT = #{isComment} </if>
+        </where>
+    </select>
+
+    <select id="findOrderCnt" resultType="long"  parameterType="map">
+        SELECT COUNT(*)   FROM HQ_CROWD_ORDER  AS T
+        <include refid="order_exists" />
+    </select>
+
+    <!--获取用户公益订单-->
+    <select id="findByCrowd" resultMap="RM_OrderRespCrowd">
+        SELECT * FROM HQ_CROWD_ORDER T
+        LEFT JOIN HQ_ORDER_CROWD HOC ON HOC.ORDER_ID = T.ID
+        WHERE T.TYPE = 4 AND T.MEMBER_ID =#{memberId}
+    </select>
+    <!--获取用户公益订单-->
+    <select id="findByCrowdPage" parameterType="map" resultMap="RM_OrderRespCrowd">
+        SELECT T.*,HOC.CROWD_ID AS CROWD_ID FROM HQ_CROWD_ORDER T
+        LEFT JOIN HQ_ORDER_CROWD HOC ON HOC.ORDER_ID = T.ID
+        <include refid="order_exists" />
+    </select>
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.IssueSetMapper">
+    <resultMap id="RM_issueSet" type="com.up72.hq.model.IssueSet">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="isAuditing" column="IS_AUDITING" />
+        <result property="issueSet" column="ISSUE_SET" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="issueHours" column="ISSUE_HOURS" />
+        <result property="issueMinutes" column="ISSUE_MINUTES" />
+    </resultMap>
+    
+    <sql id="issueSet_columns">
+        T.ID,T.SITE_MENU_ID,T.COMPANY_ID,T.IS_AUDITING,T.ISSUE_SET,T.ADD_USER_ID,T.ADD_USER_NAME,T.ISSUE_HOURS,T.ISSUE_MINUTES
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_ISSUE_SET (
+         ID, SITE_MENU_ID, COMPANY_ID, IS_AUDITING, ISSUE_SET, ADD_USER_ID, ADD_USER_NAME, ISSUE_HOURS, ISSUE_MINUTES
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{companyId}, #{isAuditing}, #{issueSet}, #{addUserId}, #{addUserName}, #{issueHours}, #{issueMinutes}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE BUSI_ISSUE_SET AS T SET
+            T.SITE_MENU_ID = #{siteMenuId} , T.COMPANY_ID = #{companyId} , T.IS_AUDITING = #{isAuditing} , T.ISSUE_SET = #{issueSet} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.ISSUE_HOURS = #{issueHours} , T.ISSUE_MINUTES = #{issueMinutes}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_ISSUE_SET WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_issueSet">
+        SELECT <include refid="issueSet_columns" /> FROM BUSI_ISSUE_SET AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_issueSet">
+     SELECT <include refid="issueSet_columns" />  FROM BUSI_ISSUE_SET AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+           <if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+           <if test="@Ognl@isNotEmpty(isAuditing)"> AND T.IS_AUDITING = #{isAuditing} </if>
+           <if test="@Ognl@isNotEmpty(issueSet)"> AND T.ISSUE_SET = #{issueSet} </if>
+           <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+           <if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+           <if test="@Ognl@isNotEmpty(issueHours)"> AND T.ISSUE_HOURS = #{issueHours} </if>
+           <if test="@Ognl@isNotEmpty(issueMinutes)"> AND T.ISSUE_MINUTES = #{issueMinutes} </if>
+        </where>
+    </select>
+
+    
+</mapper>

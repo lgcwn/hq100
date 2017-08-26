@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.RegionMapper">
+    <resultMap id="RM_region" type="com.up72.hq.model.Region">
+        <result property="id" column="ID" />
+        <result property="name" column="NAME" />
+        <result property="parentId" column="PARENT_ID" />
+        <result property="fullName" column="FULL_NAME" />
+        <result property="treePath" column="TREE_PATH" />
+        <result property="level" column="LEVEL" />
+        <result property="isDel" column="IS_DEL" />
+    </resultMap>
+    
+    <sql id="region_columns">
+        T.ID,T.NAME,T.PARENT_ID,T.FULL_NAME,T.TREE_PATH,T.LEVEL,T.IS_DEL
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_REGION (
+         ID, NAME, PARENT_ID, FULL_NAME, TREE_PATH, LEVEL, IS_DEL
+        ) VALUES (
+         #{id}, #{name}, #{parentId}, #{fullName}, #{treePath}, #{level}, #{isDel}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_REGION AS T SET
+            T.NAME = #{name} , T.PARENT_ID = #{parentId} , T.FULL_NAME = #{fullName} , T.TREE_PATH = #{treePath} , T.LEVEL = #{level} , T.IS_DEL = #{isDel}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_REGION WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_region">
+        SELECT <include refid="region_columns" /> FROM HQ_REGION AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_region">
+     SELECT <include refid="region_columns" />  FROM HQ_REGION AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(parentId)"> AND T.PARENT_ID = #{parentId} </if>
+           <if test="@Ognl@isNotEmpty(fullName)"> AND T.FULL_NAME = #{fullName} </if>
+           <if test="@Ognl@isNotEmpty(treePath)"> AND T.TREE_PATH = #{treePath} </if>
+           <if test="@Ognl@isNotEmpty(level)"> AND T.LEVEL = #{level} </if>
+           <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+        </where>
+    </select>
+
+    
+</mapper>

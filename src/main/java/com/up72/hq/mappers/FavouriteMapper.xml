@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.FavouriteMapper">
+    <resultMap id="RM_favourite" type="com.up72.hq.model.Favourite">
+        <result property="id" column="ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="type" column="TYPE"/>
+        <result property="sourceId" column="SOURCE_ID"/>
+    </resultMap>
+
+    <resultMap id="RM_favourite_resp" type="com.up72.hq.dto.resp.FavouriteResp" extends="RM_favourite">
+        <collection property="goods" column="SOURCE_ID" javaType="com.up72.hq.model.Goods" ofType="com.up72.hq.model.Goods"
+                    select="com.up72.hq.dao.GoodsMapper.findById"></collection>
+    </resultMap>
+    <resultMap id="RM_favouriteCrowd" type="com.up72.hq.dto.resp.FavouriteResp" extends="RM_favourite">
+        <association property="crowdResp" column="SOURCE_ID"
+                    select="com.up72.hq.dao.CrowdMapper.findRespById"></association>
+    </resultMap>
+
+
+    <resultMap id="RM_favouriteChoose" type="com.up72.hq.dto.resp.FavouriteResp" extends="RM_favourite">
+        <association property="chooseResp" column="SOURCE_ID"
+                    select="com.up72.hq.dao.ChooseMapper.findById"></association>
+    </resultMap>
+    <resultMap id="RM_favouriteStarRanking" type="com.up72.hq.dto.resp.FavouriteResp" extends="RM_favourite">
+        <association property="starRankingResp" column="SOURCE_ID"
+                    select="com.up72.hq.dao.StarRankingMapper.findById"></association>
+    </resultMap>
+    <resultMap id="RM_favouriteRoleSelect" type="com.up72.hq.dto.resp.FavouriteResp" extends="RM_favourite">
+        <association property="roleSelectResp" column="SOURCE_ID"
+                    select="com.up72.hq.dao.RoleSelectMapper.findById"></association>
+    </resultMap>
+
+
+    <resultMap id="RM_favouriteVideo" type="com.up72.hq.dto.resp.FavouriteResp" extends="RM_favourite">
+        <association property="videoResp" column="SOURCE_ID"
+                    select="com.up72.hq.dao.VideoMapper.findById"></association>
+    </resultMap>
+    <resultMap id="RM_favouriteNew" type="com.up72.hq.dto.resp.FavouriteResp" extends="RM_favourite">
+        <association property="newsResp" column="SOURCE_ID"
+                    select="com.up72.hq.dao.NewsMapper.findByIdResp"></association>
+    </resultMap>
+
+
+
+
+
+    <sql id="favourite_columns">
+        T.ID,T.MEMBER_ID,T.TYPE,T.SOURCE_ID
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_FAVOURITE (
+         ID, MEMBER_ID, TYPE, SOURCE_ID
+        ) VALUES (
+         #{id}, #{memberId}, #{type}, #{sourceId}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_FAVOURITE AS T SET
+            T.MEMBER_ID = #{memberId} , T.TYPE = #{type} , T.SOURCE_ID = #{sourceId}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_FAVOURITE WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_favourite">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE AS T WHERE T.ID = #{id}
+    </select>
+    <select id="findByParam" resultMap="RM_favourite">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+    <select id="findFavouriteCountByNewId" resultType="int">
+        SELECT COUNT(*) FROM HQ_FAVOURITE AS T WHERE  T.SOURCE_ID = #{sourceId}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_favourite">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+
+    <select id="findFavouriteList"  resultMap="RM_favourite" parameterType="com.up72.hq.model.Favourite">
+        SELECT <include refid="favourite_columns" />  FROM HQ_FAVOURITE AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(sourceId)"> AND T.SOURCE_ID = #{sourceId} </if>
+        </where>
+    </select>
+
+    <select id="findFavouriteRespList"  resultMap="RM_favourite_resp" parameterType="com.up72.hq.model.Favourite">
+        SELECT <include refid="favourite_columns" />
+        ,(SELECT IMGS FROM HQ_PROD_IMG I LEFT JOIN HQ_PROD_SPEC SP ON SP.PROD_ID = I.PROD_ID LEFT JOIN HQ_SPEC SC ON SC.ID = SP.SPEC_ID WHERE I.SPEC_ID = SP.SPEC_ID AND I.SPEC_VALUE_ID = SP.SPEC_VALUE_ID AND SP.GOODS_ID = T.SOURCE_ID AND SC.IS_COLOR = 1 LIMIT 0,1) AS imgStr
+        FROM HQ_FAVOURITE AS T
+        LEFT JOIN HQ_GOODS  D ON D.ID=T.SOURCE_ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(sourceId)"> AND T.SOURCE_ID = #{sourceId} </if>
+            AND D.IS_MARKETABLE=1
+        </where>
+    </select>
+<!--众筹-->
+    <select id="findPageCrowd" parameterType="map" resultMap="RM_favouriteCrowd">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+    <!--评选-->
+    <select id="findPageChoose" parameterType="map" resultMap="RM_favouriteChoose">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+    <!--视频-->
+    <select id="findPageVideo" parameterType="map" resultMap="RM_favouriteVideo">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+    <!--资讯-->
+    <select id="findPageNew" parameterType="map" resultMap="RM_favouriteNew">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+    <!--明星排行-->
+    <select id="findPageStarRanking" parameterType="map" resultMap="RM_favouriteStarRanking">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+    <!---->
+    <select id="findPageRoleSelect" parameterType="map" resultMap="RM_favouriteRoleSelect">
+        SELECT
+        <include refid="favourite_columns"/>
+        FROM HQ_FAVOURITE  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+        </where>
+    </select>
+</mapper>

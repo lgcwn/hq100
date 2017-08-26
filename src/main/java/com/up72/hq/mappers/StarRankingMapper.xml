@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.StarRankingMapper">
+    <resultMap id="RM_starRanking" type="com.up72.hq.model.StarRanking">
+        <result property="id" column="id"/>
+        <result property="catId" column="CAT_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="imgs" column="IMGS"/>
+        <result property="remark" column="REMARK"/>
+        <result property="content" column="CONTENT"/>
+        <result property="status" column="STATUS"/>
+        <result property="realVotes" column="REAL_VOTES"/>
+        <result property="virtualVotes" column="VIRTUAL_VOTES"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="addTime" column="ADD_TIME"/>
+        <result property="auditTime" column="AUDIT_TIME"/>
+        <result property="rejectReason" column="REJECT_REASON"/>
+    </resultMap>
+
+    <resultMap id="RM_starRankingResp" type="com.up72.hq.dto.resp.StarRankingResp" extends="RM_starRanking">
+        <result property="catName" column="CAT_NAME"/>
+        <result property="sumVotes" column="SUM_VOTES"/>
+        <result property="ranking" column="RANKING" />
+        <result property="renqi" column="RQ" />
+        <collection property="memberResp" column="MEMBER_ID" javaType="com.up72.hq.dto.resp.MemberResp" ofType="com.up72.hq.dto.resp.MemberResp"
+                    select="com.up72.hq.dao.MemberMapper.findById"/>
+    </resultMap>
+
+    <sql id="starRanking_columns">
+        T.ID,T.CAT_ID,T.NAME,T.IMGS,T.REMARK,T.CONTENT,T.STATUS,T.REAL_VOTES,T.VIRTUAL_VOTES,T.MEMBER_ID,T.ADD_TIME,T.AUDIT_TIME,T.REJECT_REASON ,(T.REAL_VOTES+T.VIRTUAL_VOTES) AS SUM_VOTES
+        ,(SELECT  COUNT(DISTINCT(T1.REAL_VOTES+T1.VIRTUAL_VOTES))+1 FROM HQ_STAR_RANKING AS T1  WHERE (T1.REAL_VOTES+T1.VIRTUAL_VOTES) >(T.REAL_VOTES+T.VIRTUAL_VOTES) AND T1.CAT_ID=T.CAT_ID) AS  RANKING
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.id IN ('${id}')</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(sname)">AND T.NAME LIKE CONCAT('%',#{sname},'%')</if>
+            <if test="@Ognl@isNotEmpty(name)">AND T.NAME LIKE CONCAT('%',#{name},'%')</if>
+            <if test="@Ognl@isNotEmpty(imgs)">AND T.IMGS = #{imgs}</if>
+            <if test="@Ognl@isNotEmpty(remark)">AND T.REMARK = #{remark}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+            <if test="@Ognl@isNotEmpty(realVotes)">AND T.REAL_VOTES = #{realVotes}</if>
+            <if test="@Ognl@isNotEmpty(virtualVotes)">AND T.VIRTUAL_VOTES = #{virtualVotes}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(auditTime)">AND T.AUDIT_TIME = #{auditTime}</if>
+            <if test="@Ognl@isNotEmpty(memberName)">AND M.NICK_NAME LIKE CONCAT('%',#{memberName},'%')</if>
+            <if test="@Ognl@isNotEmpty(catName)">AND C.NAME LIKE CONCAT('%',#{catName},'%')</if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_STAR_RANKING (
+         id, CAT_ID, NAME, IMGS, REMARK, CONTENT,STATUS, REAL_VOTES, VIRTUAL_VOTES, MEMBER_ID, ADD_TIME, AUDIT_TIME,REJECT_REASON
+        ) VALUES (
+         #{id}, #{catId}, #{name}, #{imgs}, #{remark}, #{content}, #{status}, #{realVotes}, #{virtualVotes}, #{memberId}, #{addTime}, #{auditTime}, #{rejectReason}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_STAR_RANKING AS T SET
+            T.CAT_ID = #{catId} , T.NAME = #{name} , T.IMGS = #{imgs} , T.REMARK = #{remark} ,T.CONTENT = #{content} , T.STATUS = #{status} , T.REAL_VOTES = #{realVotes} ,
+             T.VIRTUAL_VOTES = #{virtualVotes} , T.MEMBER_ID = #{memberId} , T.ADD_TIME = #{addTime} , T.AUDIT_TIME = #{auditTime} , T.REJECT_REASON = #{rejectReason}
+        WHERE T.id = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_STAR_RANKING WHERE  id = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_starRankingResp">
+        SELECT
+        <include refid="starRanking_columns"/>
+        ,C.NAME AS CAT_NAME  FROM
+        HQ_STAR_RANKING AS T
+        LEFT JOIN HQ_CAT AS C ON C.ID=T.CAT_ID
+        LEFT JOIN HQ_MEMBER AS M ON M.ID=T.MEMBER_ID
+        WHERE T.id = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_starRankingResp">
+        SELECT<include refid="starRanking_columns"/>,C.NAME AS CAT_NAME FROM HQ_STAR_RANKING AS T
+        LEFT JOIN HQ_CAT AS C ON C.ID=T.CAT_ID
+        LEFT JOIN HQ_MEMBER AS M ON M.ID=T.MEMBER_ID
+        <include refid="where_sql"/>
+        ORDER BY SUM_VOTES DESC
+    </select>
+
+    <select id="findPageHt" parameterType="map" resultMap="RM_starRankingResp">
+        SELECT<include refid="starRanking_columns"/>,C.NAME AS CAT_NAME  FROM HQ_STAR_RANKING AS T
+        LEFT JOIN HQ_CAT AS C ON C.ID=T.CAT_ID
+        LEFT JOIN HQ_MEMBER AS M ON M.ID=T.MEMBER_ID
+        <include refid="where_sql"/>
+        ORDER BY T.AUDIT_TIME DESC
+    </select>
+
+    <select id="findStarRankPage" parameterType="map" resultMap="RM_starRankingResp">
+        SELECT
+        <include refid="starRanking_columns"/>
+        FROM HQ_STAR_RANKING AS T
+        <include refid="where_sql"/>
+    </select>
+
+    <select id="findStarPageByPopularity" parameterType="map" resultMap="RM_starRankingResp">
+        SELECT T.ID,T.CAT_ID,T.NAME,T.IMGS,T.REMARK,T.CONTENT,T.STATUS,T.REAL_VOTES,T.VIRTUAL_VOTES,T.MEMBER_ID,T.ADD_TIME,T.AUDIT_TIME,T.REJECT_REASON ,(T.REAL_VOTES+T.VIRTUAL_VOTES) AS SUM_VOTES
+        , IFNULL((SELECT <if test="type==1"> COUNT(V.ID)</if><if test="type==2"> SUM(V.NUMBER)</if>
+        FROM  HQ_VOTES AS V WHERE V.TYPE =3
+        <if test="@Ognl@isNotEmpty(year)"> AND V.YEAR=#{year} </if>
+        <if test="@Ognl@isNotEmpty(month)"> AND V.MONTH =#{month} </if>
+        <if test="@Ognl@isNotEmpty(day)"> AND V.DAY = #{day} </if>
+        <if test="@Ognl@isNotEmpty(addVotesStartTime)"> AND V.ADD_TIME &gt;= #{addVotesStartTime} </if>
+        <if test="@Ognl@isNotEmpty(addVotesEndTime)"> AND V.ADD_TIME &lt;= #{addVotesEndTime} </if>
+         AND V.SOURCE_ID = T.ID ),0) AS RQ  FROM HQ_STAR_RANKING AS T
+        <include refid="where_sql"/>
+        ORDER BY RQ DESC
+    </select>
+
+    <select id="countNumber" resultType="Long" parameterType="map">
+        SELECT COUNT(*) FROM HQ_STAR_RANKING AS T
+        <include refid="where_sql"/>
+    </select>
+
+
+    <select id="findListByCatId" parameterType="Long" resultMap="RM_starRankingResp">
+        SELECT <include refid="starRanking_columns"/>
+        FROM HQ_STAR_RANKING AS T WHERE T.CAT_ID=#{catId} AND T.STATUS=3 GROUP BY ID ORDER BY SUM_VOTES DESC
+    </select>
+
+</mapper>

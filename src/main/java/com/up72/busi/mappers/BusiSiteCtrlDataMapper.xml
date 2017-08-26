@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiSiteCtrlDataMapper">
+	<resultMap id="RM_busiSiteCtrlData" type="com.up72.busi.model.BusiSiteCtrlData">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="ctrlId" column="CTRL_ID" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="images" column="IMAGES" />
+        <result property="texts" column="TEXTS" />
+        <result property="urls" column="URLS" />
+	</resultMap>
+	
+	<sql id="busiSiteCtrlData_columns">
+		T.ID,T.SITE_MENU_ID,T.CTRL_ID,T.SORT_ID,T.IMAGES,T.TEXTS,T.URLS
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_SITE_CTRL_DATA (
+         ID, SITE_MENU_ID, CTRL_ID, SORT_ID, IMAGES, TEXTS, URLS
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{ctrlId}, #{sortId}, #{images}, #{texts}, #{urls}
+        )
+	</insert>
+    
+	<update id="update" >
+        UPDATE BUSI_SITE_CTRL_DATA AS T SET
+	        T.SITE_MENU_ID = #{siteMenuId} , T.CTRL_ID = #{ctrlId} , T.SORT_ID = #{sortId} , T.IMAGES = #{images} , T.TEXTS = #{texts} , T.URLS = #{urls}  
+        WHERE T.ID = #{id}  
+	</update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_SITE_CTRL_DATA WHERE ID = #{id} 
+    </delete>
+    
+    <select id="findById" resultMap="RM_busiSiteCtrlData">
+		SELECT <include refid="busiSiteCtrlData_columns" /> FROM BUSI_SITE_CTRL_DATA  AS T WHERE T.ID = #{id} 
+	</select>
+	
+	<select id="findPage" parameterType="map" resultMap="RM_busiSiteCtrlData">
+	 SELECT <include refid="busiSiteCtrlData_columns" />  FROM BUSI_SITE_CTRL_DATA AS T
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+	       <if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+	       <if test="@Ognl@isNotEmpty(ctrlId)"> AND T.CTRL_ID = #{ctrlId} </if>
+	       <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+	       <if test="@Ognl@isNotEmpty(images)"> AND T.IMAGES = #{images} </if>
+	       <if test="@Ognl@isNotEmpty(texts)"> AND T.TEXTS = #{texts} </if>
+	       <if test="@Ognl@isNotEmpty(urls)"> AND T.URLS = #{urls} </if>
+		</where>
+	</select>
+
+	<select id="findListByCtrlId" parameterType="long" resultMap="RM_busiSiteCtrlData">
+		SELECT <include refid="busiSiteCtrlData_columns" />  FROM BUSI_SITE_CTRL_DATA AS T
+			WHERE T.CTRL_ID = #{ctrlId}  ORDER BY T.SORT_ID ASC
+	</select>
+
+
+	
+</mapper>

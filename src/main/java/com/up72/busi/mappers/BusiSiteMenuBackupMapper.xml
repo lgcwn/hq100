@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiSiteMenuBackupMapper">
+	<resultMap id="RM_busiSiteMenuBackup" type="com.up72.busi.model.BusiSiteMenuBackup">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="bakName" column="BAK_NAME" />
+        <result property="fileName" column="FILE_NAME" />
+        <result property="fileUrl" column="FILE_URL" />
+        <result property="content" column="CONTENT" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="addTime" column="ADD_TIME" />
+	</resultMap>
+
+	<resultMap id="RM_busiSiteMenuBackupResp" type="com.up72.busi.dto.resp.BusiSiteMenuBackupResp">
+		<result property="id" column="ID" />
+		<result property="siteMenuId" column="SITE_MENU_ID" />
+		<result property="bakName" column="BAK_NAME" />
+		<result property="fileName" column="FILE_NAME" />
+		<result property="fileUrl" column="FILE_URL" />
+		<result property="content" column="CONTENT" />
+		<result property="addUserId" column="ADD_USER_ID" />
+		<result property="addUserName" column="ADD_USER_NAME" />
+		<result property="addTime" column="ADD_TIME" />
+	</resultMap>
+	
+	<sql id="busiSiteMenuBackup_columns">
+		T.ID,T.SITE_MENU_ID,T.BAK_NAME,T.FILE_NAME,T.FILE_URL,T.CONTENT,T.ADD_USER_ID,T.ADD_USER_NAME,T.ADD_TIME
+	</sql>
+	<sql id="select_sql">
+		SELECT <include refid="busiSiteMenuBackup_columns" />  FROM BUSI_SITE_MENU_BACKUP AS T
+		<where>
+			<if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+			<if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+			<if test="@Ognl@isNotEmpty(bakName)"> AND T.BAK_NAME = #{bakName} </if>
+			<if test="@Ognl@isNotEmpty(fileName)"> AND T.FILE_NAME = #{fileName} </if>
+			<if test="@Ognl@isNotEmpty(fileUrl)"> AND T.FILE_URL = #{fileUrl} </if>
+			<if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+			<if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+			<if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+			<if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+		</where>
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_SITE_MENU_BACKUP (
+         ID, SITE_MENU_ID, BAK_NAME, FILE_NAME, FILE_URL, CONTENT, ADD_USER_ID, ADD_USER_NAME, ADD_TIME
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{bakName}, #{fileName}, #{fileUrl}, #{content}, #{addUserId}, #{addUserName}, #{addTime}
+        )
+	</insert>
+    
+	<update id="update" >
+        UPDATE BUSI_SITE_MENU_BACKUP AS T SET
+	        T.SITE_MENU_ID = #{siteMenuId} , T.BAK_NAME = #{bakName} , T.FILE_NAME = #{fileName} , T.FILE_URL = #{fileUrl} , T.CONTENT = #{content} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.ADD_TIME = #{addTime}  
+        WHERE T.ID = #{id}  
+	</update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_SITE_MENU_BACKUP WHERE ID = #{id} 
+    </delete>
+    
+    <select id="findById" resultMap="RM_busiSiteMenuBackup">
+		SELECT <include refid="busiSiteMenuBackup_columns" /> FROM BUSI_SITE_MENU_BACKUP  AS T WHERE T.ID = #{id} 
+	</select>
+	
+	<select id="findPage" parameterType="map" resultMap="RM_busiSiteMenuBackup">
+		<include refid="select_sql" />
+	</select>
+
+	<select id="findList" parameterType="map" resultMap="RM_busiSiteMenuBackupResp">
+		<include refid="select_sql" />
+	</select>
+</mapper>

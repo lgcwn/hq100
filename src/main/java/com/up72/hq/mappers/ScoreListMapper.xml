@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ScoreListMapper">
+    <resultMap id="RM_scoreList" type="com.up72.hq.model.ScoreList">
+        <result property="id" column="ID" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="score" column="SCORE" />
+        <result property="type" column="TYPE" />
+        <result property="pointRuleId" column="POINT_RULE_ID" />
+        <result property="remark" column="REMARK" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="sourceType" column="SOURCE_TYPE" />
+        <result property="contentId" column="CONTENT_ID" />
+        <result property="overTime" column="OVER_TIME" />
+        <result property="isOver" column="IS_OVER" />
+        <result property="tbOrJf" column="TB_OR_JF" />
+    </resultMap>
+
+    <resultMap id="RM_scoreListResp" type="com.up72.hq.dto.resp.ScoreRespListResp" extends="RM_scoreList">
+        <result property="memberName" column="MEMBER_NAME" />
+        <result property="ruleName" column="RULE_NAME" />
+    </resultMap>
+    
+    <sql id="scoreList_columns">
+        T.ID,T.MEMBER_ID,T.SCORE,T.TYPE,T.POINT_RULE_ID,T.REMARK,T.ADD_TIME,T.SOURCE_TYPE,T.CONTENT_ID,T.OVER_TIME,T.IS_OVER
+    </sql>
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(score)"> AND T.SCORE = #{score} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(pointRuleId)"> AND T.POINT_RULE_ID = #{pointRuleId} </if>
+            <if test="@Ognl@isNotEmpty(remark)"> AND T.REMARK = #{remark} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(sourceType)"> AND T.SOURCE_TYPE = #{sourceType} </if>
+            <if test="@Ognl@isNotEmpty(contentId)"> AND T.CONTENT_ID = #{contentId} </if>
+            <if test="@Ognl@isNotEmpty(overTime)"> AND T.OVER_TIME = #{overTime} </if>
+            <if test="@Ognl@isNotEmpty(isOver)"> AND T.IS_OVER = #{isOver} </if>
+            <if test="@Ognl@isNotEmpty(tbOrJf)"> AND T.TB_OR_JF = #{tbOrJf} </if>
+            <if test="@Ognl@isNotEmpty(ruleName)"> AND P.NAME LIKE  CONCAT('%','${ruleName}','%')</if>
+            <if test="@Ognl@isNotEmpty(memberName)"> AND M.NICK_NAME LIKE  CONCAT('%','${memberName}','%')</if>
+        </where>
+    </sql>
+
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_SCORE_LIST (
+         ID, MEMBER_ID, SCORE, TYPE, POINT_RULE_ID, REMARK, ADD_TIME, SOURCE_TYPE, CONTENT_ID, OVER_TIME, IS_OVER,TB_OR_JF
+        ) VALUES (
+         #{id}, #{memberId}, #{score}, #{type}, #{pointRuleId}, #{remark}, #{addTime}, #{sourceType}, #{contentId}, #{overTime}, #{isOver}, #{tbOrJf}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_SCORE_LIST AS T SET
+            T.MEMBER_ID = #{memberId} , T.SCORE = #{score} , T.TYPE = #{type} , T.POINT_RULE_ID = #{pointRuleId} ,
+             T.REMARK = #{remark} , T.ADD_TIME = #{addTime} , T.SOURCE_TYPE = #{sourceType} , T.CONTENT_ID = #{contentId} ,
+              T.OVER_TIME = #{overTime} , T.IS_OVER = #{isOver}, T.TB_OR_JF = #{tbOrJf}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_SCORE_LIST WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_scoreList">
+        SELECT <include refid="scoreList_columns" /> FROM HQ_SCORE_LIST AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_scoreList">
+     SELECT <include refid="scoreList_columns" />  FROM HQ_SCORE_LIST AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_scoreListResp">
+        SELECT <include refid="scoreList_columns" /> ,M.NICK_NAME AS MEMBER_NAME,P.NAME AS RULE_NAME
+        FROM HQ_SCORE_LIST T LEFT JOIN HQ_MEMBER M ON M.ID = T.MEMBER_ID  LEFT JOIN HQ_POINTS_RULE P ON P.ID=T.POINT_RULE_ID
+        <include refid="where_sql" />
+    </select>
+    
+</mapper>

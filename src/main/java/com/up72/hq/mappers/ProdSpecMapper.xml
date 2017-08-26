@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ProdSpecMapper">
+    <resultMap id="RM_ProdSpec" type="com.up72.hq.model.ProdSpec">
+        <result property="id" column="ID" />
+        <result property="prodId" column="PROD_ID" />
+        <result property="specId" column="SPEC_ID" />
+        <result property="specValueId" column="SPEC_VALUE_ID" />
+        <result property="goodsId" column="GOODS_ID" />
+    </resultMap>
+    <resultMap id="RM_ProdSpecResp" type="com.up72.hq.dto.resp.ProdSpecResp" extends="RM_ProdSpec">
+    </resultMap>
+
+    <sql id="prodSpec_columns">
+        T.ID,T.PROD_ID,T.SPEC_ID,T.SPEC_VALUE_ID,T.GOODS_ID
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PROD_SPEC (
+        ID, PROD_ID, SPEC_ID, SPEC_VALUE_ID, GOODS_ID
+        ) VALUES (
+        #{id}, #{prodId}, #{specId}, #{specValueId}, #{goodsId}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_PROD_SPEC AS T SET
+        T.PROD_ID = #{prodId} , T.SPEC_ID = #{specId} , T.SPEC_VALUE_ID = #{specValueId} , T.GOODS_ID = #{goodsId}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PROD_SPEC WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteByGoodsId" parameterType="Long">
+        DELETE FROM HQ_PROD_SPEC WHERE GOODS_ID = #{goodsId}
+    </delete>
+
+    <delete id="deleteByProdId" parameterType="Long">
+        DELETE FROM HQ_PROD_SPEC WHERE PROD_ID = #{prodId}
+    </delete>
+
+    <select id="findById" resultMap="RM_ProdSpec">
+        SELECT <include refid="prodSpec_columns" /> FROM HQ_PROD_SPEC  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_ProdSpec">
+        SELECT <include refid="prodSpec_columns" />  FROM HQ_PROD_SPEC AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(specId)"> AND T.SPEC_ID = #{specId} </if>
+            <if test="@Ognl@isNotEmpty(specValueId)"> AND T.SPEC_VALUE_ID = #{specValueId} </if>
+            <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+            <if test="@Ognl@isNotEmpty(goodsStr)"> AND T.SPEC_ID IN
+                (SELECT SP.ID FROM HQ_SPEC SP WHERE SP.ID = T.SPEC_ID AND SP.IS_COLOR = 0)</if>
+        </where>
+    </select>
+
+    <select id="findListByGoodsId" parameterType="long" resultMap="RM_ProdSpec">
+        SELECT <include refid="prodSpec_columns" />  FROM HQ_PROD_SPEC AS T WHERE T.GOODS_ID = #{goodsId}
+    </select>
+
+    <select id="findByParams" parameterType="map" resultMap="RM_ProdSpecResp">
+        SELECT <include refid="prodSpec_columns" />  FROM HQ_PROD_SPEC AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(specId)"> AND T.SPEC_ID = #{specId} </if>
+            <if test="@Ognl@isNotEmpty(specValueId)"> AND T.SPEC_VALUE_ID = #{specValueId} </if>
+            <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+        </where>
+        limit 0,1
+    </select>
+
+    <select id="findListByProdId" parameterType="long" resultMap="RM_ProdSpecResp">
+        SELECT <include refid="prodSpec_columns" />  FROM HQ_PROD_SPEC AS T
+        LEFT JOIN HQ_SPEC S ON S.ID = T.SPEC_ID
+        WHERE T.PROD_ID = #{prodId} AND S.IS_COLOR = 1
+    </select>
+
+    <select id="findSpecValueIdsByGoodsId" parameterType="map" resultType="String">
+        SELECT GROUP_CONCAT(CAST(T.SPEC_VALUE_ID AS CHAR))   FROM HQ_PROD_SPEC AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(goodsIds)">AND T.GOODS_ID IN (${goodsIds})</if>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(specId)"> AND T.SPEC_ID = #{specId} </if>
+        </where>
+    </select>
+
+    <select id="findColorListByProdId" parameterType="map" resultMap="RM_ProdSpecResp">
+        SELECT <include refid="prodSpec_columns" />  FROM HQ_PROD_SPEC AS T
+        LEFT JOIN HQ_SPEC S ON S.ID = T.SPEC_ID
+        LEFT JOIN HQ_GOODS G ON G.ID = T.GOODS_ID
+        WHERE T.PROD_ID = #{prodId} AND S.IS_COLOR = 1  AND G.IS_DELETE = 0 AND G.IS_MARKETABLE = 1 AND G.TYPE = 1
+        GROUP BY T.SPEC_VALUE_ID
+    </select>
+</mapper>

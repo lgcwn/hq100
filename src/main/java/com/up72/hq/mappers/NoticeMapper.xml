@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.NoticeMapper">
+	<resultMap id="RM_notice" type="com.up72.hq.model.Notice">
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="content" column="CONTENT" />
+        <result property="imgUrl" column="IMG_URL" />
+        <result property="status" column="STATUS" />
+        <result property="addtime" column="ADDTIME" />
+        <result property="lastupdate" column="LASTUPDATE" />
+        <result property="creator" column="CREATOR" />
+        <result property="readCnt" column="READ_CNT" />
+        <result property="type" column="TYPE" />
+		<result property="beginTime" column="BEGIN_TIME" />
+		<result property="address" column="ADDRESS" />
+	</resultMap>
+	<resultMap id="RM_noticeDTO" type="com.up72.hq.dto.resp.NoticeResp" extends="RM_notice">
+		<result property="creatorName" column="creatorName" />
+	</resultMap>
+	
+	<sql id="notice_columns">
+	    <![CDATA[
+		ID,TITLE,CONTENT,IMG_URL,STATUS,ADDTIME,LASTUPDATE,CREATOR,READ_CNT,TYPE,BEGIN_TIME,ADDRESS
+	    ]]>
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO HQ_NOTICE (
+         ID, TITLE, CONTENT, IMG_URL, STATUS, ADDTIME, LASTUPDATE, CREATOR, READ_CNT, TYPE,BEGIN_TIME,ADDRESS
+        ) VALUES (
+         #{id}, #{title}, #{content}, #{imgUrl}, #{status}, #{addtime}, #{lastupdate}, #{creator}, #{readCnt}, #{type},#{beginTime},#{address}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE HQ_NOTICE SET
+	        TITLE = #{title} , CONTENT = #{content} , IMG_URL = #{imgUrl} , STATUS = #{status} , ADDTIME = #{addtime} , LASTUPDATE = #{lastupdate} , CREATOR = #{creator} , READ_CNT = #{readCnt} , TYPE = #{type} ,BEGIN_TIME=#{beginTime},ADDRESS=#{address}
+        WHERE 
+        	ID = #{id}  
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM HQ_NOTICE WHERE
+        ID = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="findById" resultMap="RM_notice">
+		SELECT <include refid="notice_columns" />
+	    <![CDATA[
+		    FROM HQ_NOTICE 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+
+
+	<select id="findByType" resultMap="RM_notice" parameterType="Integer">
+		SELECT T.*  FROM HQ_NOTICE AS  T  WHERE T.TYPE=#{type}
+	</select>
+
+	
+	<select id="findPage" parameterType="map" resultMap="RM_noticeDTO" >
+	 SELECT   n.ADDRESS,n.BEGIN_TIME, n.ID,n.TITLE,n.CONTENT,n.IMG_URL,n.STATUS,n.ADDTIME,n.LASTUPDATE,n.CREATOR,n.READ_CNT,n.TYPE,u.REAL_NAME as creatorName  FROM HQ_NOTICE  n LEFT  JOIN  SYS_USER  u ON  n.CREATOR=u.ID
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND n.ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(title)">
+				AND n.TITLE LIKE  concat(#{title},'%')
+			</if>
+	       <if test="@Ognl@isNotEmpty(content)">
+				AND n.CONTENT = #{content}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imgUrl)">
+				AND n.IMG_URL = #{imgUrl}
+			</if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND n.STATUS = #{status}
+			</if>
+	       <if test="@Ognl@isNotEmpty(addtime)">
+				AND n.ADDTIME = #{addtime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(lastupdate)">
+				AND n.LASTUPDATE = #{lastupdate}
+			</if>
+	       <if test="@Ognl@isNotEmpty(creator)">
+				AND n.CREATOR = #{creator}
+			</if>
+	       <if test="@Ognl@isNotEmpty(readCnt)">
+				AND n.READ_CNT = #{readCnt}
+			</if>
+	       <if test="@Ognl@isNotEmpty(type)">
+				AND n.TYPE = #{type}
+			</if>
+		</where>
+	</select>
+
+
+	
+</mapper>
+

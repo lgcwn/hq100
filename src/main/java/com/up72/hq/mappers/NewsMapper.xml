@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.NewsMapper">
+    <resultMap id="RM_news" type="com.up72.hq.model.News">
+        <result property="id" column="ID"/>
+        <result property="catId" column="CAT_ID"/>
+        <result property="title" column="TITLE"/>
+        <result property="intro" column="INTRO"/>
+        <result property="quizId" column="QUIZ_ID"/>
+        <result property="quizName" column="QUIZ_NAME"/>
+        <result property="lookCnt" column="LOOK_CNT"/>
+        <result property="videoId" column="VIDEO_ID"/>
+        <result property="videoName" column="VIDEO_NAME"/>
+        <result property="chooseId" column="CHOOSE_ID"/>
+        <result property="chooseName" column="CHOOSE_NAME"/>
+        <result property="chooseLink" column="CHOOSE_LINK"/>
+        <result property="crowdId" column="CROWD_ID"/>
+        <result property="crowdName2" column="CROWD_NAME2"/>
+        <result property="addTime" column="ADD_TIME"/>
+        <result property="publishTime" column="PUBLISH_TIME"/>
+        <result property="status" column="STATUS"/>
+        <result property="isRecommend" column="IS_RECOMMEND"/>
+        <result property="isImg" column="IS_IMG"/>
+        <result property="firstImg" column="FIRST_IMG"/>
+        <result property="newOrTravel" column="NEW_OR_TRAVEL"/>
+        <result property="newProfiles" column="NEW_PROFILES"/>
+        <result property="toHome" column="TO_HOME"/>
+        <result property="autoOrManually" column="AUTO_OR_MANUALLY"/>
+        <result property="addUser" column="ADD_USER"/>
+    </resultMap>
+    <resultMap id="RM_newsResp" type="com.up72.hq.dto.resp.NewsResp" extends="RM_news">
+        <result property="faNum" column="faNum"/>
+        <result property="prNum" column="prNum"/>
+        <result property="commentCount" column="COMMENT_COUNT"/>
+        <result property="catIdName" column="CAT_ID_NAME"/>
+        <result property="realName" column="REAL_NAME"/>
+    </resultMap>
+
+    <sql id="news_columns">
+        T.ID,T.CAT_ID,T.TITLE,T.INTRO,AUTO_OR_MANUALLY,ADD_USER,T.QUIZ_ID,T.QUIZ_NAME,T.LOOK_CNT,T.VIDEO_ID,T.VIDEO_NAME,T.CHOOSE_ID,T.CHOOSE_NAME,T.CROWD_ID,T.CROWD_NAME2,T.ADD_TIME,T.PUBLISH_TIME,T.STATUS,T.IS_RECOMMEND,T.IS_IMG,T.FIRST_IMG,T.NEW_OR_TRAVEL,T.NEW_PROFILES,T.CHOOSE_LINK,T.TO_HOME
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_NEWS (
+         ID, CAT_ID, TITLE, INTRO, QUIZ_ID, QUIZ_NAME, LOOK_CNT, VIDEO_ID, VIDEO_NAME, CHOOSE_ID, CHOOSE_NAME, CROWD_ID, CROWD_NAME2, ADD_TIME, PUBLISH_TIME, STATUS, IS_RECOMMEND, IS_IMG, FIRST_IMG,NEW_OR_TRAVEL,NEW_PROFILES,CHOOSE_LINK,TO_HOME,AUTO_OR_MANUALLY,ADD_USER
+        ) VALUES (
+         #{id}, #{catId}, #{title}, #{intro}, #{quizId}, #{quizName}, #{lookCnt}, #{videoId}, #{videoName}, #{chooseId}, #{chooseName}, #{crowdId}, #{crowdName2}, #{addTime}, #{publishTime}, #{status}, #{isRecommend}, #{isImg}, #{firstImg},#{newOrTravel},#{newProfiles},#{chooseLink},#{toHome},#{autoOrManually},#{addUser}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_NEWS  T SET
+            T.CAT_ID = #{catId} , T.TITLE = #{title} , T.INTRO = #{intro} , T.QUIZ_ID = #{quizId} , T.QUIZ_NAME = #{quizName} , T.LOOK_CNT = #{lookCnt} , T.VIDEO_ID = #{videoId} , T.VIDEO_NAME = #{videoName} , T.CHOOSE_ID = #{chooseId} , T.CHOOSE_NAME = #{chooseName} ,T.NEW_OR_TRAVEL = #{newOrTravel} ,T.CROWD_ID = #{crowdId} , T.CROWD_NAME2 = #{crowdName2} , T.ADD_TIME = #{addTime} , T.PUBLISH_TIME = #{publishTime} , T.STATUS = #{status} , T.IS_RECOMMEND = #{isRecommend} , T.IS_IMG = #{isImg} , T.FIRST_IMG = #{firstImg},T.CHOOSE_LINK = #{chooseLink},T.NEW_PROFILES = #{newProfiles},TO_HOME=#{toHome},AUTO_OR_MANUALLY = #{autoOrManually},ADD_USER = #{addUser}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_NEWS WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findByIdResp" resultMap="RM_newsResp">
+        SELECT
+        <include refid="news_columns"/>
+        FROM HQ_NEWS T WHERE T.ID = #{id}
+    </select>
+    <select id="findById" resultMap="RM_news">
+        SELECT
+        <include refid="news_columns"/>
+        FROM HQ_NEWS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_newsResp">
+        SELECT<include refid="news_columns"/>,AA.faNum,BB.prNum,hc.NAME AS CAT_ID_NAME,CC.COMMENT_COUNT AS COMMENT_COUNT ,SU.REAL_NAME FROM HQ_NEWS T
+        LEFT JOIN (SELECT hfa.SOURCE_ID,COUNT(hfa.SOURCE_ID) AS faNum,hfa.TYPE FROM HQ_FAVOURITE hfa GROUP BY
+        hfa.SOURCE_ID,hfa.TYPE) AA ON AA.SOURCE_ID = T.ID
+        LEFT JOIN (SELECT hpr.SOURCE_ID,COUNT(hpr.SOURCE_ID) AS prNum,hpr.TYPE FROM HQ_PRAISE hpr GROUP BY
+        hpr.SOURCE_ID,hpr.TYPE) BB ON BB.SOURCE_ID = T.ID
+        LEFT JOIN (SELECT HR.CAT_ID, HR.SOURCE_ID , COUNT(*) AS COMMENT_COUNT FROM HQ_REVIEW HR WHERE HR.CAT_ID =7  GROUP BY HR.CAT_ID, HR.SOURCE_ID)CC ON CC.SOURCE_ID = T.ID
+        LEFT JOIN HQ_CAT hc ON hc.ID=T.CAT_ID
+        LEFT JOIN SYS_USER SU ON SU.ID = T.ADD_USER
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID IN ('${id}')</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(title)">AND T.TITLE LIKE CONCAT('%',#{title},'%')</if>
+            <if test="@Ognl@isNotEmpty(intro)">AND T.INTRO = #{intro}</if>
+            <if test="@Ognl@isNotEmpty(quizId)">AND T.QUIZ_ID = #{quizId}</if>
+            <if test="@Ognl@isNotEmpty(quizName)">AND T.QUIZ_NAME = #{quizName}</if>
+            <if test="@Ognl@isNotEmpty(lookCnt)">AND T.LOOK_CNT = #{lookCnt}</if>
+            <if test="@Ognl@isNotEmpty(videoId)">AND T.VIDEO_ID = #{videoId}</if>
+            <if test="@Ognl@isNotEmpty(videoName)">AND T.VIDEO_NAME = #{videoName}</if>
+            <if test="@Ognl@isNotEmpty(chooseId)">AND T.CHOOSE_ID = #{chooseId}</if>
+            <if test="@Ognl@isNotEmpty(chooseName)">AND T.CHOOSE_NAME = #{chooseName}</if>
+            <if test="@Ognl@isNotEmpty(crowdId)">AND T.CROWD_ID = #{crowdId}</if>
+            <if test="@Ognl@isNotEmpty(crowdName2)">AND T.CROWD_NAME2 = #{crowdName2}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(publishTime)">AND T.PUBLISH_TIME = #{publishTime}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+            <if test="@Ognl@isNotEmpty(isRecommend)">AND T.IS_RECOMMEND = #{isRecommend}</if>
+            <if test="@Ognl@isNotEmpty(isImg)">AND T.IS_IMG = #{isImg}</if>
+            <if test="@Ognl@isNotEmpty(firstImg)">AND T.FIRST_IMG = #{firstImg}</if>
+            <if test="@Ognl@isNotEmpty(newOrTravel)">AND T.NEW_OR_TRAVEL = #{newOrTravel}</if>
+            <if test="@Ognl@isNotEmpty(newProfiles)">AND T.NEW_PROFILES = #{newProfiles}</if>
+            <if test="@Ognl@isNotEmpty(toHome)">AND T.TO_HOME = #{toHome}</if>
+            <if test="@Ognl@isNotEmpty(autoOrManually)">AND AUTO_OR_MANUALLY = #{autoOrManually} </if>
+            <if test="@Ognl@isNotEmpty(addUser)">AND ADD_USER = #{addUser} </if>
+        </where>
+    </select>
+
+    <select id="findPageTour" parameterType="map" resultMap="RM_newsResp">
+        SELECT<include refid="news_columns"/>,AA.faNum,BB.prNum,hc.NAME AS CAT_ID_NAME,CC.COMMENT_COUNT AS COMMENT_COUNT ,SU.REAL_NAME FROM HQ_NEWS T
+        LEFT JOIN (SELECT hfa.SOURCE_ID,COUNT(hfa.SOURCE_ID) AS faNum,hfa.TYPE FROM HQ_FAVOURITE hfa GROUP BY
+        hfa.SOURCE_ID,hfa.TYPE) AA ON AA.SOURCE_ID = T.ID
+        LEFT JOIN (SELECT hpr.SOURCE_ID,COUNT(hpr.SOURCE_ID) AS prNum,hpr.TYPE FROM HQ_PRAISE hpr GROUP BY
+        hpr.SOURCE_ID,hpr.TYPE) BB ON BB.SOURCE_ID = T.ID
+        LEFT JOIN (SELECT HR.CAT_ID, HR.SOURCE_ID , COUNT(*) AS COMMENT_COUNT FROM HQ_REVIEW HR WHERE HR.CAT_ID =8  GROUP BY HR.CAT_ID, HR.SOURCE_ID)CC ON CC.SOURCE_ID = T.ID
+        LEFT JOIN HQ_CAT hc ON hc.ID=T.CAT_ID
+        LEFT JOIN SYS_USER SU ON SU.ID = T.ADD_USER
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID IN ('${id}')</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(title)">AND T.TITLE LIKE CONCAT('%',#{title},'%')</if>
+            <if test="@Ognl@isNotEmpty(intro)">AND T.INTRO = #{intro}</if>
+            <if test="@Ognl@isNotEmpty(quizId)">AND T.QUIZ_ID = #{quizId}</if>
+            <if test="@Ognl@isNotEmpty(quizName)">AND T.QUIZ_NAME = #{quizName}</if>
+            <if test="@Ognl@isNotEmpty(lookCnt)">AND T.LOOK_CNT = #{lookCnt}</if>
+            <if test="@Ognl@isNotEmpty(videoId)">AND T.VIDEO_ID = #{videoId}</if>
+            <if test="@Ognl@isNotEmpty(videoName)">AND T.VIDEO_NAME = #{videoName}</if>
+            <if test="@Ognl@isNotEmpty(chooseId)">AND T.CHOOSE_ID = #{chooseId}</if>
+            <if test="@Ognl@isNotEmpty(chooseName)">AND T.CHOOSE_NAME = #{chooseName}</if>
+            <if test="@Ognl@isNotEmpty(crowdId)">AND T.CROWD_ID = #{crowdId}</if>
+            <if test="@Ognl@isNotEmpty(crowdName2)">AND T.CROWD_NAME2 = #{crowdName2}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(publishTime)">AND T.PUBLISH_TIME = #{publishTime}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+            <if test="@Ognl@isNotEmpty(isRecommend)">AND T.IS_RECOMMEND = #{isRecommend}</if>
+            <if test="@Ognl@isNotEmpty(isImg)">AND T.IS_IMG = #{isImg}</if>
+            <if test="@Ognl@isNotEmpty(firstImg)">AND T.FIRST_IMG = #{firstImg}</if>
+            <if test="@Ognl@isNotEmpty(newOrTravel)">AND T.NEW_OR_TRAVEL = #{newOrTravel}</if>
+            <if test="@Ognl@isNotEmpty(newProfiles)">AND T.NEW_PROFILES = #{newProfiles}</if>
+            <if test="@Ognl@isNotEmpty(toHome)">AND T.TO_HOME = #{toHome}</if>
+            <if test="@Ognl@isNotEmpty(autoOrManually)">AND AUTO_OR_MANUALLY = #{autoOrManually} </if>
+            <if test="@Ognl@isNotEmpty(addUser)">AND ADD_USER = #{addUser} </if>
+        </where>
+    </select>
+
+</mapper>

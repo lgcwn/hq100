@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ShoppingCartMapper">
+    <resultMap id="RM_shoppingCart" type="com.up72.hq.model.ShoppingCart">
+        <result property="id" column="ID" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="goodsId" column="GOODS_ID" />
+        <result property="count" column="COUNT" />
+        <result property="goodsImg" column="GOODS_IMG" />
+        <result property="goodsName" column="GOODS_NAME" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="status" column="STATUS" />
+        <result property="orderTime" column="ORDER_TIME" />
+    </resultMap>
+
+
+    <resultMap id="RM_shoppingCartResp" type="com.up72.hq.dto.resp.ShoppingCartResp" extends="RM_shoppingCart">
+        <result property="price" column="PRICE" />
+    </resultMap>
+
+    <sql id="shoppingCart_columns">
+        T.ID,T.MEMBER_ID,T.GOODS_ID,T.COUNT,T.GOODS_IMG,T.GOODS_NAME,T.ADD_TIME,T.STATUS,T.ORDER_TIME
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_SHOPPING_CART (
+         ID, MEMBER_ID, GOODS_ID, COUNT, GOODS_IMG, GOODS_NAME, ADD_TIME, STATUS, ORDER_TIME
+        ) VALUES (
+         #{id}, #{memberId}, #{goodsId}, #{count}, #{goodsImg}, #{goodsName}, #{addTime}, #{status}, #{orderTime}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_SHOPPING_CART AS T SET
+            T.MEMBER_ID = #{memberId} , T.GOODS_ID = #{goodsId} , T.COUNT = #{count} , T.GOODS_IMG = #{goodsImg} , T.GOODS_NAME = #{goodsName} , T.ADD_TIME = #{addTime} , T.STATUS = #{status} , T.ORDER_TIME = #{orderTime}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_SHOPPING_CART WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_shoppingCart">
+        SELECT <include refid="shoppingCart_columns" /> FROM HQ_SHOPPING_CART AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_shoppingCart">
+     SELECT <include refid="shoppingCart_columns" />  FROM HQ_SHOPPING_CART AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+           <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+           <if test="@Ognl@isNotEmpty(count)"> AND T.COUNT = #{count} </if>
+           <if test="@Ognl@isNotEmpty(goodsImg)"> AND T.GOODS_IMG = #{goodsImg} </if>
+           <if test="@Ognl@isNotEmpty(goodsName)"> AND T.GOODS_NAME = #{goodsName} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+           <if test="@Ognl@isNotEmpty(orderTime)"> AND T.ORDER_TIME = #{orderTime} </if>
+        </where>
+    </select>
+
+    <select id="findByShopping" parameterType="com.up72.hq.model.ShoppingCart" resultMap="RM_shoppingCart">
+        SELECT <include refid="shoppingCart_columns" /> FROM HQ_SHOPPING_CART AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(count)"> AND T.COUNT = #{count} </if>
+        </where>
+    </select>
+
+    <select id="findByGoodsId" parameterType="map"  resultMap="RM_shoppingCart">
+        SELECT <include refid="shoppingCart_columns" /> FROM HQ_SHOPPING_CART AS T WHERE  T.GOODS_ID = #{goodsId} and T.STATUS = 1 and T.MEMBER_ID = #{memberId}
+    </select>
+
+    <select id="findByUserId" resultMap="RM_shoppingCartResp">
+        SELECT <include refid="shoppingCart_columns" />,G.PRICE AS  price
+        FROM HQ_SHOPPING_CART AS T
+        LEFT  JOIN HQ_GOODS AS G ON G.ID = T.GOODS_ID
+        WHERE  T.MEMBER_ID = #{id} and  STATUS=1
+
+    </select>
+
+
+    <select id="countShoppingCartByUserId" resultType="java.lang.Integer">
+        SELECT count(T.ID) FROM HQ_SHOPPING_CART AS T WHERE  T.MEMBER_ID = #{id} and T.STATUS = 1
+    </select>
+
+    
+</mapper>

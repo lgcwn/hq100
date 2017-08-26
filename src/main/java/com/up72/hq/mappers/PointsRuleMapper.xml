@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.PointsRuleMapper">
+    <resultMap id="RM_pointsRule" type="com.up72.hq.model.PointsRule">
+        <result property="id" column="ID" />
+        <result property="name" column="NAME" />
+        <result property="score" column="SCORE" />
+        <result property="upperLimit" column="UPPER_LIMIT" />
+        <result property="enable" column="ENABLE" />
+        <result property="timeLimit" column="TIME_LIMIT" />
+        <result property="constant" column="CONSTANT" />
+    </resultMap>
+    
+    <sql id="pointsRule_columns">
+        T.ID,T.NAME,T.SCORE,T.UPPER_LIMIT,T.ENABLE,T.TIME_LIMIT,T.CONSTANT
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_POINTS_RULE (
+         ID, NAME, SCORE, UPPER_LIMIT, ENABLE, TIME_LIMIT, CONSTANT
+        ) VALUES (
+         #{id}, #{name}, #{score}, #{upperLimit}, #{enable}, #{timeLimit}, #{constant}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_POINTS_RULE AS T SET
+            T.NAME = #{name} , T.SCORE = #{score} , T.UPPER_LIMIT = #{upperLimit} , T.ENABLE = #{enable} , T.TIME_LIMIT = #{timeLimit} , T.CONSTANT = #{constant}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_POINTS_RULE WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_pointsRule">
+        SELECT <include refid="pointsRule_columns" /> FROM HQ_POINTS_RULE AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_pointsRule">
+     SELECT <include refid="pointsRule_columns" />  FROM HQ_POINTS_RULE AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(score)"> AND T.SCORE = #{score} </if>
+           <if test="@Ognl@isNotEmpty(upperLimit)"> AND T.UPPER_LIMIT = #{upperLimit} </if>
+           <if test="@Ognl@isNotEmpty(enable)"> AND T.ENABLE = #{enable} </if>
+           <if test="@Ognl@isNotEmpty(timeLimit)"> AND T.TIME_LIMIT = #{timeLimit} </if>
+           <if test="@Ognl@isNotEmpty(constant)"> AND T.CONSTANT = #{constant} </if>
+        </where>
+    </select>
+
+    
+</mapper>

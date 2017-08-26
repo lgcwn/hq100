@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.FilterWordsMapper">
+    <resultMap id="RM_filterWords" type="com.up72.hq.model.FilterWords">
+        <result property="id" column="ID" />
+        <result property="words" column="WORDS" />
+        <result property="replaceWords" column="REPLACE_WORDS" />
+        <result property="addTime" column="ADD_TIME" />
+    </resultMap>
+    
+    <sql id="filterWords_columns">
+        T.ID,T.WORDS,T.REPLACE_WORDS,T.ADD_TIME
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_FILTER_WORDS (
+          WORDS, REPLACE_WORDS, ADD_TIME
+        ) VALUES (
+          #{words}, #{replaceWords}, #{addTime}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_FILTER_WORDS AS T SET
+            T.WORDS = #{words} , T.REPLACE_WORDS = #{replaceWords} , T.ADD_TIME = #{addTime}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_FILTER_WORDS WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findAll" resultMap="RM_filterWords">
+        SELECT <include refid="filterWords_columns" /> FROM HQ_FILTER_WORDS T
+    </select>
+    <select id="findById" resultMap="RM_filterWords">
+        SELECT <include refid="filterWords_columns" /> FROM HQ_FILTER_WORDS AS T WHERE  T.ID = #{id}
+    </select>
+    <select id="findByWords" resultMap="RM_filterWords">
+        SELECT <include refid="filterWords_columns" /> FROM HQ_FILTER_WORDS AS T WHERE  T.WORDS = #{words}
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_filterWords">
+     SELECT <include refid="filterWords_columns" />  FROM HQ_FILTER_WORDS AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(words)"> AND T.WORDS = #{words} </if>
+           <if test="@Ognl@isNotEmpty(replaceWords)"> AND T.REPLACE_WORDS = #{replaceWords} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+        </where>
+    </select>
+
+    
+</mapper>

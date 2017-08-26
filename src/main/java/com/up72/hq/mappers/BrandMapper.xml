@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.BrandMapper">
+    <resultMap id="RM_brand" type="com.up72.hq.model.Brand">
+        <result property="id" column="ID" />
+        <result property="name" column="NAME" />
+        <result property="logoPath" column="LOGO_PATH" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="content" column="CONTENT" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="supplier" column="SUPPLIER" />
+    </resultMap>
+    
+    <sql id="brand_columns">
+        T.ID,T.NAME,T.LOGO_PATH,T.ADD_TIME,T.CONTENT,T.SORT_ID,T.SUPPLIER
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_BRAND (
+         ID, NAME, LOGO_PATH, ADD_TIME, CONTENT, SORT_ID, SUPPLIER
+        ) VALUES (
+         #{id}, #{name}, #{logoPath}, #{addTime}, #{content}, #{sortId}, #{supplier}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_BRAND AS T SET
+            T.NAME = #{name} , T.LOGO_PATH = #{logoPath} , T.ADD_TIME = #{addTime} , T.CONTENT = #{content} , T.SORT_ID = #{sortId} , T.SUPPLIER = #{supplier}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_BRAND WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_brand">
+        SELECT <include refid="brand_columns" /> FROM HQ_BRAND AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_brand">
+     SELECT <include refid="brand_columns" />  FROM HQ_BRAND AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(logoPath)"> AND T.LOGO_PATH = #{logoPath} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+           <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+           <if test="@Ognl@isNotEmpty(supplier)"> AND T.SUPPLIER = #{supplier} </if>
+        </where>
+    </select>
+
+    
+</mapper>

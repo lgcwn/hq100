@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiSiteCtrlMapper">
+	<resultMap id="RM_busiSiteCtrl" type="com.up72.busi.model.BusiSiteCtrl">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="name" column="NAME" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="images" column="IMAGES" />
+        <result property="texts" column="TEXTS" />
+        <result property="urls" column="URLS" />
+	</resultMap>
+
+	<resultMap id="RM_busiSiteCtrlResp" type="com.up72.busi.dto.resp.BusiSiteCtrlResp" extends="RM_busiSiteCtrl">
+		<collection property="dataList" column="ID" javaType="ArrayList" ofType="com.up72.busi.model.BusiSiteCtrlData" select="com.up72.busi.dao.BusiSiteCtrlDataMapper.findListByCtrlId"/>
+	</resultMap>
+	
+	<sql id="busiSiteCtrl_columns">
+		T.ID,T.SITE_MENU_ID,T.NAME,T.SORT_ID,T.IMAGES,T.TEXTS,T.URLS
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_SITE_CTRL (
+         ID, SITE_MENU_ID, NAME, SORT_ID, IMAGES, TEXTS, URLS
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{name}, #{sortId}, #{images}, #{texts}, #{urls}
+        )
+	</insert>
+    
+	<update id="update" >
+        UPDATE BUSI_SITE_CTRL AS T SET
+	        T.SITE_MENU_ID = #{siteMenuId} , T.NAME = #{name} , T.SORT_ID = #{sortId} , T.IMAGES = #{images} , T.TEXTS = #{texts} , T.URLS = #{urls}  
+        WHERE T.ID = #{id}  
+	</update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_SITE_CTRL WHERE ID = #{id} 
+    </delete>
+    
+    <select id="findById" resultMap="RM_busiSiteCtrl">
+		SELECT <include refid="busiSiteCtrl_columns" /> FROM BUSI_SITE_CTRL  AS T WHERE T.ID = #{id} 
+	</select>
+
+	<select id="findAll" resultMap="RM_busiSiteCtrlResp">
+		SELECT <include refid="busiSiteCtrl_columns" /> FROM BUSI_SITE_CTRL AS T ORDER BY T.SORT_ID ASC
+	</select>
+
+	<select id="findBySiteMenuId" resultMap="RM_busiSiteCtrlResp">
+		SELECT <include refid="busiSiteCtrl_columns" /> FROM BUSI_SITE_CTRL AS T WHERE T.SITE_MENU_ID = #{siteMenuId} ORDER BY T.SORT_ID ASC
+	</select>
+
+	<select id="findPage" parameterType="map" resultMap="RM_busiSiteCtrl">
+	 SELECT <include refid="busiSiteCtrl_columns" />  FROM BUSI_SITE_CTRL AS T
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+	       <if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+	       <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+	       <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+	       <if test="@Ognl@isNotEmpty(images)"> AND T.IMAGES = #{images} </if>
+	       <if test="@Ognl@isNotEmpty(texts)"> AND T.TEXTS = #{texts} </if>
+	       <if test="@Ognl@isNotEmpty(urls)"> AND T.URLS = #{urls} </if>
+		</where>
+	</select>
+
+
+	
+</mapper>

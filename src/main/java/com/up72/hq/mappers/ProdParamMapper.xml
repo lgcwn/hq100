@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ProdParamMapper">
+    <resultMap id="RM_prodParam" type="com.up72.hq.model.ProdParam">
+        <result property="id" column="ID" />
+        <result property="prodId" column="PROD_ID" />
+        <result property="paramId" column="PARAM_ID" />
+        <result property="paramValueId" column="PARAM_VALUE_ID" />
+        <result property="paramValue" column="PARAM_VALUE" />
+    </resultMap>
+
+    <resultMap id="RM_prodParamResp" type="com.up72.hq.dto.resp.ProdParamResp" extends="RM_prodParam">
+        <result property="paramName" column="PARAM_NAME" />
+    </resultMap>
+    
+    <sql id="prodParam_columns">
+        T.ID,T.PROD_ID,T.PARAM_ID,T.PARAM_VALUE_ID,T.PARAM_VALUE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PROD_PARAM (
+         ID, PROD_ID, PARAM_ID, PARAM_VALUE_ID, PARAM_VALUE
+        ) VALUES (
+         #{id}, #{prodId}, #{paramId}, #{paramValueId}, #{paramValue}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_PROD_PARAM AS T SET
+            T.PROD_ID = #{prodId} , T.PARAM_ID = #{paramId} , T.PARAM_VALUE_ID = #{paramValueId} , T.PARAM_VALUE = #{paramValue}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PROD_PARAM WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_prodParam">
+        SELECT <include refid="prodParam_columns" /> FROM HQ_PROD_PARAM AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_prodParam">
+     SELECT <include refid="prodParam_columns" />  FROM HQ_PROD_PARAM AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+           <if test="@Ognl@isNotEmpty(paramId)"> AND T.PARAM_ID = #{paramId} </if>
+           <if test="@Ognl@isNotEmpty(paramValueId)"> AND T.PARAM_VALUE_ID = #{paramValueId} </if>
+           <if test="@Ognl@isNotEmpty(paramValue)"> AND T.PARAM_VALUE = #{paramValue} </if>
+        </where>
+    </select>
+
+    <delete id="deleteByProdId" parameterType="long">
+        DELETE FROM HQ_PROD_PARAM WHERE PROD_ID = #{prodId}
+    </delete>
+
+    <select id="findListByProdId" parameterType="long" resultMap="RM_prodParamResp">
+        SELECT <include refid="prodParam_columns" />,V.PARAM_VALUE AS PARAM_NAME
+        FROM HQ_PROD_PARAM AS T
+        LEFT JOIN HQ_PARAM_VALUE V ON V.ID = T.PARAM_VALUE_ID
+        WHERE T.PROD_ID = #{prodId}
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.MemberMessageMapper">
+    <resultMap id="RM_memberMessage" type="com.up72.hq.model.MemberMessage">
+        <result property="id" column="ID" />
+        <result property="hqMemberId" column="HQ_MEMBER_ID" />
+        <result property="content" column="CONTENT" />
+        <result property="type" column="TYPE" />
+        <result property="column8" column="Column_8" />
+        <result property="status" column="STATUS" />
+        <result property="isDel" column="IS_DEL" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="title" column="TITLE" />
+    </resultMap>
+    <resultMap id="RM_memberMessageResp" type="com.up72.hq.dto.resp.MemberMessageResp" extends="RM_memberMessage">
+        <result property="countAll" column="countAll" />
+        <result property="countWd" column="countWd" />
+        <association property="memberResp" column="HQ_MEMBER_ID" select="com.up72.hq.dao.MemberMapper.findById" />
+    </resultMap>
+    
+    <sql id="memberMessage_columns">
+        T.ID,T.HQ_MEMBER_ID,T.CONTENT,T.TYPE,T.Column_8,T.STATUS,T.IS_DEL,T.ADD_TIME,T.TITLE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_MEMBER_MESSAGE (
+         ID, HQ_MEMBER_ID, CONTENT, TYPE, Column_8, STATUS, IS_DEL, ADD_TIME, TITLE
+        ) VALUES (
+         #{id}, #{hqMemberId}, #{content}, #{type}, #{column8}, #{status}, #{isDel}, #{addTime}, #{title}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_MEMBER_MESSAGE AS T SET
+            T.HQ_MEMBER_ID = #{hqMemberId} , T.CONTENT = #{content} , T.TYPE = #{type} , T.Column_8 = #{column8},T.TITLE = #{title} , T.STATUS = #{status} , T.IS_DEL = #{isDel} , T.ADD_TIME = #{addTime}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_MEMBER_MESSAGE WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_memberMessage">
+        SELECT <include refid="memberMessage_columns" /> FROM HQ_MEMBER_MESSAGE AS T WHERE  T.ID = #{id}  
+    </select>
+
+    <select id="findByIdResp" resultMap="RM_memberMessageResp">
+        SELECT <include refid="memberMessage_columns" /> ,COUNT(T.ID) AS countAll, sum(case when T.`STATUS`=0 then 1 else 0 end) AS countWd FROM HQ_MEMBER_MESSAGE AS T WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_memberMessageResp">
+     SELECT <include refid="memberMessage_columns" />  FROM HQ_MEMBER_MESSAGE AS T
+        LEFT JOIN HQ_MEMBER HM ON HM.ID = T.HQ_MEMBER_ID
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(hqMemberId)"> AND T.HQ_MEMBER_ID = #{hqMemberId} </if>
+           <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+           <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+           <if test="@Ognl@isNotEmpty(column8)"> AND T.Column_8 = #{column8} </if>
+           <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+           <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(userName)"> AND HM.NICK_NAME LIKE CONCAT('%',#{userName},'%') </if>
+        </where>
+    </select>
+    <select id="findByMemberId" resultMap="RM_memberMessageResp">
+        SELECT
+            T.HQ_MEMBER_ID,COUNT(T.ID) AS countAll, sum(case when T.`STATUS`=0 then 1 else 0 end) AS countWd
+            FROM HQ_MEMBER_MESSAGE AS T
+            WHERE T.HQ_MEMBER_ID = #{hqMemberId} AND T.IS_DEL = 0
+    </select>
+
+
+</mapper>

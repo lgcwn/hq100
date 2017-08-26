@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.KeywordMapper">
+    <resultMap id="RM_keyword" type="com.up72.hq.model.Keyword">
+        <result property="id" column="id" />
+        <result property="keyword" column="KEYWORD" />
+        <result property="pinyin" column="PINYIN" />
+        <result property="abbre" column="ABBRE" />
+        <result property="searchTimes" column="SEARCH_TIMES" />
+        <result property="editTime" column="EDIT_TIME" />
+        <result property="type" column="TYPE" />
+    </resultMap>
+    
+    <sql id="keyword_columns">
+        T.id,T.KEYWORD,T.PINYIN,T.ABBRE,T.SEARCH_TIMES,T.EDIT_TIME,T.TYPE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_KEYWORD (
+         id, KEYWORD, PINYIN, ABBRE, SEARCH_TIMES,EDIT_TIME,TYPE
+        ) VALUES (
+         #{id}, #{keyword}, #{pinyin}, #{abbre}, #{searchTimes}, #{editTime},#{type}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_KEYWORD AS T SET
+            T.KEYWORD = #{keyword} , T.PINYIN = #{pinyin} , T.ABBRE = #{abbre} , T.SEARCH_TIMES = #{searchTimes} , T.EDIT_TIME = #{editTime} , T.TYPE = #{type}
+        WHERE T.id = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_KEYWORD WHERE  id = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_keyword">
+        SELECT <include refid="keyword_columns" /> FROM HQ_KEYWORD AS T WHERE  T.id = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_keyword">
+     SELECT <include refid="keyword_columns" />  FROM HQ_KEYWORD AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.id = #{id} </if>
+           <if test="@Ognl@isNotEmpty(keyword)"> AND T.KEYWORD = #{keyword} </if>
+           <if test="@Ognl@isNotEmpty(pinyin)"> AND T.PINYIN = #{pinyin} </if>
+           <if test="@Ognl@isNotEmpty(abbre)"> AND T.ABBRE = #{abbre} </if>
+           <if test="@Ognl@isNotEmpty(searchTimes)"> AND T.SEARCH_TIMES = #{searchTimes} </if>
+        </where>
+    </select>
+
+    <select id="findByKeyword" resultMap="RM_keyword" parameterType="java.lang.String">
+        SELECT <include refid="keyword_columns"/>
+        FROM HQ_KEYWORD AS T where T.KEYWORD = #{keyword}
+    </select>
+
+</mapper>

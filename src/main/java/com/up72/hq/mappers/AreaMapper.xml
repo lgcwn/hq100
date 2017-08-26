@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.AreaMapper">
+    <resultMap id="RM_area" type="com.up72.hq.model.Area">
+        <result property="id" column="ID" />
+        <result property="fullName" column="FULL_NAME" />
+        <result property="name" column="NAME" />
+        <result property="treePath" column="TREE_PATH" />
+        <result property="parentId" column="PARENT_ID" />
+    </resultMap>
+    
+    <sql id="area_columns">
+        T.ID,T.FULL_NAME,T.NAME,T.TREE_PATH,T.PARENT_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_AREA (
+         ID, FULL_NAME, NAME, TREE_PATH, PARENT_ID
+        ) VALUES (
+         #{id}, #{fullName}, #{name}, #{treePath}, #{parentId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_AREA AS T SET
+            T.FULL_NAME = #{fullName} , T.NAME = #{name} , T.TREE_PATH = #{treePath} , T.PARENT_ID = #{parentId}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_AREA WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_area">
+        SELECT <include refid="area_columns" /> FROM HQ_AREA AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_area">
+     SELECT <include refid="area_columns" />  FROM HQ_AREA AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(fullName)"> AND T.FULL_NAME = #{fullName} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(treePath)"> AND T.TREE_PATH = #{treePath} </if>
+           <if test="@Ognl@isNotEmpty(parentId)"> AND T.PARENT_ID = #{parentId} </if>
+        </where>
+    </select>
+
+    
+</mapper>

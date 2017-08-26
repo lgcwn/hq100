@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiCategoryMapper">
+	<resultMap id="RM_busiCategory" type="com.up72.busi.model.BusiCategory">
+		<result property="id" column="ID" />
+		<result property="siteMenuId" column="SITE_MENU_ID" />
+		<result property="companyId" column="COMPANY_ID" />
+		<result property="name" column="NAME" />
+		<result property="parentId" column="PARENT_ID" />
+		<result property="rootId" column="ROOT_ID" />
+		<result property="level" column="LEVEL" />
+		<result property="idPath" column="ID_PATH" />
+		<result property="isEnable" column="IS_ENABLE" />
+		<result property="isDel" column="IS_DEL" />
+		<result property="issueCnt" column="ISSUE_CNT" />
+		<result property="notIssueCnt" column="NOT_ISSUE_CNT" />
+		<result property="auditingCnt" column="AUDITING_CNT" />
+		<result property="notAuditingCnt" column="NOT_AUDITING_CNT" />
+		<result property="addUserId" column="ADD_USER_ID" />
+		<result property="addUserName" column="ADD_USER_NAME" />
+		<result property="addTime" column="ADD_TIME" />
+		<result property="addTime" column="ADD_TIME" />
+		<result property="sortId" column="SORT_ID" />
+		<result property="templateIndex" column="TEMPLATE_INDEX" />
+		<result property="templateList" column="TEMPLATE_LIST" />
+		<result property="templateDetail" column="TEMPLATE_DETAIL" />
+		<result property="staticFilePath" column="STATIC_FILE_PATH" />
+		<result property="templateIndexWap" column="TEMPLATE_INDEX_WAP" />
+		<result property="templateListWap" column="TEMPLATE_LIST_WAP" />
+		<result property="templateDetailWap" column="TEMPLATE_DETAIL_WAP" />
+		<result property="staticFilePathWap" column="STATIC_FILE_PATH_WAP" />
+		<result property="isStatic" column="IS_STATIC" />
+		<result property="staticFileRule" column="STATIC_FILE_RULE" />
+	</resultMap>
+
+	<resultMap id="RM_busiCategoryResp" type="com.up72.busi.dto.resp.BusiCategoryResp" extends="RM_busiCategory">
+		<association property="countSize" column="ID" select="com.up72.busi.dao.BusiCategoryMapper.findCountByPid"></association>
+	</resultMap>
+
+	<resultMap id="RM_busiCategoryTempFileResp" type="com.up72.busi.dto.resp.BusiCategoryResp" extends="RM_busiCategory">
+		<association property="countSize" column="ID" select="com.up72.busi.dao.BusiCategoryMapper.findCountByPid"></association>
+		<association property="tmplIndex" javaType="com.up72.busi.model.BusiSiteTemplateFile" column="TEMPLATE_INDEX" select="com.up72.busi.dao.BusiSiteTemplateFileMapper.findById"></association>
+		<association property="tmplList" javaType="com.up72.busi.model.BusiSiteTemplateFile" column="TEMPLATE_LIST" select="com.up72.busi.dao.BusiSiteTemplateFileMapper.findById"></association>
+		<association property="tmplDetail" javaType="com.up72.busi.model.BusiSiteTemplateFile" column="TEMPLATE_DETAIL" select="com.up72.busi.dao.BusiSiteTemplateFileMapper.findById"></association>
+		<association property="busiSiteMenu" javaType="com.up72.busi.model.BusiSiteMenu" column="SITE_MENU_ID" select="com.up72.busi.dao.BusiSiteMenuMapper.findById"></association>
+	</resultMap>
+
+	<sql id="busiCategory_columns">
+		<![CDATA[ID,SITE_MENU_ID,COMPANY_ID,NAME,PARENT_ID,ROOT_ID,LEVEL,ID_PATH,IS_ENABLE,IS_DEL,ISSUE_CNT,NOT_ISSUE_CNT,AUDITING_CNT,NOT_AUDITING_CNT,ADD_USER_ID,ADD_USER_NAME,ADD_TIME,SORT_ID,TEMPLATE_INDEX, TEMPLATE_LIST, TEMPLATE_DETAIL, STATIC_FILE_PATH,TEMPLATE_INDEX_WAP, TEMPLATE_LIST_WAP, TEMPLATE_DETAIL_WAP, STATIC_FILE_PATH_WAP, IS_STATIC, STATIC_FILE_RULE
+	    ]]>
+	</sql>
+
+	<sql id="select_sql">
+		SELECT <include refid="busiCategory_columns" />  FROM BUSI_CATEGORY
+		<where>
+			<if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(siteMenuId)">
+				AND SITE_MENU_ID = #{siteMenuId}
+			</if>
+			<if test="@Ognl@isNotEmpty(companyId)">
+				AND COMPANY_ID = #{companyId}
+			</if>
+			<if test="@Ognl@isNotEmpty(name)">
+				AND NAME = #{name}
+			</if>
+			<if test="@Ognl@isNotEmpty(parentId)">
+				AND PARENT_ID = #{parentId}
+			</if>
+			<if test="@Ognl@isNotEmpty(rootId)">
+				AND ROOT_ID = #{rootId}
+			</if>
+			<if test="@Ognl@isNotEmpty(level)">
+				AND LEVEL = #{level}
+			</if>
+			<if test="@Ognl@isNotEmpty(idPath)">
+				AND ID_PATH = #{idPath}
+			</if>
+			<if test="@Ognl@isNotEmpty(isEnable)">
+				AND IS_ENABLE = #{isEnable}
+			</if>
+			<if test="@Ognl@isNotEmpty(isDel)">
+				AND IS_DEL = #{isDel}
+			</if>
+			<if test="@Ognl@isNotEmpty(issueCnt)">
+				AND ISSUE_CNT = #{issueCnt}
+			</if>
+			<if test="@Ognl@isNotEmpty(notIssueCnt)">
+				AND NOT_ISSUE_CNT = #{notIssueCnt}
+			</if>
+			<if test="@Ognl@isNotEmpty(auditingCnt)">
+				AND AUDITING_CNT = #{auditingCnt}
+			</if>
+			<if test="@Ognl@isNotEmpty(notAuditingCnt)">
+				AND NOT_AUDITING_CNT = #{notAuditingCnt}
+			</if>
+			<if test="@Ognl@isNotEmpty(addUserId)">
+				AND ADD_USER_ID = #{addUserId}
+			</if>
+			<if test="@Ognl@isNotEmpty(addUserName)">
+				AND ADD_USER_NAME = #{addUserName}
+			</if>
+			<if test="@Ognl@isNotEmpty(addTime)">
+				AND ADD_TIME = #{addTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(templateIndex)">
+				AND TEMPLATE_INDEX = #{templateIndex}
+			</if>
+			<if test="@Ognl@isNotEmpty(templateList)">
+				AND TEMPLATE_LIST = #{templateList}
+			</if>
+			<if test="@Ognl@isNotEmpty(templateDetail)">
+				AND TEMPLATE_DETAIL = #{templateDetail}
+			</if>
+			<if test="@Ognl@isNotEmpty(staticFilePath)">
+				AND STATIC_FILE_PATH = #{staticFilePath}
+			</if>
+			<if test="@Ognl@isNotEmpty(templateIndexWap)">
+				AND TEMPLATE_INDEX_WAP = #{templateIndexWap}
+			</if>
+			<if test="@Ognl@isNotEmpty(templateListWap)">
+				AND TEMPLATE_LIST_WAP = #{templateListWap}
+			</if>
+			<if test="@Ognl@isNotEmpty(templateDetailWap)">
+				AND TEMPLATE_DETAIL_WAP = #{templateDetailWap}
+			</if>
+			<if test="@Ognl@isNotEmpty(staticFilePathWap)">
+				AND STATIC_FILE_PATH_WAP = #{staticFilePathWap}
+			</if>
+			<if test="@Ognl@isNotEmpty(isStatic)">
+				AND IS_STATIC = #{isStatic}
+			</if>
+			<if test="@Ognl@isNotEmpty(staticFileRule)">
+				AND STATIC_FILE_RULE = #{staticFileRule}
+			</if>
+		</where>
+		ORDER BY SORT_ID ASC
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+        INSERT INTO BUSI_CATEGORY (
+         ID, SITE_MENU_ID, COMPANY_ID, NAME, PARENT_ID, ROOT_ID, LEVEL, ID_PATH, IS_ENABLE, IS_DEL, ISSUE_CNT, NOT_ISSUE_CNT, AUDITING_CNT, NOT_AUDITING_CNT, ADD_USER_ID, ADD_USER_NAME, ADD_TIME, SORT_ID, TEMPLATE_INDEX, TEMPLATE_LIST, TEMPLATE_DETAIL, STATIC_FILE_PATH, TEMPLATE_INDEX_WAP, TEMPLATE_LIST_WAP, TEMPLATE_DETAIL_WAP, STATIC_FILE_PATH_WAP, IS_STATIC, STATIC_FILE_RULE
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{companyId}, #{name}, #{parentId}, #{rootId}, #{level}, #{idPath}, #{isEnable}, #{isDel}, #{issueCnt}, #{notIssueCnt}, #{auditingCnt}, #{notAuditingCnt}, #{addUserId}, #{addUserName}, #{addTime}, #{sortId}, #{templateIndex}, #{templateList}, #{templateDetail}, #{staticFilePath}, #{templateIndexWap}, #{templateListWap}, #{templateDetailWap}, #{staticFilePathWap}, #{isStatic}, #{staticFileRule}
+        )
+    ]]>
+	</insert>
+
+	<update id="update" >
+		<![CDATA[
+        UPDATE BUSI_CATEGORY SET
+	        SITE_MENU_ID = #{siteMenuId} , COMPANY_ID = #{companyId} , NAME = #{name} , PARENT_ID = #{parentId} , ROOT_ID = #{rootId} , LEVEL = #{level} , ID_PATH = #{idPath} , IS_ENABLE = #{isEnable} , IS_DEL = #{isDel} , ISSUE_CNT = #{issueCnt} , NOT_ISSUE_CNT = #{notIssueCnt} , AUDITING_CNT = #{auditingCnt} , NOT_AUDITING_CNT = #{notAuditingCnt} , ADD_USER_ID = #{addUserId} , ADD_USER_NAME = #{addUserName} , ADD_TIME = #{addTime}, SORT_ID = #{sortId}, TEMPLATE_INDEX = #{templateIndex}, TEMPLATE_LIST = #{templateList}, TEMPLATE_DETAIL = #{templateDetail}, STATIC_FILE_PATH = #{staticFilePath}, TEMPLATE_INDEX_WAP = #{templateIndexWap}, TEMPLATE_LIST_WAP = #{templateListWap}, TEMPLATE_DETAIL_WAP = #{templateDetailWap}, STATIC_FILE_PATH_WAP = #{staticFilePathWap}, IS_STATIC = #{isStatic}, STATIC_FILE_RULE = #{staticFileRule}
+        WHERE 
+        	ID = #{id}  
+    ]]>
+	</update>
+
+	<delete id="delete">
+		<![CDATA[
+        DELETE FROM BUSI_CATEGORY WHERE
+        ID = #{id} 
+    ]]>
+	</delete>
+
+	<select id="findById" resultMap="RM_busiCategory">
+		SELECT <include refid="busiCategory_columns" />
+		<![CDATA[
+		    FROM BUSI_CATEGORY 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+
+	<select id="findPage" parameterType="map" resultMap="RM_busiCategory">
+		<include refid="select_sql" />
+	</select>
+
+	<select id="findList" parameterType="map" resultMap="RM_busiCategoryResp">
+		<include refid="select_sql" />
+	</select>
+
+	<select id="findList4TmplFile" parameterType="map" resultMap="RM_busiCategoryTempFileResp">
+		<include refid="select_sql" />
+	</select>
+
+	<select id="findNoteListByPid" parameterType="String" resultMap="RM_busiCategoryResp">
+		SELECT <include refid="busiCategory_columns" />  FROM BUSI_CATEGORY AS T
+		WHERE T.IS_DEL = 0 AND T.ID_PATH LIKE "%[${_parameter}]%" ORDER BY SORT_ID ASC
+	</select>
+
+	<select id="findList4Tree" parameterType="map" resultMap="RM_busiCategoryResp">
+		<include refid="select_sql" />
+	</select>
+
+	<select id="findByPid" parameterType="Long" resultMap="RM_busiCategoryResp">
+		SELECT <include refid="busiCategory_columns" />  FROM BUSI_CATEGORY AS T
+		WHERE T.IS_DEL = 0 AND T.IS_ENABLE = 1 AND T.PARENT_ID = #{pid} ORDER BY T.SORT_ID ASC
+	</select>
+
+	<select id="findCountByPid" parameterType="Long" resultType="Long">
+		SELECT COUNT(ID) FROM BUSI_CATEGORY
+		WHERE IS_DEL = 0 AND IS_ENABLE = 1 AND PARENT_ID = #{id}
+	</select>
+
+	<delete id="deleteByCompanyId" parameterType="long">
+		DELETE FROM BUSI_CATEGORY WHERE COMPANY_ID = #{companyId} OR SITE_MENU_ID IN (SELECT ID FROM BUSI_SITE_MENU WHERE COMPANY_ID = #{companyId})
+	</delete>
+
+	<select id="cntFilePath" resultType="int">
+		SELECT COUNT(1) FROM BUSI_CATEGORY AS T WHERE T.STATIC_FILE_PATH = #{staticFilePath}
+		<if test="@Ognl@isNotEmpty(id)"> AND T.ID != #{id} </if>
+	</select>
+
+	<select id="findByFilePath" resultMap="RM_busiCategory">
+		SELECT <include refid="busiCategory_columns" />  FROM BUSI_CATEGORY AS T WHERE T.STATIC_FILE_PATH = #{staticFilePath} LIMIT 1
+	</select>
+</mapper>

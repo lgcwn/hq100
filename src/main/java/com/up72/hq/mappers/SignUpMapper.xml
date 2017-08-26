@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.SignUpMapper">
+    <resultMap id="RM_signUp" type="com.up72.hq.model.SignUp">
+        <result property="id" column="ID" />
+        <result property="appId" column="APP_ID" />
+        <result property="appSecret" column="APP_SECRET" />
+        <result property="appStatus" column="APP_STATUS" />
+        <result property="appName" column="APP_NAME" />
+        <result property="appDescription" column="APP_DESCRIPTION" />
+        <result property="developer" column="DEVELOPER" />
+        <result property="email" column="EMAIL" />
+        <result property="phone" column="PHONE" />
+        <result property="timestamp" column="TIMESTAMP" />
+        <result property="appVer" column="APP_VER" />
+        <result property="appRef" column="APP_REF" />
+        <result property="appCoinsWon" column="APP_COINS_WON" />
+        <result property="appCoinsLost" column="APP_COINS_LOST" />
+        <result property="appPointsWon" column="APP_POINTS_WON" />
+        <result property="appPointsLost" column="APP_POINTS_LOST" />
+        <result property="isDelete" column="IS_DELETE" />
+    </resultMap>
+    
+    <sql id="signUp_columns">
+        T.ID,T.APP_ID,T.APP_SECRET,T.APP_STATUS,T.APP_NAME,T.APP_DESCRIPTION,T.DEVELOPER ,T.APP_POINTS_WON,T.APP_POINTS_LOST,T.EMAIL,T.PHONE,T.TIMESTAMP,T.APP_VER,T.APP_REF,T.APP_COINS_WON,T.APP_COINS_LOST,T.IS_DELETE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO APP_SIGN_UP (
+         ID, APP_ID, APP_SECRET, APP_STATUS, APP_NAME, APP_DESCRIPTION, DEVELOPER, EMAIL, PHONE, TIMESTAMP, APP_VER, APP_REF, APP_COINS_WON, APP_COINS_LOST,IS_DELETE,APP_POINTS_WON,APP_POINTS_LOST
+        ) VALUES (
+         #{id}, #{appId}, #{appSecret}, #{appStatus}, #{appName}, #{appDescription}, #{developer}, #{email}, #{phone}, #{timestamp}, #{appVer}, #{appRef}, #{appCoinsWon}, #{appCoinsLost}, #{isDelete}, #{appPointsWon}, #{appPointsLost}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE APP_SIGN_UP AS T SET
+            T.APP_ID = #{appId} , T.APP_SECRET = #{appSecret} , T.APP_STATUS = #{appStatus} , T.APP_NAME = #{appName} , T.APP_DESCRIPTION = #{appDescription} , T.DEVELOPER = #{developer} ,T.IS_DELETE = #{isDelete},T.APP_POINTS_WON = #{appPointsWon},T.APP_POINTS_LOST = #{appPointsLost},   T.EMAIL = #{email} , T.PHONE = #{phone} , T.TIMESTAMP = #{timestamp} , T.APP_VER = #{appVer} , T.APP_REF = #{appRef} , T.APP_COINS_WON = #{appCoinsWon} , T.APP_COINS_LOST = #{appCoinsLost}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM APP_SIGN_UP WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_signUp">
+        SELECT <include refid="signUp_columns" /> FROM APP_SIGN_UP AS T WHERE  T.ID = #{id}  
+    </select>
+
+    <select id="findByAppId" resultMap="RM_signUp">
+        SELECT <include refid="signUp_columns" /> FROM APP_SIGN_UP AS T WHERE  T.APP_ID = #{appId}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_signUp">
+     SELECT <include refid="signUp_columns" />  FROM APP_SIGN_UP AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(appId)"> AND T.APP_ID = #{appId} </if>
+           <if test="@Ognl@isNotEmpty(appSecret)"> AND T.APP_SECRET = #{appSecret} </if>
+           <if test="@Ognl@isNotEmpty(appStatus)"> AND T.APP_STATUS = #{appStatus} </if>
+           <if test="@Ognl@isNotEmpty(appName)"> AND T.APP_NAME = #{appName} </if>
+           <if test="@Ognl@isNotEmpty(appDescription)"> AND T.APP_DESCRIPTION = #{appDescription} </if>
+           <if test="@Ognl@isNotEmpty(developer)"> AND T.DEVELOPER = #{developer} </if>
+           <if test="@Ognl@isNotEmpty(email)"> AND T.EMAIL = #{email} </if>
+           <if test="@Ognl@isNotEmpty(phone)"> AND T.PHONE = #{phone} </if>
+           <if test="@Ognl@isNotEmpty(timestamp)"> AND T.TIMESTAMP = #{timestamp} </if>
+           <if test="@Ognl@isNotEmpty(appVer)"> AND T.APP_VER = #{appVer} </if>
+           <if test="@Ognl@isNotEmpty(appRef)"> AND T.APP_REF = #{appRef} </if>
+           <if test="@Ognl@isNotEmpty(appCoinsWon)"> AND T.APP_COINS_WON = #{appCoinsWon} </if>
+           <if test="@Ognl@isNotEmpty(appCoinsLost)"> AND T.APP_COINS_LOST = #{appCoinsLost} </if>
+           <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+           <if test="@Ognl@isNotEmpty(appPointsWon)"> AND T.APP_POINTS_WON = #{appPointsWon}</if>
+           <if test="@Ognl@isNotEmpty(appPointsLost)"> AND T.APP_POINTS_LOST = #{appPointsLost} </if>
+        </where>
+    </select>
+
+    
+</mapper>

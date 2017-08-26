@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.InformationMapper">
+     <resultMap id="RM_information" type="com.up72.hq.model.Information">
+            <result property="id" column="ID" />
+            <result property="type" column="TYPE" />
+            <result property="title" column="TITLE" />
+            <result property="addTime" column="ADD_TIME" />
+            <result property="editTime" column="EDIT_TIME" />
+            <result property="enabled" column="ENABLED" />
+            <result property="imgs" column="IMGS" />
+            <result property="content" column="CONTENT" />
+            <result property="email" column="EMAIL" />
+            <result property="contactPhone" column="CONTACT_PHONE" />
+     </resultMap>
+
+    <sql id="information_columns">
+        T.ID,T.TYPE,T.TITLE,T.ADD_TIME,T.EDIT_TIME,T.ENABLED,T.IMGS,T.CONTENT,T.EMAIL,T.CONTACT_PHONE
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_INFORMATION (
+         ID, TYPE, TITLE, ADD_TIME, EDIT_TIME, ENABLED, IMGS,CONTENT,EMAIL,CONTACT_PHONE
+                ) VALUES (
+         #{id}, #{type}, #{title}, #{addTime}, #{editTime}, #{enabled}, #{imgs},#{content},#{email},#{contactPhone}
+                )
+     </insert>
+
+    <update id="update" >
+        UPDATE HQ_INFORMATION AS T SET
+        T.TYPE = #{type} , T.TITLE = #{title} , T.ADD_TIME = #{addTime}, T.EDIT_TIME = #{editTime} ,
+        T.ENABLED = #{enabled} , T.IMGS = #{imgs}, T.CONTENT = #{content}, T.EMAIL = #{email}, T.CONTACT_PHONE = #{contactPhone}
+                WHERE
+        T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_INFORMATION WHERE
+        ID = #{id} 
+    </delete>
+
+    <select id="findById" resultMap="RM_information">
+        SELECT <include refid="information_columns" />
+        FROM HQ_INFORMATION  AS T
+        WHERE
+        T.ID = #{id} 
+    </select>
+    <select id="findByType" resultMap="RM_information">
+        SELECT <include refid="information_columns" />
+        FROM HQ_INFORMATION  AS T
+        WHERE  T.TYPE=#{type}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_information">
+        SELECT <include refid="information_columns" />  FROM HQ_INFORMATION AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">
+                AND T.ID = #{id}
+            </if>
+            <if test="@Ognl@isNotEmpty(type)">
+                AND T.TYPE = #{type}
+            </if>
+            <if test="@Ognl@isNotEmpty(typeClause)">
+                AND T.TYPE IN (${typeClause})
+            </if>
+            <if test="@Ognl@isNotEmpty(title)">
+                AND T.TITLE like '%${title}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(addTime)">
+                AND T.ADD_TIME = #{addTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(enabled)">
+                AND T.ENABLED = #{enabled}
+            </if>
+            <if test="@Ognl@isNotEmpty(imgs)">
+                AND T.IMGS = #{imgs}
+            </if>
+        </where>
+    </select>
+
+    <delete id="batchRealDel" parameterType="string">
+        DELETE FROM HQ_INFORMATION WHERE ID IN (${ids})
+    </delete>
+
+</mapper>
+

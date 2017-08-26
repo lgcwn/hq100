@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ThirdPartyUsersMapper">
+    <resultMap id="RM_thirdPartyUsers" type="com.up72.hq.model.ThirdPartyUsers">
+        <result property="id" column="ID" />
+        <result property="type" column="TYPE" />
+        <result property="thirdUserSn" column="THIRD_USER_SN" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="memberId" column="MEMBER_ID" />
+    </resultMap>
+    
+    <sql id="thirdPartyUsers_columns">
+        T.ID,T.TYPE,T.THIRD_USER_SN,T.ADD_TIME,T.MEMBER_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_THIRD_PARTY_USERS (
+         ID, TYPE, THIRD_USER_SN, ADD_TIME, MEMBER_ID
+        ) VALUES (
+         #{id},  #{type}, #{thirdUserSn}, #{addTime}, #{memberId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_THIRD_PARTY_USERS AS T SET
+            T.TYPE = #{type} , T.THIRD_USER_SN = #{thirdUserSn} , T.ADD_TIME = #{addTime} , T.MEMBER_ID = #{memberId}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_THIRD_PARTY_USERS WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_thirdPartyUsers">
+        SELECT <include refid="thirdPartyUsers_columns" /> FROM HQ_THIRD_PARTY_USERS AS T WHERE  T.ID = #{id}  
+    </select>
+
+    <select id="findParam" parameterType="map" resultMap="RM_thirdPartyUsers">
+        SELECT <include refid="thirdPartyUsers_columns" />  FROM HQ_THIRD_PARTY_USERS AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(thirdUserSn)"> AND T.THIRD_USER_SN = #{thirdUserSn} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+        </where>
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_thirdPartyUsers">
+     SELECT <include refid="thirdPartyUsers_columns" />  FROM HQ_THIRD_PARTY_USERS AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+           <if test="@Ognl@isNotEmpty(thirdUserSn)"> AND T.THIRD_USER_SN = #{thirdUserSn} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+        </where>
+    </select>
+
+    <select id="findThirdPartyUsersByUserSn"  parameterType="map" resultMap="RM_thirdPartyUsers">
+        SELECT <include refid="thirdPartyUsers_columns" /> FROM HQ_THIRD_PARTY_USERS AS T WHERE  T.THIRD_USER_SN = #{thirdUserSn}
+    </select>
+
+    
+</mapper>

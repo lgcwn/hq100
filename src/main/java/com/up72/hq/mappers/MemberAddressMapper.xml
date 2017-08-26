@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.MemberAddressMapper">
+    <resultMap id="RM_memberAddress" type="com.up72.hq.model.MemberAddress">
+        <result property="id" column="ID" />
+        <result property="hqMemberId" column="HQ_MEMBER_ID" />
+        <result property="memberName" column="MEMBER_NAME" />
+        <result property="phone" column="PHONE" />
+        <result property="provinceId" column="PROVINCE_ID" />
+        <result property="cityId" column="CITY_ID" />
+        <result property="countyId" column="COUNTY_ID" />
+        <result property="detailAddress" column="DETAIL_ADDRESS" />
+        <result property="postalCode" column="POSTAL_CODE" />
+        <result property="email" column="EMAIL" />
+        <result property="isDefault" column="IS_DEFAULT" />
+        <result property="isDel" column="IS_DEL" />
+        <result property="townId" column="TOWN_ID" />
+        <result property="villageId" column="VILLAGE_ID" />
+    </resultMap>
+
+    <resultMap id="RM_memberAddressResp" type="com.up72.hq.dto.resp.MemberAddressResp" extends="RM_memberAddress">
+        <result property="fullName" column="FULL_NAME" />
+    </resultMap>
+
+    
+    <sql id="memberAddress_columns">
+        T.ID,T.HQ_MEMBER_ID,T.MEMBER_NAME,T.PHONE,T.PROVINCE_ID,T.CITY_ID,T.COUNTY_ID,T.DETAIL_ADDRESS,T.POSTAL_CODE,T.EMAIL,T.IS_DEFAULT,T.IS_DEL,T.TOWN_ID,T.VILLAGE_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_MEMBER_ADDRESS (
+         ID, HQ_MEMBER_ID, MEMBER_NAME, PHONE, PROVINCE_ID, CITY_ID, COUNTY_ID, DETAIL_ADDRESS, POSTAL_CODE, EMAIL, IS_DEFAULT, IS_DEL, TOWN_ID, VILLAGE_ID
+        ) VALUES (
+         #{id}, #{hqMemberId}, #{memberName}, #{phone}, #{provinceId}, #{cityId}, #{countyId}, #{detailAddress}, #{postalCode}, #{email}, #{isDefault}, #{isDel}, #{townId}, #{villageId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_MEMBER_ADDRESS  T SET
+            T.HQ_MEMBER_ID = #{hqMemberId} , T.MEMBER_NAME = #{memberName} , T.PHONE = #{phone} , T.PROVINCE_ID = #{provinceId} , T.CITY_ID = #{cityId} , T.COUNTY_ID = #{countyId} , T.DETAIL_ADDRESS = #{detailAddress} , T.POSTAL_CODE = #{postalCode} , T.EMAIL = #{email} , T.IS_DEFAULT = #{isDefault} , T.IS_DEL = #{isDel} , T.TOWN_ID = #{townId} , T.VILLAGE_ID = #{villageId}  
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_MEMBER_ADDRESS WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_memberAddressResp">
+        SELECT <include refid="memberAddress_columns" /> , (SELECT A.FULL_NAME FROM HQ_AREA A WHERE A.ID = T.COUNTY_ID) as FULL_NAME FROM HQ_MEMBER_ADDRESS  T WHERE  T.ID = #{id}
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_memberAddress">
+     SELECT <include refid="memberAddress_columns" />  FROM HQ_MEMBER_ADDRESS  T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(hqMemberId)"> AND T.HQ_MEMBER_ID = #{hqMemberId} </if>
+           <if test="@Ognl@isNotEmpty(memberName)"> AND T.MEMBER_NAME = #{memberName} </if>
+           <if test="@Ognl@isNotEmpty(phone)"> AND T.PHONE = #{phone} </if>
+           <if test="@Ognl@isNotEmpty(provinceId)"> AND T.PROVINCE_ID = #{provinceId} </if>
+           <if test="@Ognl@isNotEmpty(cityId)"> AND T.CITY_ID = #{cityId} </if>
+           <if test="@Ognl@isNotEmpty(countyId)"> AND T.COUNTY_ID = #{countyId} </if>
+           <if test="@Ognl@isNotEmpty(detailAddress)"> AND T.DETAIL_ADDRESS = #{detailAddress} </if>
+           <if test="@Ognl@isNotEmpty(postalCode)"> AND T.POSTAL_CODE = #{postalCode} </if>
+           <if test="@Ognl@isNotEmpty(email)"> AND T.EMAIL = #{email} </if>
+           <if test="@Ognl@isNotEmpty(isDefault)"> AND T.IS_DEFAULT = #{isDefault} </if>
+           <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+           <if test="@Ognl@isNotEmpty(townId)"> AND T.TOWN_ID = #{townId} </if>
+           <if test="@Ognl@isNotEmpty(villageId)"> AND T.VILLAGE_ID = #{villageId} </if>
+        </where>
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_memberAddressResp">
+        SELECT T.*,
+        (SELECT A.FULL_NAME FROM HQ_AREA A WHERE A.ID = T.COUNTY_ID) as FULL_NAME
+        FROM HQ_MEMBER_ADDRESS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(hqMemberId)"> AND T.HQ_MEMBER_ID = #{hqMemberId} </if>
+            <if test="@Ognl@isNotEmpty(memberName)"> AND T.MEMBER_NAME = #{memberName} </if>
+            <if test="@Ognl@isNotEmpty(phone)"> AND T.PHONE = #{phone} </if>
+            <if test="@Ognl@isNotEmpty(provinceId)"> AND T.PROVINCE_ID = #{provinceId} </if>
+            <if test="@Ognl@isNotEmpty(cityId)"> AND T.CITY_ID = #{cityId} </if>
+            <if test="@Ognl@isNotEmpty(countyId)"> AND T.COUNTY_ID = #{countyId} </if>
+            <if test="@Ognl@isNotEmpty(detailAddress)"> AND T.DETAIL_ADDRESS = #{detailAddress} </if>
+            <if test="@Ognl@isNotEmpty(postalCode)"> AND T.POSTAL_CODE = #{postalCode} </if>
+            <if test="@Ognl@isNotEmpty(email)"> AND T.EMAIL = #{email} </if>
+            <if test="@Ognl@isNotEmpty(isDefault)"> AND T.IS_DEFAULT = #{isDefault} </if>
+            <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+            <if test="@Ognl@isNotEmpty(townId)"> AND T.TOWN_ID = #{townId} </if>
+            <if test="@Ognl@isNotEmpty(villageId)"> AND T.VILLAGE_ID = #{villageId} </if>
+        </where>
+    </select>
+
+    <select id="findMemberAddress" resultMap="RM_memberAddressResp">
+        SELECT <include refid="memberAddress_columns" />, (SELECT A.FULL_NAME FROM HQ_AREA A WHERE A.ID = T.COUNTY_ID) as FULL_NAME
+        FROM HQ_MEMBER_ADDRESS  T   WHERE  T.HQ_MEMBER_ID = #{hqMemberId}
+        AND   T.IS_DEFAULT =1
+    </select>
+    
+</mapper>

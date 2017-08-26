@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.OrderShippingInfoMapper">
+    <resultMap id="RM_orderShippingInfo" type="com.up72.hq.model.OrderShippingInfo">
+        <result property="id" column="ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="info" column="INFO" />
+        <result property="addTime" column="ADD_TIME" />
+    </resultMap>
+    
+    <sql id="orderShippingInfo_columns">
+        T.ID,T.ORDER_ID,T.INFO,T.ADD_TIME
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ORDER_SHIPPING_INFO (
+         ID, ORDER_ID, INFO, ADD_TIME
+        ) VALUES (
+         #{id}, #{orderId}, #{info}, #{addTime}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ORDER_SHIPPING_INFO AS T SET
+            T.ORDER_ID = #{orderId} , T.INFO = #{info} , T.ADD_TIME = #{addTime}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ORDER_SHIPPING_INFO WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_orderShippingInfo">
+        SELECT <include refid="orderShippingInfo_columns" /> FROM HQ_ORDER_SHIPPING_INFO AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_orderShippingInfo">
+     SELECT <include refid="orderShippingInfo_columns" />  FROM HQ_ORDER_SHIPPING_INFO AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+           <if test="@Ognl@isNotEmpty(info)"> AND T.INFO = #{info} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+        </where>
+    </select>
+
+    
+</mapper>

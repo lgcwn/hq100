@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.QuizOrderMapper">
+    <resultMap id="RM_quizOrder" type="com.up72.hq.model.QuizOrder">
+        <result property="id" column="ID" />
+        <result property="hqQuizSelectId" column="HQ_QUIZ_SELECT_ID" />
+        <result property="hqQuizQuestioId" column="HQ_QUIZ_QUESTIO_ID" />
+        <result property="hqCrowdId" column="HQ_CROWD_ID" />
+        <result property="quizMoney" column="QUIZ_MONEY" />
+        <result property="quizReturn" column="QUIZ_RETURN" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="isSuccess" column="IS_SUCCESS" />
+    </resultMap>
+    <resultMap id="RM_quizOrderResp" type="com.up72.hq.dto.resp.QuizOrderResp" extends="RM_quizOrder">
+        <result property="quizSelectName" column="QUIZ_SELECT_NAME" />
+        <result property="quizQuestioName" column="QUIZ_QUESTIO_NAME" />
+        <result property="quizId" column="QUIZ_ID" />
+        <result property="selectNum" column="SELECT_NUM" />
+        <result property="hqsOdds" column="HQS_ODDS" />
+        <result property="trueName" column="TRUE_NAME" />
+    </resultMap>
+    
+    <sql id="quizOrder_columns">
+        T.ID,T.HQ_QUIZ_SELECT_ID,T.HQ_QUIZ_QUESTIO_ID,T.HQ_CROWD_ID,T.QUIZ_MONEY,T.QUIZ_RETURN,T.MEMBER_ID,T.ADD_TIME,T.IS_SUCCESS
+    </sql>
+    
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(hqQuizSelectId)"> AND T.HQ_QUIZ_SELECT_ID = #{hqQuizSelectId} </if>
+            <if test="@Ognl@isNotEmpty(hqQuizQuestioId)"> AND T.HQ_QUIZ_QUESTIO_ID = #{hqQuizQuestioId} </if>
+            <if test="@Ognl@isNotEmpty(hqCrowdId)"> AND T.HQ_CROWD_ID = #{hqCrowdId} </if>
+            <if test="@Ognl@isNotEmpty(quizMoney)"> AND T.QUIZ_MONEY = #{quizMoney} </if>
+            <if test="@Ognl@isNotEmpty(quizReturn)"> AND T.QUIZ_RETURN = #{quizReturn} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(isSuccess)"> AND T.IS_SUCCESS = #{isSuccess} </if>
+            <if test="@Ognl@isNotEmpty(addStartTime)">
+                <![CDATA[
+                 AND T.ADD_TIME >= #{addStartTime}
+                 ]]>
+            </if>
+            <if test="@Ognl@isNotEmpty(addEndTime)">
+                <![CDATA[
+                 AND T.ADD_TIME <= #{addEndTime}
+                 ]]>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_QUIZ_ORDER (
+         ID, HQ_QUIZ_SELECT_ID, HQ_QUIZ_QUESTIO_ID, HQ_CROWD_ID, QUIZ_MONEY, QUIZ_RETURN, MEMBER_ID, ADD_TIME, IS_SUCCESS
+        ) VALUES (
+         #{id}, #{hqQuizSelectId}, #{hqQuizQuestioId}, #{hqCrowdId}, #{quizMoney}, #{quizReturn}, #{memberId}, #{addTime}, #{isSuccess}
+                 )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_QUIZ_ORDER  T SET
+            T.HQ_QUIZ_SELECT_ID = #{hqQuizSelectId} , T.HQ_QUIZ_QUESTIO_ID = #{hqQuizQuestioId} , T.HQ_CROWD_ID = #{hqCrowdId} , T.QUIZ_MONEY = #{quizMoney} , T.QUIZ_RETURN = #{quizReturn} , T.MEMBER_ID = #{memberId} , T.ADD_TIME = #{addTime} , T.IS_SUCCESS = #{isSuccess}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_QUIZ_ORDER WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_quizOrder">
+        SELECT <include refid="quizOrder_columns" /> FROM HQ_QUIZ_ORDER  T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_quizOrder">
+     SELECT <include refid="quizOrder_columns" />  FROM HQ_QUIZ_ORDER  T
+      <include refid="where_sql" />
+    </select>
+    <select id="findAll" parameterType="map" resultMap="RM_quizOrderResp">
+     SELECT <include refid="quizOrder_columns" /> ,HQQ.`NAME` AS QUIZ_QUESTIO_NAME,HQS.`NAME` AS QUIZ_SELECT_NAME,HQS.ODDS AS HQS_ODDS,HQS1.`NAME` AS TRUE_NAME FROM HQ_QUIZ_ORDER  T
+        LEFT JOIN HQ_QUIZ_QUESTIO HQQ ON HQQ.ID = T.HQ_QUIZ_QUESTIO_ID
+        LEFT JOIN HQ_QUIZ_SELECT HQS ON HQS.ID = T.HQ_QUIZ_SELECT_ID
+        LEFT JOIN HQ_QUIZ_SELECT HQS1 ON HQS1.ID = HQQ.SELECT_ID
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findPageResp" parameterType="map" resultMap="RM_quizOrderResp">
+
+        SELECT T.*,HQQ.`NAME` AS QUIZ_QUESTIO_NAME,HQQ.QUIZ_ID AS QUIZ_ID,HQS.`NAME` AS QUIZ_SELECT_NAME,HQS.ODDS AS HQS_ODDS,HQS1.`NAME` AS TRUE_NAME FROM HQ_QUIZ_ORDER T
+        LEFT JOIN HQ_QUIZ_QUESTIO HQQ ON HQQ.ID = T.HQ_QUIZ_QUESTIO_ID
+        LEFT JOIN HQ_QUIZ_SELECT HQS ON HQS.ID = T.HQ_QUIZ_SELECT_ID
+        LEFT JOIN HQ_QUIZ_SELECT HQS1 ON HQS1.ID = HQQ.SELECT_ID
+        <include refid="where_sql" />
+        ORDER BY T.ID DESC
+    </select>
+    <!--统计数据-->
+    <select id="findListCount" parameterType="map" resultMap="RM_quizOrderResp">
+        SELECT hqq.NAME AS QUIZ_QUESTIO_NAME,hqs.`NAME` AS QUIZ_SELECT_NAME,COUNT(T.HQ_QUIZ_SELECT_ID) AS SELECT_NUM from HQ_QUIZ_ORDER  T
+        LEFT JOIN HQ_QUIZ_QUESTIO hqq ON hqq.ID = T.HQ_QUIZ_QUESTIO_ID
+        LEFT JOIN HQ_QUIZ_SELECT hqs ON hqs.ID = T.HQ_QUIZ_SELECT_ID
+        <include refid="where_sql" />
+        GROUP BY T.HQ_QUIZ_SELECT_ID,T.HQ_QUIZ_QUESTIO_ID
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.TagMapper">
+    <resultMap id="RM_Tag" type="com.up72.hq.model.Tag">
+        <result property="id" column="ID" />
+        <result property="catId" column="CAT_ID" />
+        <result property="name" column="NAME" />
+        <result property="icon" column="ICON" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="isShowInHome" column="IS_SHOW_IN_HOME" />
+    </resultMap>
+
+    <resultMap id="RM_TagResp" type="com.up72.hq.dto.resp.TagResp" extends="RM_Tag">
+        <result property="catName" column="CAT_NAME" />
+    </resultMap>
+
+    <sql id="tag_columns">
+        T.ID,T.CAT_ID,T.NAME,T.ICON,T.SORT_ID,T.IS_SHOW_IN_HOME
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_TAG (
+        ID, CAT_ID, NAME, ICON, SORT_ID,IS_SHOW_IN_HOME
+        ) VALUES (
+        #{id}, #{catId}, #{name}, #{icon}, #{sortId}, #{isShowInHome}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_TAG AS T SET T.CAT_ID = #{catId} , T.NAME = #{name} , T.ICON = #{icon} , T.SORT_ID = #{sortId} , T.IS_SHOW_IN_HOME = #{isShowInHome}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_TAG WHERE ID = #{id}
+    </delete>
+
+    <select id="findById" resultMap="RM_Tag">
+        SELECT <include refid="tag_columns" /> FROM HQ_TAG  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findRespById" resultMap="RM_TagResp">
+        SELECT <include refid="tag_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_TAG  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_Tag">
+        SELECT <include refid="tag_columns" />  FROM HQ_TAG AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+        </where>
+        ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_TagResp">
+        SELECT <include refid="tag_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_TAG AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+        </where>
+        ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="cntUsing" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM HQ_GOODS AS T WHERE
+        CONCAT(',',T.TAG_IDS,',') like '%,${tagId},%'
+    </select>
+
+    <select id="findListByCat" parameterType="map" resultMap="RM_Tag">
+        SELECT <include refid="tag_columns" /> FROM HQ_TAG AS T WHERE T.CAT_ID=
+        (SELECT MAX(T.CAT_ID) FROM HQ_TAG AS T WHERE FIND_IN_SET(T.CAT_ID,(SELECT C.ID_PATH FROM HQ_CAT AS C WHERE C.ID=#{catId})))
+        ORDER BY SORT_ID ASC
+    </select>
+</mapper>

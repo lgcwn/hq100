@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiIssueSetMapper">
+	<resultMap id="RM_busiIssueSet" type="com.up72.busi.model.BusiIssueSet">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="isAuditing" column="IS_AUDITING" />
+        <result property="issueSet" column="ISSUE_SET" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="issueHours" column="ISSUE_HOURS" />
+        <result property="issueMinutes" column="ISSUE_MINUTES" />
+	</resultMap>
+	
+	<sql id="busiIssueSet_columns">
+	    <![CDATA[
+		ID,SITE_MENU_ID,COMPANY_ID,IS_AUDITING,ISSUE_SET,ADD_USER_ID,ADD_USER_NAME,ISSUE_HOURS,ISSUE_MINUTES
+	    ]]>
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO BUSI_ISSUE_SET (
+         ID, SITE_MENU_ID, COMPANY_ID, IS_AUDITING, ISSUE_SET, ADD_USER_ID, ADD_USER_NAME,ISSUE_HOURS,ISSUE_MINUTES
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{companyId}, #{isAuditing}, #{issueSet}, #{addUserId}, #{addUserName},#{issueHours},#{issueMinutes}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE BUSI_ISSUE_SET SET
+	        SITE_MENU_ID = #{siteMenuId} , COMPANY_ID = #{companyId} , IS_AUDITING = #{isAuditing} , ISSUE_SET = #{issueSet} , ADD_USER_ID = #{addUserId} , ADD_USER_NAME = #{addUserName}, ISSUE_HOURS = #{issueHours}, ISSUE_MINUTES = #{issueMinutes}
+        WHERE 
+        	ID = #{id}  
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM BUSI_ISSUE_SET WHERE
+        ID = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="findById" resultMap="RM_busiIssueSet">
+		SELECT <include refid="busiIssueSet_columns" />
+	    <![CDATA[
+		    FROM BUSI_ISSUE_SET 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+	
+	<select id="findPage" parameterType="map" resultMap="RM_busiIssueSet">
+	 SELECT <include refid="busiIssueSet_columns" />  FROM BUSI_ISSUE_SET  
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(siteMenuId)">
+				AND SITE_MENU_ID = #{siteMenuId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(companyId)">
+				AND COMPANY_ID = #{companyId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isAuditing)">
+				AND IS_AUDITING = #{isAuditing}
+			</if>
+	       <if test="@Ognl@isNotEmpty(issueSet)">
+				AND ISSUE_SET = #{issueSet}
+			</if>
+	       <if test="@Ognl@isNotEmpty(addUserId)">
+				AND ADD_USER_ID = #{addUserId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(addUserName)">
+				AND ADD_USER_NAME = #{addUserName}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="findByCompanyIdSiteMenuId" parameterType="map" resultMap="RM_busiIssueSet">
+		SELECT <include refid="busiIssueSet_columns" />  FROM BUSI_ISSUE_SET
+		<where>
+			<if test="@Ognl@isNotEmpty(siteMenuId)">
+				AND SITE_MENU_ID = #{siteMenuId}
+			</if>
+			<if test="@Ognl@isNotEmpty(companyId)">
+				AND COMPANY_ID = #{companyId}
+			</if>
+		</where>
+	</select>
+
+    <delete id="deleteByCompanyId" parameterType="long">
+        DELETE FROM BUSI_ISSUE_SET WHERE COMPANY_ID = #{companyId}
+    </delete>
+</mapper>
+

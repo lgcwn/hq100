@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.PushDeviceMapper">
+	<resultMap id="RM_pushDevice" type="com.up72.hq.model.PushDevice">
+		<result property="id" column="ID" />
+		<result property="type" column="TYPE" />
+		<result property="device" column="DEVICE" />
+		<result property="addTime" column="ADD_TIME" />
+		<result property="status" column="STATUS" />
+		<result property="customerId" column="CUSTOMER_ID" />
+	</resultMap>
+
+	<sql id="whereSql">
+		<where>
+			<if test="@Ognl@isNotEmpty(type)">
+				AND T.TYPE = #{type}
+			</if>
+			<if test="@Ognl@isNotEmpty(customerId)">
+				AND T.CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="@Ognl@isNotEmpty(device)">
+				AND T.DEVICE = #{device}
+			</if>
+		</where>
+	</sql>
+
+	<insert id="save" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO HQ_PUSH_DEVICE (
+         ID, TYPE, DEVICE,ADD_TIME,STATUS,CUSTOMER_ID
+        ) VALUES (
+         #{id}, #{type}, #{device}, #{addTime},#{status},#{customerId}
+        )
+    ]]>
+	</insert>
+
+	<delete id="deleteBySalesMemberId">
+		<![CDATA[
+       		 DELETE FROM HQ_PUSH_DEVICE WHERE  CUSTOMER_ID = #{customerId}
+        ]]>
+	</delete>
+
+	<update id="update" >
+    <![CDATA[
+        UPDATE HQ_PUSH_DEVICE SET
+	        TYPE = #{type} , DEVICE = #{device}  ,ADD_TIME= #{addTime},STATUS=#{status},CUSTOMER_ID=#{customerId}
+        WHERE 
+        	ID = #{id}  
+    ]]>
+	</update>
+
+    <select id="getByTypeAndDevice" resultMap="RM_pushDevice">
+		SELECT  T.*  FROM HQ_PUSH_DEVICE AS  T
+		<include refid="whereSql" />
+	</select>
+	<select id="getAll" resultMap="RM_pushDevice">
+		SELECT   T.*   FROM HQ_PUSH_DEVICE T  WHERE  STATUS=1
+	</select>
+</mapper>
+

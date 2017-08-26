@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.QuizSelectMapper">
+    <resultMap id="RM_quizSelect" type="com.up72.hq.model.QuizSelect">
+        <result property="id" column="ID" />
+        <result property="hqQuizQuestioId" column="HQ_QUIZ_QUESTIO_ID" />
+        <result property="name" column="NAME" />
+        <result property="odds" column="ODDS" />
+    </resultMap>
+
+    <resultMap id="RM_quizSelectResp" type="com.up72.hq.dto.resp.QuizSelectResp" extends="RM_quizSelect">
+        <result property="percentage" column="PERCENTAGE" />
+    </resultMap>
+    <sql id="quizSelect_columns">
+        T.ID,T.HQ_QUIZ_QUESTIO_ID,T.NAME,T.ODDS
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_QUIZ_SELECT (
+         ID, HQ_QUIZ_QUESTIO_ID, NAME, ODDS
+        ) VALUES (
+         #{id}, #{hqQuizQuestioId}, #{name}, #{odds}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_QUIZ_SELECT  T SET
+            T.HQ_QUIZ_QUESTIO_ID = #{hqQuizQuestioId} , T.NAME = #{name} , T.ODDS = #{odds}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_QUIZ_SELECT WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_quizSelect">
+        SELECT <include refid="quizSelect_columns" /> FROM HQ_QUIZ_SELECT T WHERE  T.ID = #{id}
+    </select>
+    <!--获取前台页面展示数据-->
+    <select id="findByQuestioIdLimit" resultMap="RM_quizSelect">
+        SELECT <include refid="quizSelect_columns" /> FROM HQ_QUIZ_SELECT T WHERE  T.HQ_QUIZ_QUESTIO_ID = #{hqQuizQuestioId}
+        LIMIT 2
+    </select>
+    <select id="findByQuestioId" resultMap="RM_quizSelectResp">
+        SELECT <include refid="quizSelect_columns" />,ifnull(ifnull(A.SELECT_MONEY,0)/ifnull(B.SELECT_MONEY,0),0) AS PERCENTAGE FROM HQ_QUIZ_SELECT T
+        LEFT JOIN (SELECT HQ_QUIZ_SELECT_ID, SUM(HQO.QUIZ_MONEY) AS SELECT_MONEY FROM HQ_QUIZ_ORDER HQO
+        GROUP BY HQO.HQ_QUIZ_SELECT_ID) A ON A.HQ_QUIZ_SELECT_ID = T.ID
+        LEFT JOIN(SELECT HQO.HQ_QUIZ_QUESTIO_ID, SUM(HQO.QUIZ_MONEY) AS SELECT_MONEY FROM HQ_QUIZ_ORDER HQO
+        GROUP BY HQO.HQ_QUIZ_QUESTIO_ID) B ON B.HQ_QUIZ_QUESTIO_ID = T.HQ_QUIZ_QUESTIO_ID
+        WHERE  T.HQ_QUIZ_QUESTIO_ID = #{hqQuizQuestioId}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_quizSelect">
+     SELECT <include refid="quizSelect_columns" />  FROM HQ_QUIZ_SELECT  T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(hqQuizQuestioId)"> AND T.HQ_QUIZ_QUESTIO_ID = #{hqQuizQuestioId} </if>
+           <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+           <if test="@Ognl@isNotEmpty(odds)"> AND T.ODDS = #{odds} </if>
+        </where>
+    </select>
+
+    <select id="findList" parameterType="map" resultMap="RM_quizSelect">
+        SELECT <include refid="quizSelect_columns" />  FROM HQ_QUIZ_SELECT  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(hqQuizQuestioId)"> AND T.HQ_QUIZ_QUESTIO_ID = #{hqQuizQuestioId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+            <if test="@Ognl@isNotEmpty(odds)"> AND T.ODDS = #{odds} </if>
+        </where>
+    </select>
+    
+</mapper>

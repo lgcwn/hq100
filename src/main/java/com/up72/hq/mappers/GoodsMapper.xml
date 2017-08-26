@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.GoodsMapper">
+    <resultMap id="RM_Goods" type="com.up72.hq.model.Goods">
+        <result property="id" column="ID" />
+        <result property="prodId" column="PROD_ID" />
+        <result property="catId" column="CAT_ID" />
+        <result property="sn" column="SN" />
+        <result property="isGive" column="IS_GIVE" />
+        <result property="fullName" column="FULL_NAME" />
+        <result property="specNames" column="SPEC_NAMES" />
+        <result property="price" column="PRICE" />
+        <result property="marketPrice" column="MARKET_PRICE" />
+        <result property="stock" column="STOCK" />
+        <result property="sales" column="SALES" />
+        <result property="monthSales" column="MONTH_SALES" />
+        <result property="collectNum" column="COLLECT_NUM" />
+        <result property="isMarketable" column="IS_MARKETABLE" />
+        <result property="isTop" column="IS_TOP" />
+        <result property="firstImg" column="FIRST_IMG" />
+        <result property="images" column="IMAGES" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="editTime" column="EDIT_TIME" />
+        <result property="tagIds" column="TAG_IDS" />
+        <result property="qrCode" column="QR_CODE" />
+        <result property="solrName" column="SOLR_NAME" />
+        <result property="isDelete" column="IS_DELETE" />
+        <result property="markeTime" column="MARKE_TIME" />
+        <result property="sort" column="SORT" />
+        <result property="type" column="TYPE" />
+        <result property="intro" column="INTRO" />
+        <result property="givePoints" column="GIVE_POINTS" />
+    </resultMap>
+
+    <resultMap id="RM_GoodsResp" type="com.up72.hq.dto.resp.GoodsResp" extends="RM_Goods">
+        <result property="prodName" column="prodName"/>
+        <result property="commentCount" column="commentCount"/>
+        <result property="niceCount" column="niceCount"/>
+        <result property="imgStr" column="imgStr"/>
+        <collection property="prodSpecList" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.ProdSpec" select="com.up72.hq.dao.ProdSpecMapper.findListByGoodsId"/>
+        <collection property="cat" column="CAT_ID" javaType="com.up72.hq.model.Cat" ofType="com.up72.hq.model.Cat" select="com.up72.hq.dao.CatMapper.findById"/>
+    </resultMap>
+
+    <resultMap id="RM_Goods2Resp" type="com.up72.hq.dto.resp.Goods2Resp" extends="RM_Goods">
+        <result property="paramInfo" column="PARAM_INFO"/>
+    </resultMap>
+
+    <resultMap id="RM_Goods3Resp" type="com.up72.hq.dto.resp.Goods3Resp" extends="RM_Goods">
+        <result property="catName" column="CAT_NAME"/>
+    </resultMap>
+
+    <sql id="select_sql">
+        SELECT <include refid="goods_columns" />  FROM HQ_GOODS AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(sn)"> AND T.SN LIKE CONCAT('%',#{sn},'%')</if>
+            <if test="@Ognl@isNotEmpty(isGive)"> AND T.IS_GIVE = #{isGive} </if>
+            <if test="@Ognl@isNotEmpty(fullName)"> AND T.FULL_NAME = #{fullName} </if>
+            <if test="@Ognl@isNotEmpty(specNames)"> AND T.SPEC_NAMES = #{specNames} </if>
+            <if test="@Ognl@isNotEmpty(price)"> AND T.PRICE = #{price} </if>
+            <if test="@Ognl@isNotEmpty(marketPrice)"> AND T.MARKET_PRICE = #{marketPrice} </if>
+            <if test="@Ognl@isNotEmpty(stock)"> AND T.STOCK = #{stock} </if>
+            <if test="@Ognl@isNotEmpty(sales)"> AND T.SALES = #{sales} </if>
+            <if test="@Ognl@isNotEmpty(invCode)"> AND T.INV_CODE = #{invCode} </if>
+            <if test="@Ognl@isNotEmpty(monthSales)"> AND T.MONTH_SALES = #{monthSales} </if>
+            <if test="@Ognl@isNotEmpty(collectNum)"> AND T.COLLECT_NUM = #{collectNum} </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isTop)"> AND T.IS_TOP = #{isTop} </if>
+            <if test="@Ognl@isNotEmpty(firstImg)"> AND T.FIRST_IMG = #{firstImg} </if>
+            <if test="@Ognl@isNotEmpty(images)"> AND T.IMAGES = #{images} </if>
+            <if test="@Ognl@isNotEmpty(editTime)"> AND T.EDIT_TIME = #{editTime} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(markeTime)"> AND T.MARKE_TIME = #{markeTime} </if>
+            <if test="@Ognl@isNotEmpty(solrName)"> AND T.SOLR_NAME = #{solrName} </if>
+            <if test="@Ognl@isNotEmpty(qrCode)"> AND T.QR_CODE = #{qrCode} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(tagIds)"> AND T.TAG_IDS = #{tagIds} </if>
+            <if test="@Ognl@isNotEmpty(weight)"> AND T.WEIGHT = #{weight} </if>
+            <if test="@Ognl@isNotEmpty(employer)"> AND T.EMPLOYER = #{employer} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(dosc)"> AND T.DOSC = #{dosc} </if>
+            <if test="@Ognl@isNotEmpty(sort)"> AND T.SORT = #{sort} </if>
+            <if test="@Ognl@isNotEmpty(moveStr)"><![CDATA[ AND T.SORT < #{moveStr} ]]></if>
+            <if test="@Ognl@isNotEmpty(downStr)"><![CDATA[ AND T.SORT > #{downStr} ]]></if>
+        </where>
+    </sql>
+
+    <sql id="goods_columns">
+        T.ID,T.PROD_ID,T.CAT_ID,T.SN,T.IS_GIVE,T.FULL_NAME,T.SPEC_NAMES,T.PRICE,T.MARKET_PRICE,T.STOCK,T.SALES,T.MONTH_SALES,T.COLLECT_NUM,T.IS_MARKETABLE,T.IS_TOP,T.FIRST_IMG,T.IMAGES,T.ADD_TIME,T.EDIT_TIME,T.TAG_IDS,T.QR_CODE,T.SOLR_NAME,T.IS_DELETE,T.MARKE_TIME,T.SORT,T.TYPE,T.INTRO,T.GIVE_POINTS
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_GOODS (
+         ID, PROD_ID, CAT_ID, SN, IS_GIVE, FULL_NAME, SPEC_NAMES, PRICE, MARKET_PRICE, STOCK, SALES, MONTH_SALES, COLLECT_NUM, IS_MARKETABLE, IS_TOP, FIRST_IMG, IMAGES, ADD_TIME, EDIT_TIME, TAG_IDS, QR_CODE, SOLR_NAME, IS_DELETE, MARKE_TIME, SORT, TYPE,INTRO,GIVE_POINTS
+        ) VALUES (
+         #{id}, #{prodId}, #{catId}, #{sn}, #{isGive}, #{fullName}, #{specNames}, #{price}, #{marketPrice}, #{stock}, #{sales}, #{monthSales}, #{collectNum}, #{isMarketable}, #{isTop}, #{firstImg}, #{images}, #{addTime}, #{editTime}, #{tagIds}, #{qrCode}, #{solrName}, #{isDelete}, #{markeTime}, #{sort}, #{type},#{intro},#{givePoints}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_GOODS AS T SET
+            T.PROD_ID = #{prodId} , T.CAT_ID = #{catId} , T.SN = #{sn} , T.IS_GIVE = #{isGive} , T.FULL_NAME = #{fullName} ,
+             T.SPEC_NAMES = #{specNames} , T.PRICE = #{price} , T.MARKET_PRICE = #{marketPrice} , T.STOCK = #{stock} ,
+              T.SALES = #{sales} , T.MONTH_SALES = #{monthSales} , T.COLLECT_NUM = #{collectNum} , T.IS_MARKETABLE = #{isMarketable} , T.IS_TOP = #{isTop} , T.FIRST_IMG = #{firstImg} , T.IMAGES = #{images} , T.ADD_TIME = #{addTime} , T.EDIT_TIME = #{editTime} , T.TAG_IDS = #{tagIds} , T.QR_CODE = #{qrCode} , T.SOLR_NAME = #{solrName},T.GIVE_POINTS = #{givePoints} , T.IS_DELETE = #{isDelete} , T.MARKE_TIME = #{markeTime} , T.SORT = #{sort} , T.TYPE = #{type} ,T.INTRO = #{intro}
+        WHERE T.ID = #{id}  
+    </update>
+    <update id="updateIsMarketable" parameterType="map">
+        UPDATE HQ_GOODS AS T SET T.IS_MARKETABLE = #{isMarketable}, T.MARKE_TIME=#{markeTime} WHERE T.PROD_ID = #{prodId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_GOODS WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteByProdId" parameterType="long">
+        DELETE FROM HQ_GOODS WHERE PROD_ID = #{prodId}
+    </delete>
+
+    <select id="findById" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns" /> FROM HQ_GOODS  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findListByGoodsName" resultMap="RM_Goods">
+        SELECT <include refid="goods_columns" /> FROM HQ_GOODS  AS T WHERE T.FULL_NAME LIKE '%${fullName}%' AND  T.IS_DELETE = 0 AND T.IS_MARKETABLE = 1 ORDER BY T.SALES DESC
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_GoodsResp">
+        <include refid="select_sql" />
+    </select>
+
+    <select id="findList" parameterType="map" resultMap="RM_Goods">
+        <include refid="select_sql" />
+    </select>
+
+    <select id="findResp2ById" parameterType="map" resultMap="RM_Goods2Resp">
+        SELECT <include refid="goods_columns" />,
+        (SELECT CONCAT(GROUP_CONCAT(PV.PARAM_VALUE),'__-__',GROUP_CONCAT(PP.PARAM_VALUE)) FROM HQ_PARAM AS P, HQ_PARAM_VALUE AS PV,HQ_PROD_PARAM AS PP
+        WHERE P.ID=PV.PARAM_ID AND PV.ID=PP.PARAM_VALUE_ID AND PP.PROD_ID=T.PROD_ID
+        ORDER BY P.SORT_ID ASC,PV.SORT_ID ASC ) AS PARAM_INFO
+        FROM HQ_GOODS  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findListByProdId" parameterType="long" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns"/>
+        FROM HQ_GOODS AS T WHERE PROD_ID = #{prodId}
+    </select>
+    <select id="findByProdId" parameterType="map" resultMap="RM_GoodsResp">
+         SELECT <include refid="goods_columns"/>  FROM HQ_GOODS AS T WHERE PROD_ID = #{prodId} AND IS_DELETE = 0
+    </select>
+
+    <select id="findStockById" resultType="java.lang.Integer">
+        SELECT T.STOCK FROM HQ_GOODS  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findSalesById" resultType="java.lang.Integer">
+        SELECT T.MONTH_SALES FROM HQ_GOODS  AS T WHERE T.ID = #{id}
+    </select>
+
+    <update id="updateStock">
+        UPDATE HQ_GOODS SET STOCK = #{stock}, EDIT_TIME = #{editTime} WHERE ID = #{id}
+    </update>
+
+    <update id="updateSales">
+        UPDATE HQ_GOODS SET MONTH_SALES = #{sales}, EDIT_TIME = #{editTime} WHERE ID = #{id}
+    </update>
+
+    <select id="findHomePage" parameterType="map" resultMap="RM_Goods">
+        SELECT B.* FROM
+        (SELECT T.* FROM HQ_GOODS AS T RIGHT JOIN
+        (SELECT ID FROM HQ_PROD WHERE IS_MARKETABLE=1 AND IS_SHOW_IN_HOME=1 ORDER BY ADD_TIME DESC) AS A
+        ON T.PROD_ID=A.ID ORDER BY T.PRICE ASC) AS B
+        GROUP BY B.PROD_ID ORDER BY B.PRICE ASC
+    </select>
+
+    <select id="findResp3Page" parameterType="map" resultMap="RM_Goods3Resp">
+        SELECT <include refid="goods_columns" />,(SELECT C.NAME FROM HQ_CAT AS C WHERE C.ID=T.CAT_ID) AS CAT_NAME
+        FROM HQ_GOODS AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(catId)">
+                <if test="isRoot == 1">
+                    AND T.CAT_ID IN (SELECT C.ID FROM HQ_CAT AS C WHERE C.ROOT_ID=#{catId})
+                </if>
+                <if test="isRoot != 1"> AND T.CAT_ID = #{catId} </if>
+            </if>
+            <if test="@Ognl@isNotEmpty(sn)"> AND T.SN = #{sn} </if>
+            <if test="@Ognl@isNotEmpty(invCode)"> AND T.INV_CODE = #{invCode} </if>
+            <if test="@Ognl@isNotEmpty(isGive)"> AND T.IS_GIVE = #{isGive} </if>
+            <if test="@Ognl@isNotEmpty(fullName)"> AND T.FULL_NAME LIKE '%${fullName}%' </if>
+            <if test="@Ognl@isNotEmpty(specNames)"> AND T.SPEC_NAMES = #{specNames} </if>
+            <if test="@Ognl@isNotEmpty(price)"> AND T.PRICE = #{price} </if>
+            <if test="@Ognl@isNotEmpty(marketPrice)"> AND T.MARKET_PRICE = #{marketPrice} </if>
+            <if test="@Ognl@isNotEmpty(stock)"> AND T.STOCK = #{stock} </if>
+            <if test="@Ognl@isNotEmpty(sales)"> AND T.SALES = #{sales} </if>
+            <if test="@Ognl@isNotEmpty(monthSales)"> AND T.MONTH_SALES = #{monthSales} </if>
+            <if test="@Ognl@isNotEmpty(collectNum)"> AND T.COLLECT_NUM = #{collectNum} </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isTop)"> AND T.IS_TOP = #{isTop} </if>
+            <if test="@Ognl@isNotEmpty(firstImg)"> AND T.FIRST_IMG = #{firstImg} </if>
+            <if test="@Ognl@isNotEmpty(images)"> AND T.IMAGES = #{images} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(markeTime)"> AND T.MARKE_TIME = #{markeTime} </if>
+            <if test="@Ognl@isNotEmpty(editTime)"> AND T.EDIT_TIME = #{editTime} </if>
+            <if test="@Ognl@isNotEmpty(solrName)"> AND T.SOLR_NAME = #{solrName} </if>
+            <if test="@Ognl@isNotEmpty(qrCode)"> AND T.QR_CODE = #{qrCode} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(tagIds)"> AND T.TAG_IDS = #{tagIds} </if>
+            <if test="@Ognl@isNotEmpty(weight)"> AND T.WEIGHT = #{weight} </if>
+            <if test="@Ognl@isNotEmpty(employer)"> AND T.EMPLOYER = #{employer} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(dosc)"> AND T.DOSC = #{dosc} </if>
+            <if test="@Ognl@isNotEmpty(sort)"> AND T.SORT = #{sort} </if>
+            <if test="@Ognl@isNotEmpty(tagId)"> AND CONCAT(',',T.TAG_IDS,',') LIKE '%${tagId}%' </if>
+        </where>
+    </select>
+    <select id="findRespPage" parameterType="map" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns" />
+        ,(SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS catName
+        ,(SELECT IMGS FROM HQ_PROD_IMG I LEFT JOIN HQ_PROD_SPEC SP ON SP.PROD_ID = I.PROD_ID WHERE I.SPEC_ID = SP.SPEC_ID AND I.SPEC_VALUE_ID = SP.SPEC_VALUE_ID AND SP.GOODS_ID = T.ID LIMIT 0,1) AS imgStr
+        ,(SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT AS G WHERE G.GOODS_ID = T.ID) AS COMMENT_SUM
+        FROM HQ_GOODS AS T
+        LEFT JOIN HQ_PROD P ON P.ID = T.PROD_ID
+        LEFT  JOIN HQ_CAT C ON  C.ID=T.CAT_ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(catId)">
+                <if test="isRoot == 1">
+                    AND T.CAT_ID IN (SELECT C.ID FROM HQ_CAT AS C WHERE C.ROOT_ID=#{catId})
+                </if>
+                <if test="isRoot != 1"> AND T.CAT_ID = #{catId} </if>
+            </if>
+            <if test="@Ognl@isNotEmpty(sn)"> AND T.SN = #{sn} </if>
+            <if test="@Ognl@isNotEmpty(isGive)"> AND T.IS_GIVE = #{isGive} </if>
+            <if test="@Ognl@isNotEmpty(fullName)"> AND T.FULL_NAME LIKE CONCAT('%',#{fullName},'%') </if>
+            <if test="@Ognl@isNotEmpty(specNames)"> AND T.SPEC_NAMES = #{specNames} </if>
+            <if test="@Ognl@isNotEmpty(price)"> AND T.PRICE = #{price} </if>
+            <if test="@Ognl@isNotEmpty(marketPrice)"> AND T.MARKET_PRICE = #{marketPrice} </if>
+            <if test="@Ognl@isNotEmpty(stock)"> AND T.STOCK = #{stock} </if>
+            <if test="@Ognl@isNotEmpty(sales)"> AND T.SALES = #{sales} </if>
+            <if test="@Ognl@isNotEmpty(monthSales)"> AND T.MONTH_SALES = #{monthSales} </if>
+            <if test="@Ognl@isNotEmpty(collectNum)"> AND T.COLLECT_NUM = #{collectNum} </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isTop)"> AND T.IS_TOP = #{isTop} </if>
+            <if test="@Ognl@isNotEmpty(firstImg)"> AND T.FIRST_IMG = #{firstImg} </if>
+            <if test="@Ognl@isNotEmpty(images)"> AND T.IMAGES = #{images} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(editTime)"> AND T.EDIT_TIME = #{editTime} </if>
+            <if test="@Ognl@isNotEmpty(markeTime)"> AND T.MARKE_TIME = #{markeTime} </if>
+            <if test="@Ognl@isNotEmpty(solrName)"> AND T.SOLR_NAME = #{solrName} </if>
+            <if test="@Ognl@isNotEmpty(qrCode)"> AND T.QR_CODE = #{qrCode} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(tagIds)"> AND T.TAG_IDS = #{tagIds} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(dosc)"> AND T.DOSC = #{dosc} </if>
+            <if test="@Ognl@isNotEmpty(sort)"> AND T.SORT = #{sort} </if>
+            <if test="@Ognl@isNotEmpty(priceBegin)"> AND T.PRICE >= #{priceBegin} </if>
+            <if test="@Ognl@isNotEmpty(priceEnd)"><![CDATA[ AND T.PRICE <= #{priceEnd} ]]></if>
+            <if test="@Ognl@isNotEmpty(makerTimeBeginStr)"> AND T.MARKE_TIME > #{makerTimeBeginStr} </if>
+            <if test="@Ognl@isNotEmpty(makerTimeEndStr)"><![CDATA[  AND T.MARKE_TIME < #{makerTimeEndStr} ]]></if>
+            <if test="@Ognl@isNotEmpty(tagId)"> AND CONCAT(',',T.TAG_IDS,',') LIKE '%${tagId}%' </if>
+            <if test="@Ognl@isNotEmpty(prodIsMarke)"> AND  P.IS_MARKETABLE = 1</if>
+            <if test="@Ognl@isNotEmpty(catType)"> AND  C.TYPE = #{catType}</if>
+        </where>
+    </select>
+
+    <select id="findRecommendGoodsPage" parameterType="map" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns" />
+        ,(SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT AS G WHERE G.GOODS_ID = T.ID) AS COMMENT_SUM
+        FROM HQ_GOODS AS T
+        <where>
+            CAT_ID IN(
+            SELECT G.CAT_ID FROM HQ_FAVOURITE F
+            LEFT JOIN HQ_GOODS G ON G.ID = F.SOURCE_ID
+            WHERE F.TYPE = 1 AND F.MEMBER_ID = #{memberId} GROUP BY G.CAT_ID
+            )
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+        </where>
+    </select>
+
+    <select id="findListByCatId" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns" />
+        FROM HQ_GOODS  AS T WHERE T.CAT_ID = #{catId}
+    </select>
+
+    <select id="getListByGoodsIds" parameterType="map" resultMap="RM_Goods">
+        SELECT <include refid="goods_columns" /> FROM HQ_GOODS AS T WHERE FIND_IN_SET(T.ID,'${goodsIds}')
+    </select>
+
+    <select id="findTop10OfToday" parameterType="map" resultMap="RM_Goods">
+        SELECT A.* FROM
+        (SELECT T.ID,T.FULL_NAME,
+        (SELECT IFNULL(SUM(OG.GOODS_COUNT),0) FROM HQ_ORDER_GOODS AS OG WHERE OG.GOODS_ID=T.ID AND OG.ORDER_ID IN
+        (SELECT ID FROM HQ_ORDER AS O WHERE O.STATUS=3
+        AND O.CREATE_DATE >= #{createDateStart} AND O.CREATE_DATE <![CDATA[ <= ]]> #{createDateEnd})
+        ) AS MONTH_SALES
+        FROM HQ_GOODS AS T ) AS A
+        ORDER BY A.MONTH_SALES DESC LIMIT 10
+    </select>
+
+    <select id="findGoodsIdsByProdId" parameterType="long" resultType="string">
+        SELECT GROUP_CONCAT(T.ID) FROM HQ_GOODS AS T WHERE PROD_ID=#{prodId}
+    </select>
+
+    <select id="findMinSort" parameterType="long" resultType="long">
+        SELECT  MIN(T.SORT) FROM HQ_GOODS AS T WHERE T.CAT_ID = #{catId}
+    </select>
+
+    <select id="findRespById" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns" />
+        ,(SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS catName
+        ,(SELECT IMGS FROM HQ_PROD_IMG I LEFT JOIN HQ_PROD_SPEC SP ON SP.PROD_ID = I.PROD_ID WHERE I.SPEC_ID = SP.SPEC_ID AND I.SPEC_VALUE_ID = SP.SPEC_VALUE_ID AND SP.GOODS_ID = T.ID LIMIT 0,1) AS imgStr
+        FROM HQ_GOODS AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findMemberFavouriteList" parameterType="map" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns" />
+        ,(SELECT P.NAME FROM HQ_PROD P WHERE P.ID = T.PROD_ID) AS prodName
+        ,(SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT C1 WHERE C1.GOODS_ID=T.ID) AS commentCount
+        ,(SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT C2 WHERE C2.GOODS_ID=T.ID AND (C2.LEVEL = 4 OR C2.LEVEL = 5)) AS niceCount
+        FROM HQ_GOODS AS T
+        LEFT JOIN HQ_FAVOURITE AS F ON F.SOURCE_ID = T.ID
+        WHERE  T.IS_DELETE = 0 AND T.IS_MARKETABLE = 1
+        <if test="@Ognl@isNotEmpty(memberId)"> AND F.MEMBER_ID = #{memberId} </if>
+        <if test="@Ognl@isNotEmpty(type)"> AND F.TYPE = #{type} </if>
+        <if test="@Ognl@isNotEmpty(newGoods)"> AND T.MARKE_TIME > #{newGoods} </if>
+        <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+        ORDER BY F.ID DESC
+    </select>
+
+    <select id="findGoodsErrorPage" parameterType="com.up72.hq.model.Goods" resultMap="RM_GoodsResp">
+        SELECT <include refid="goods_columns" />
+        FROM HQ_GOODS AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+        </where>
+        ORDER BY T.SALES DESC
+    </select>
+    
+</mapper>

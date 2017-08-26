@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.AppVersionMapper">
+    <resultMap id="RM_appVersion" type="com.up72.hq.model.AppVersion">
+        <result property="id" column="id" />
+        <result property="type" column="type" />
+        <result property="versionNo" column="version_no" />
+        <result property="versionName" column="version_name" />
+        <result property="size" column="size" />
+        <result property="appUrl" column="app_url" />
+        <result property="updateInfo" column="update_info" />
+        <result property="addTime" column="add_Time" />
+        <result property="isMustUpdate" column="is_must_update" />
+        <result property="isDelete" column="is_delete" />
+    </resultMap>
+    
+    <sql id="appVersion_columns">
+        T.id,T.type,T.version_no,T.version_name,T.size,T.app_url,T.update_info,T.add_Time,T.is_must_update,T.is_delete
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO APP_VERSION (
+         id, type, version_no, version_name, size, app_url, update_info, add_Time, is_must_update, is_delete
+        ) VALUES (
+         #{id}, #{type}, #{versionNo}, #{versionName}, #{size}, #{appUrl}, #{updateInfo}, #{addTime}, #{isMustUpdate}, #{isDelete}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE APP_VERSION AS T SET
+            T.type = #{type} , T.version_no = #{versionNo} , T.version_name = #{versionName} , T.size = #{size} , T.app_url = #{appUrl} , T.update_info = #{updateInfo} , T.add_Time = #{addTime} , T.is_must_update = #{isMustUpdate} , T.is_delete = #{isDelete}  
+        WHERE T.id = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM APP_VERSION WHERE  id = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_appVersion">
+        SELECT <include refid="appVersion_columns" /> FROM APP_VERSION AS T WHERE  T.id = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_appVersion">
+     SELECT <include refid="appVersion_columns" />  FROM APP_VERSION AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.id = #{id} </if>
+           <if test="@Ognl@isNotEmpty(type)"> AND T.type = #{type} </if>
+           <if test="@Ognl@isNotEmpty(versionNo)"> AND T.version_no = #{versionNo} </if>
+           <if test="@Ognl@isNotEmpty(versionName)"> AND T.version_name = #{versionName} </if>
+           <if test="@Ognl@isNotEmpty(size)"> AND T.size = #{size} </if>
+           <if test="@Ognl@isNotEmpty(appUrl)"> AND T.app_url = #{appUrl} </if>
+           <if test="@Ognl@isNotEmpty(updateInfo)"> AND T.update_info = #{updateInfo} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.add_Time = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(isMustUpdate)"> AND T.is_must_update = #{isMustUpdate} </if>
+           <if test="@Ognl@isNotEmpty(isDelete)"> AND T.is_delete = #{isDelete} </if>
+        </where>
+    </select>
+
+    <select id="findLastestVersionByType" resultMap="RM_appVersion">
+        SELECT <include refid="appVersion_columns" />
+        <![CDATA[
+		    FROM APP_VERSION AS T WHERE type=#{type } order by T.id desc limit 0,1
+	    ]]>
+    </select>
+
+
+
+</mapper>

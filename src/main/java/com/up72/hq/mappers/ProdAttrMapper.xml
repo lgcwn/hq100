@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ProdAttrMapper">
+    <resultMap id="RM_prodAttr" type="com.up72.hq.model.ProdAttr">
+        <result property="id" column="ID" />
+        <result property="prodId" column="PROD_ID" />
+        <result property="attrId" column="ATTR_ID" />
+        <result property="attrValueId" column="ATTR_VALUE_ID" />
+    </resultMap>
+
+    <resultMap id="RM_prodAttrResp" type="com.up72.hq.dto.resp.ProdAttrResp" extends="RM_prodAttr">
+        <result property="attrName" column="attrName" />
+        <result property="attrValueName" column="attrValueName" />
+    </resultMap>
+    
+    <sql id="prodAttr_columns">
+        T.ID,T.PROD_ID,T.ATTR_ID,T.ATTR_VALUE_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PROD_ATTR (
+         ID, PROD_ID, ATTR_ID, ATTR_VALUE_ID
+        ) VALUES (
+         #{id}, #{prodId}, #{attrId}, #{attrValueId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_PROD_ATTR AS T SET
+            T.PROD_ID = #{prodId} , T.ATTR_ID = #{attrId} , T.ATTR_VALUE_ID = #{attrValueId}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PROD_ATTR WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_prodAttr">
+        SELECT <include refid="prodAttr_columns" /> FROM HQ_PROD_ATTR AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_prodAttr">
+     SELECT <include refid="prodAttr_columns" />  FROM HQ_PROD_ATTR AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+           <if test="@Ognl@isNotEmpty(attrId)"> AND T.ATTR_ID = #{attrId} </if>
+           <if test="@Ognl@isNotEmpty(attrValueId)"> AND T.ATTR_VALUE_ID = #{attrValueId} </if>
+        </where>
+    </select>
+
+    <delete id="deleteByProdId" parameterType="long">
+        DELETE FROM HQ_PROD_ATTR WHERE PROD_ID = #{prodId}
+    </delete>
+
+    <select id="findByAttrIdValId" parameterType="map" resultMap="RM_prodAttrResp">
+        SELECT <include refid="prodAttr_columns" />,
+        (SELECT A.NAME  FROM  HQ_ATTR A WHERE A.ID = T.ATTR_ID) AS attrName,
+        (SELECT A2.ATTR_VALUE  FROM  HQ_ATTR_VALUE A2 WHERE A2.ID = T.ATTR_VALUE_ID) AS attrValueName
+        FROM HQ_PROD_ATTR  AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(attrId)"> AND T.ATTR_ID = #{attrId} </if>
+            <if test="@Ognl@isNotEmpty(attrValueId)"> AND T.ATTR_VALUE_ID = #{attrValueId} </if>
+        </where>
+    </select>
+
+    <select id="findListByProdId" parameterType="long" resultMap="RM_prodAttrResp">
+        SELECT <include refid="prodAttr_columns" />,
+        (SELECT A.NAME  FROM  HQ_ATTR A WHERE A.ID = T.ATTR_ID) AS attrName,
+        (SELECT A2.ATTR_VALUE  FROM  HQ_ATTR_VALUE A2 WHERE A2.ID = T.ATTR_VALUE_ID) AS attrValueName
+        FROM HQ_PROD_ATTR AS T WHERE T.PROD_ID = #{prodId}
+    </select>
+
+
+
+
+</mapper>

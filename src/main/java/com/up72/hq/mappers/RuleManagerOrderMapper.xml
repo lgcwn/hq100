@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.RuleManagerOrderMapper">
+    <resultMap id="RM_ruleManagerOrder" type="com.up72.hq.model.RuleManagerOrder">
+        <result property="id" column="ID" />
+        <result property="roleSelectId" column="ROLE_SELECT_ID" />
+        <result property="roleManagerId" column="ROLE_MANAGER_ID" />
+        <result property="sn" column="SN" />
+        <result property="tradeNo" column="TRADE_NO" />
+        <result property="orderStatus" column="ORDER_STATUS" />
+        <result property="payTime" column="PAY_TIME" />
+        <result property="payableGoodsAmount" column="PAYABLE_GOODS_AMOUNT" />
+        <result property="payableAmount" column="PAYABLE_AMOUNT" />
+        <result property="actualPayments" column="ACTUAL_PAYMENTS" />
+        <result property="isUseScore" column="IS_USE_SCORE" />
+        <result property="scoreCount" column="SCORE_COUNT" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="auditTime" column="AUDIT_TIME" />
+        <result property="expireDate" column="EXPIRE_DATE" />
+        <result property="isExpire" column="IS_EXPIRE" />
+        <result property="paymentDate" column="PAYMENT_DATE" />
+        <result property="modifyDate" column="MODIFY_DATE" />
+        <result property="payChannel" column="PAY_CHANNEL" />
+        <result property="isDelete" column="IS_DELETE" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="isPhoneOrder" column="IS_PHONE_ORDER" />
+        <result property="rejectReason" column="REJECT_REASON" />
+        <result property="intro" column="INTRO" />
+        <result property="videoUrl" column="VIDEO_URL" />
+        <result property="votesCnt" column="VOTES_CNT" />
+    </resultMap>
+    
+    <sql id="ruleManagerOrder_columns">
+        T.ID,T.ROLE_SELECT_ID,T.ROLE_MANAGER_ID,T.SN,T.TRADE_NO,T.ORDER_STATUS,T.PAY_TIME,T.PAYABLE_GOODS_AMOUNT,T.PAYABLE_AMOUNT,
+        T.ACTUAL_PAYMENTS,T.IS_USE_SCORE,T.SCORE_COUNT,T.ADD_TIME,T.EXPIRE_DATE,T.IS_EXPIRE,T.PAYMENT_DATE,
+        T.MODIFY_DATE,T.INTRO,T.PAY_CHANNEL,T.IS_DELETE,T.MEMBER_ID,T.IS_PHONE_ORDER,T.REJECT_REASON,T.VIDEO_URL,T.VOTES_CNT,T.AUDIT_TIME
+        ,(SELECT COUNT(DISTINCT T1.VOTES_CNT)+1 FROM HQ_RULE_MANAGER_ORDER AS T1  WHERE T1.VOTES_CNT >T.VOTES_CNT AND T1.ROLE_MANAGER_ID=T.ROLE_MANAGER_ID) AS  RANKING
+    </sql>
+
+    <resultMap id="RM_ruleManagerOrderResp" type="com.up72.hq.dto.resp.RuleManagerOrderResp" extends="RM_ruleManagerOrder">
+        <result property="ranking" column="RANKING" />
+        <collection property="roleManager" column="ROLE_MANAGER_ID" javaType="com.up72.hq.model.RoleManager" ofType="com.up72.hq.model.RoleManager"
+                    select="com.up72.hq.dao.RoleManagerMapper.findById"/>
+        <collection property="roleSelect" column="ROLE_SELECT_ID" javaType="com.up72.hq.model.RoleSelect" ofType="com.up72.hq.model.RoleSelect"
+                    select="com.up72.hq.dao.RoleSelectMapper.findById"/>
+        <collection property="memberResp" column="MEMBER_ID" javaType="com.up72.hq.dto.resp.MemberResp" ofType="com.up72.hq.dto.resp.MemberResp"
+                    select="com.up72.hq.dao.MemberMapper.findById"/>
+    </resultMap>
+
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(roleSelectId)"> AND T.ROLE_SELECT_ID = #{roleSelectId} </if>
+            <if test="@Ognl@isNotEmpty(roleManagerId)"> AND T.ROLE_MANAGER_ID = #{roleManagerId} </if>
+            <if test="@Ognl@isNotEmpty(sn)"> AND T.SN = #{sn} </if>
+            <if test="@Ognl@isNotEmpty(tradeNo)"> AND T.TRADE_NO = #{tradeNo} </if>
+            <if test="@Ognl@isNotEmpty(orderStatus)"> AND T.ORDER_STATUS = #{orderStatus} </if>
+            <if test="@Ognl@isNotEmpty(payTime)"> AND T.PAY_TIME = #{payTime} </if>
+            <if test="@Ognl@isNotEmpty(payableGoodsAmount)"> AND T.PAYABLE_GOODS_AMOUNT = #{payableGoodsAmount} </if>
+            <if test="@Ognl@isNotEmpty(payableAmount)"> AND T.PAYABLE_AMOUNT = #{payableAmount} </if>
+            <if test="@Ognl@isNotEmpty(actualPayments)"> AND T.ACTUAL_PAYMENTS = #{actualPayments} </if>
+            <if test="@Ognl@isNotEmpty(isUseScore)"> AND T.IS_USE_SCORE = #{isUseScore} </if>
+            <if test="@Ognl@isNotEmpty(scoreCount)"> AND T.SCORE_COUNT = #{scoreCount} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(expireDate)"> AND T.EXPIRE_DATE = #{expireDate} </if>
+            <if test="@Ognl@isNotEmpty(isExpire)"> AND T.IS_EXPIRE = #{isExpire} </if>
+            <if test="@Ognl@isNotEmpty(paymentDate)"> AND T.PAYMENT_DATE = #{paymentDate} </if>
+            <if test="@Ognl@isNotEmpty(modifyDate)"> AND T.MODIFY_DATE = #{modifyDate} </if>
+            <if test="@Ognl@isNotEmpty(intro)"> AND T.INTRO = #{intro} </if>
+            <if test="@Ognl@isNotEmpty(payChannel)"> AND T.PAY_CHANNEL = #{payChannel} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(isPhoneOrder)"> AND T.IS_PHONE_ORDER = #{isPhoneOrder} </if>
+            <if test="@Ognl@isNotEmpty(rejectReason)"> AND T.REJECT_REASON = #{rejectReason} </if>
+            <if test="@Ognl@isNotEmpty(memberName)"> AND C.NICK_NAME LIKE  CONCAT('%','${memberName}','%')</if>
+            <if test="@Ognl@isNotEmpty(phone)"> AND C.PHONE LIKE  CONCAT('%','${phone}','%')</if>
+            <if test="@Ognl@isNotEmpty(movieName)"> AND S.NAME  LIKE  CONCAT('%','${movieName}','%') </if>
+            <if test="@Ognl@isNotEmpty(roleName)"> AND M.NAME  LIKE  CONCAT('%','${roleName}','%') </if>
+        </where>
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_RULE_MANAGER_ORDER (
+         ID, ROLE_SELECT_ID, ROLE_MANAGER_ID, SN, TRADE_NO, ORDER_STATUS, PAY_TIME, PAYABLE_GOODS_AMOUNT, PAYABLE_AMOUNT,
+         ACTUAL_PAYMENTS, IS_USE_SCORE, SCORE_COUNT, ADD_TIME, EXPIRE_DATE, IS_EXPIRE, PAYMENT_DATE, MODIFY_DATE, INTRO,
+         PAY_CHANNEL, IS_DELETE, MEMBER_ID, IS_PHONE_ORDER, REJECT_REASON,VIDEO_URL,VOTES_CNT,AUDIT_TIME
+        ) VALUES (
+         #{id}, #{roleSelectId}, #{roleManagerId}, #{sn}, #{tradeNo}, #{orderStatus}, #{payTime}, #{payableGoodsAmount}, #{payableAmount}, #{actualPayments}, #{isUseScore}, #{scoreCount}, #{addTime}, #{expireDate}, #{isExpire}, #{paymentDate}, #{modifyDate}, #{intro}, #{payChannel}, #{isDelete}, #{memberId},
+         #{isPhoneOrder}, #{rejectReason}, #{videoUrl},#{votesCnt},#{auditTime}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_RULE_MANAGER_ORDER AS T SET
+            T.ROLE_SELECT_ID = #{roleSelectId} , T.ROLE_MANAGER_ID = #{roleManagerId} , T.SN = #{sn} , T.TRADE_NO = #{tradeNo} , T.ORDER_STATUS = #{orderStatus} , T.PAY_TIME = #{payTime} , T.PAYABLE_GOODS_AMOUNT = #{payableGoodsAmount} ,
+             T.PAYABLE_AMOUNT = #{payableAmount} , T.ACTUAL_PAYMENTS = #{actualPayments} , T.IS_USE_SCORE = #{isUseScore} , T.SCORE_COUNT = #{scoreCount} , T.ADD_TIME = #{addTime} , T.EXPIRE_DATE = #{expireDate} , T.IS_EXPIRE = #{isExpire} ,
+             T.PAYMENT_DATE = #{paymentDate} , T.MODIFY_DATE = #{modifyDate} , T.INTRO = #{intro} , T.PAY_CHANNEL = #{payChannel} , T.IS_DELETE = #{isDelete} , T.MEMBER_ID = #{memberId} , T.IS_PHONE_ORDER = #{isPhoneOrder} ,
+             T.REJECT_REASON = #{rejectReason} , T.VIDEO_URL = #{videoUrl}, T.VOTES_CNT = #{votesCnt}, T.AUDIT_TIME = #{auditTime}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_RULE_MANAGER_ORDER WHERE  ID = #{id}  
+    </delete>
+    <delete id="deleteByRoleSelectId">
+        DELETE FROM HQ_RULE_MANAGER_ORDER WHERE  ROLE_SELECT_ID = #{roleSelectId}
+    </delete>
+
+    <select id="findById" resultMap="RM_ruleManagerOrderResp">
+        SELECT <include refid="ruleManagerOrder_columns" />
+        FROM HQ_RULE_MANAGER_ORDER AS T
+        LEFT JOIN HQ_ROLE_SELECT AS S ON  S.ID=T.ROLE_SELECT_ID
+        LEFT  JOIN HQ_ROLE_MANAGER AS M ON  M.ID=T.ROLE_MANAGER_ID
+        LEFT JOIN HQ_MEMBER AS  C ON C.ID=T.MEMBER_ID
+        WHERE  T.ID = #{id}
+    </select>
+
+    <select id="countNumber" resultType="Long" parameterType="map">
+        SELECT COUNT(*) FROM HQ_RULE_MANAGER_ORDER AS T
+        <include refid="where_sql" />
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_ruleManagerOrderResp">
+     SELECT <include refid="ruleManagerOrder_columns" />
+        FROM HQ_RULE_MANAGER_ORDER AS T
+        LEFT JOIN HQ_ROLE_SELECT AS S ON  S.ID=T.ROLE_SELECT_ID
+        LEFT  JOIN HQ_ROLE_MANAGER AS M ON  M.ID=T.ROLE_MANAGER_ID
+        LEFT JOIN HQ_MEMBER AS  C ON C.ID=T.MEMBER_ID
+        <include refid="where_sql" />
+    </select>
+    <select id="findListByRoleSelectId" parameterType="Long" resultMap="RM_ruleManagerOrderResp">
+        SELECT <include refid="ruleManagerOrder_columns" />
+        FROM HQ_RULE_MANAGER_ORDER AS T
+        LEFT JOIN HQ_ROLE_SELECT AS S ON  S.ID=T.ROLE_SELECT_ID
+        LEFT  JOIN HQ_ROLE_MANAGER AS M ON   M.ID=T.ROLE_MANAGER_ID
+        LEFT JOIN HQ_MEMBER AS  C ON C.ID=T.MEMBER_ID
+        WHERE T.ROLE_SELECT_ID=#{id} AND T.ORDER_STATUS=3
+    </select>
+
+    <select id="findListByRoleManagerId" parameterType="Long" resultMap="RM_ruleManagerOrderResp">
+        SELECT <include refid="ruleManagerOrder_columns" />
+        FROM HQ_RULE_MANAGER_ORDER AS T
+        LEFT JOIN HQ_ROLE_SELECT AS S ON  S.ID=T.ROLE_SELECT_ID
+        LEFT  JOIN HQ_ROLE_MANAGER AS M ON   M.ID=T.ROLE_MANAGER_ID
+        LEFT JOIN HQ_MEMBER AS  C ON C.ID=T.MEMBER_ID
+        WHERE T.ROLE_MANAGER_ID=#{id} AND T.ORDER_STATUS=3 ORDER  BY VOTES_CNT DESC
+    </select>
+
+
+    <select id="findBySn" resultMap="RM_ruleManagerOrder">
+		SELECT <include refid="ruleManagerOrder_columns" /> FROM HQ_RULE_MANAGER_ORDER AS T  WHERE T.SN = #{sn}
+    </select>
+
+    <select id="countSignUp" parameterType="map"  resultType="Integer">
+        SELECT COUNT(*) FROM  HQ_RULE_MANAGER_ORDER AS  RO WHERE  RO.ROLE_MANAGER_ID=#{roleManagerId} AND RO.ROLE_SELECT_ID =#{roleSelectId} AND RO.MEMBER_ID = #{memberId}
+    </select>
+
+</mapper>

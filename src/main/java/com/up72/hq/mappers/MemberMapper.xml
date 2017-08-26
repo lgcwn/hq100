@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.MemberMapper">
+    <resultMap id="RM_member" type="com.up72.hq.model.Member">
+        <result property="id" column="ID" />
+        <result property="nickName" column="NICK_NAME" />
+        <result property="gender" column="GENDER" />
+        <result property="province" column="PROVINCE" />
+        <result property="city" column="CITY" />
+        <result property="headImg" column="HEAD_IMG" />
+        <result property="isPhone" column="IS_PHONE" />
+        <result property="phone" column="PHONE" />
+        <result property="isDelete" column="IS_DELETE" />
+        <result property="type" column="TYPE" />
+        <result property="password" column="PASSWORD" />
+        <result property="payPassword" column="PAY_PASSWORD" />
+        <result property="birthday" column="BIRTHDAY" />
+        <result property="email" column="EMAIL" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="isDisable" column="IS_DISABLE" />
+        <result property="userName" column="USER_NAME" />
+        <result property="source" column="SOURCE" />
+        <result property="isEmail" column="IS_EMAIL" />
+        <result property="disableRemarks" column="DISABLE_REMARKS" />
+        <result property="passwordLevel" column="PASSWORD_LEVEL" />
+        <result property="eduInfoId2" column="EDU_INFO_ID2" />
+        <result property="eduInfoId" column="EDU_INFO_ID" />
+        <result property="isSysMessage" column="IS_SYS_MESSAGE" />
+        <result property="isSysNoticeMessage" column="IS_SYS_NOTICE_MESSAGE" />
+        <result property="tb" column="TB" />
+        <result property="score" column="SCORE" />
+        <result property="introduce" column="INTRODUCE" />
+        <result property="realName" column="REAL_NAME" />
+        <result property="addr" column="ADDR" />
+        <result property="level" column="LEVEL" />
+        <result property="photos" column="PHOTOS" />
+        <result property="hobby" column="HOBBY" />
+        <result property="custNo" column="CUST_NO" />
+    </resultMap>
+    <resultMap id="RM_memberResp" type="com.up72.hq.dto.resp.MemberResp" extends="RM_member">
+        <result property="lastLoginTime" column="LAST_LOGIN_TIME" />
+        <result property="chooseCnt" column="CHOOSE_CNT" />
+        <collection property="userLoginLog" column="ID" javaType="com.up72.hq.model.UserLoginLog" ofType="com.up72.hq.model.UserLoginLog"
+                    select="com.up72.hq.dao.UserLoginLogMapper.findLastLoginLog" />
+    </resultMap>
+
+    <sql id="member_columns">
+        T.ID,T.NICK_NAME,T.GENDER,T.PROVINCE,T.CITY,T.HEAD_IMG,
+        T.IS_PHONE,T.PHONE,T.IS_DELETE,T.TYPE,T.PASSWORD,T.PAY_PASSWORD,
+        T.BIRTHDAY,T.EMAIL,T.ADD_TIME,T.IS_DISABLE,T.USER_NAME,T.SOURCE,
+        T.IS_EMAIL,T.DISABLE_REMARKS,T.PASSWORD_LEVEL,T.EDU_INFO_ID2,
+        T.EDU_INFO_ID,T.IS_SYS_MESSAGE,T.IS_SYS_NOTICE_MESSAGE,
+        T.TB,T.SCORE,T.INTRODUCE,T.REAL_NAME,
+        T.ADDR,T.LEVEL,T.PHOTOS,T.HOBBY,T.CUST_NO
+    </sql>
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(userName)"> AND T.USER_NAME LIKE '%${userName}%' </if>
+            <if test="@Ognl@isNotEmpty(nickName)"> AND T.NICK_NAME LIKE '${nickName}%' </if>
+            <if test="@Ognl@isNotEmpty(custNo)"> AND T.CUST_NO CONCAT('%',#{custNo},'%') </if>
+            <if test="@Ognl@isNotEmpty(gender)"> AND T.GENDER = #{gender} </if>
+            <if test="@Ognl@isNotEmpty(province)"> AND T.PROVINCE = #{province} </if>
+            <if test="@Ognl@isNotEmpty(city)"> AND T.CITY = #{city} </if>
+            <if test="@Ognl@isNotEmpty(headImg)"> AND T.HEAD_IMG = #{headImg} </if>
+            <if test="@Ognl@isNotEmpty(isPhone)"> AND T.IS_PHONE = #{isPhone} </if>
+            <if test="@Ognl@isNotEmpty(phone)"> AND T.PHONE LIKE CONCAT('%',#{phone},'%') </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(password)"> AND T.PASSWORD = #{password} </if>
+            <if test="@Ognl@isNotEmpty(payPassword)"> AND T.PAY_PASSWORD = #{payPassword} </if>
+            <if test="@Ognl@isNotEmpty(birthday)"> AND T.BIRTHDAY = #{birthday} </if>
+            <if test="@Ognl@isNotEmpty(email)"> AND T.EMAIL = #{email} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(addStartTime)">
+                AND T.ADD_TIME &gt;= #{addStartTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(addEndTime)">
+                AND T.ADD_TIME &lt;= #{addEndTime}
+            </if>
+            <if test="@Ognl@isNotEmpty(isDisable)"> AND T.IS_DISABLE = #{isDisable} </if>
+            <if test="@Ognl@isNotEmpty(source)"> AND T.SOURCE = #{source} </if>
+            <if test="@Ognl@isNotEmpty(isEmail)"> AND T.IS_EMAIL = #{isEmail} </if>
+            <if test="@Ognl@isNotEmpty(disableRemarks)"> AND T.DISABLE_REMARKS = #{disableRemarks} </if>
+            <if test="@Ognl@isNotEmpty(passwordLevel)"> AND T.PASSWORD_LEVEL = #{passwordLevel} </if>
+            <if test="@Ognl@isNotEmpty(eduInfoId2)"> AND T.EDU_INFO_ID2 = #{eduInfoId2} </if>
+            <if test="@Ognl@isNotEmpty(eduInfoId)"> AND T.EDU_INFO_ID = #{eduInfoId} </if>
+            <if test="@Ognl@isNotEmpty(isSysMessage)"> AND T.IS_SYS_MESSAGE = #{isSysMessage} </if>
+            <if test="@Ognl@isNotEmpty(isSysNoticeMessage)"> AND T.IS_SYS_NOTICE_MESSAGE = #{isSysNoticeMessage} </if>
+            <if test="@Ognl@isNotEmpty(tb)"> AND T.TB = #{tb} </if>
+            <if test="@Ognl@isNotEmpty(score)"> AND T.SCORE = #{score} </if>
+            <if test="@Ognl@isNotEmpty(introduce)"> AND T.INTRODUCE = #{introduce} </if>
+            <if test="@Ognl@isNotEmpty(realName)"> AND T.REAL_NAME = #{realName} </if>
+            <if test="@Ognl@isNotEmpty(addr)"> AND T.ADDR = #{addr} </if>
+            <if test="@Ognl@isNotEmpty(level)"> AND T.LEVEL = #{level} </if>
+            <if test="@Ognl@isNotEmpty(photos)"> AND T.PHOTOS = #{photos} </if>
+        </where>
+    </sql>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_MEMBER (
+        ID, NICK_NAME, GENDER, PROVINCE, CITY, HEAD_IMG, IS_PHONE, PHONE, IS_DELETE, TYPE, PASSWORD, PAY_PASSWORD, BIRTHDAY, EMAIL, ADD_TIME, IS_DISABLE, USER_NAME, SOURCE,
+         IS_EMAIL, DISABLE_REMARKS, PASSWORD_LEVEL, EDU_INFO_ID2, EDU_INFO_ID, IS_SYS_MESSAGE, IS_SYS_NOTICE_MESSAGE, TB, SCORE, INTRODUCE, REAL_NAME, ADDR, LEVEL, PHOTOS,HOBBY,
+         CUST_NO
+        ) VALUES (
+        #{id}, #{nickName}, #{gender}, #{province}, #{city}, #{headImg}, #{isPhone}, #{phone}, #{isDelete}, #{type}, #{password}, #{payPassword}, #{birthday}, #{email}, #{addTime},
+         #{isDisable}, #{userName}, #{source}, #{isEmail}, #{disableRemarks}, #{passwordLevel}, #{eduInfoId2}, #{eduInfoId}, #{isSysMessage}, #{isSysNoticeMessage}, #{tb}, #{score},
+          #{introduce}, #{realName}, #{addr}, #{level}, #{photos}, #{hobby}, #{custNo}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_MEMBER AS T SET
+        T.NICK_NAME = #{nickName} , T.GENDER = #{gender} , T.PROVINCE = #{province} , T.CITY = #{city} , T.HEAD_IMG = #{headImg} , T.IS_PHONE = #{isPhone} , T.PHONE = #{phone} , T.IS_DELETE = #{isDelete} , T.TYPE = #{type} , T.PASSWORD = #{password} , T.PAY_PASSWORD = #{payPassword} , T.BIRTHDAY = #{birthday} , T.EMAIL = #{email} , T.ADD_TIME = #{addTime} ,
+        T.IS_DISABLE = #{isDisable} , T.USER_NAME = #{userName} , T.SOURCE = #{source} , T.IS_EMAIL = #{isEmail} , T.DISABLE_REMARKS = #{disableRemarks} ,
+         T.PASSWORD_LEVEL = #{passwordLevel} , T.EDU_INFO_ID2 = #{eduInfoId2} , T.EDU_INFO_ID = #{eduInfoId} , T.IS_SYS_MESSAGE = #{isSysMessage} ,
+         T.IS_SYS_NOTICE_MESSAGE = #{isSysNoticeMessage} , T.TB = #{tb} , T.SCORE = #{score} , T.INTRODUCE = #{introduce} , T.REAL_NAME = #{realName} ,
+         T.ADDR = #{addr} , T.LEVEL = #{level} , T.PHOTOS = #{photos}, T.HOBBY = #{hobby}, T.CUST_NO = #{custNo}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_MEMBER WHERE  ID = #{id}
+    </delete>
+
+    <select id="findById" resultMap="RM_memberResp">
+        SELECT <include refid="member_columns" />
+        ,IFNULL((SELECT  COUNT(*) FROM HQ_RULE_MANAGER_ORDER AS O WHERE O.MEMBER_ID=T.ID AND  O.ORDER_STATUS=3),0) AS  CHOOSE_CNT
+        FROM HQ_MEMBER AS T WHERE  T.ID = #{id}
+    </select>
+    <select id="findByPhone" resultMap="RM_memberResp">
+        SELECT <include refid="member_columns" />  FROM HQ_MEMBER AS T WHERE  T.PHONE = #{phone}
+    </select>
+    <select id="findId" resultMap="RM_member">
+        SELECT <include refid="member_columns" />
+        FROM HQ_MEMBER AS T WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_memberResp">
+        SELECT   <include refid="member_columns" />
+        ,IFNULL((SELECT  COUNT(*) FROM HQ_RULE_MANAGER_ORDER AS O WHERE O.MEMBER_ID=T.ID AND  O.ORDER_STATUS=3),0) AS  CHOOSE_CNT
+        FROM HQ_MEMBER AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findUserByUserName" resultMap="RM_member">
+        SELECT <include refid="member_columns" /> FROM HQ_MEMBER AS T WHERE  T.USER_NAME = #{userName}
+    </select>
+    <select id="findAll" resultMap="RM_member">
+        SELECT <include refid="member_columns" /> FROM HQ_MEMBER AS T
+    </select>
+
+    <select id="findUserByLoginAccountAndPassword" resultMap="RM_memberResp">
+        SELECT <include refid="member_columns" /> FROM HQ_MEMBER  AS T WHERE
+        T.EMAIL = #{loginAccount} and T.PASSWORD = #{password}
+        or T.PHONE = #{loginAccount} and T.PASSWORD = #{password}
+        or T.USER_NAME = #{loginAccount} and T.PASSWORD = #{password}
+    </select>
+
+    <select id="findUserByLoginAccount" resultMap="RM_member">
+        SELECT <include refid="member_columns" /> FROM HQ_MEMBER   AS T WHERE
+        T.EMAIL = #{loginAccount} or T.PHONE = #{loginAccount}  or T.USER_NAME = #{loginAccount}
+    </select>
+
+    <select id="findUserByEmail" resultMap="RM_member">
+        SELECT <include refid="member_columns" /> FROM HQ_MEMBER  AS T WHERE
+        T.EMAIL = #{loginAccount} or T.PHONE = #{loginAccount}  or T.USER_NAME = #{loginAccount}
+        AND T.IS_EMAIL = 1
+    </select>
+
+    <select id="findUserCnt" resultType="long"  parameterType="map">
+        SELECT COUNT(*)   FROM HQ_MEMBER  AS T
+        <include refid="where_sql" />
+    </select>
+
+</mapper>

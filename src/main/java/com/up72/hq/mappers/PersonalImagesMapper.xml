@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.PersonalImagesMapper">
+    <resultMap id="I_image" type="com.up72.hq.model.PersonalImages">
+        <result property="id" column="ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="imagePath" column="IMAGE_PATH"/>
+        <result property="imageOrder" column="IMAGE_ORDER"/>
+    </resultMap>
+
+    <sql id="image_columns">
+        T.ID,T.MEMBER_ID,T.IMAGE_PATH,T.IMAGE_ORDER
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PERSONAL_IMAGES (
+         ID, MEMBER_ID, IMAGE_PATH,IMAGE_ORDER
+                ) VALUES (
+         #{id}, #{memberId}, #{imagePath},#{imageOrder}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_PERSONAL_IMAGES AS T SET
+            T.MEMBER_ID = #{memberId} , T.IMAGE_PATH = #{imagePath},T.IMAGE_ORDER=#{imageOrder}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PERSONAL_IMAGES WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="I_image">
+        SELECT
+        <include refid="image_columns"/>
+        FROM HQ_PERSONAL_IMAGES AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findLastInfo" resultMap="I_image">
+        SELECT
+        <include refid="image_columns"/>
+        FROM HQ_PERSONAL_IMAGES AS T WHERE T.MEMBER_ID=#{memberId} ORDER BY T.IMAGE_ORDER DESC limit 1
+    </select>
+
+    <select id="findInfoByOrder" resultMap="I_image">
+        SELECT
+        <include refid="image_columns"/>
+        FROM HQ_PERSONAL_IMAGES AS T WHERE T.MEMBER_ID=#{memberId} AND T.IMAGE_ORDER=${imageOrder} limit 1
+    </select>
+
+
+    <!--查询 前一条图片  比如当前图片的排序是2 那么查询得到的是2+-->
+    <select id="findBeforeInfoByOrderAndId" resultMap="I_image">
+        SELECT
+        <include refid="image_columns"/>
+        FROM HQ_PERSONAL_IMAGES AS T WHERE T.MEMBER_ID=#{memberId} AND T.IMAGE_ORDER &gt; ${imageOrder} ORDER by IMAGE_ORDER ASC limit 1
+    </select>
+
+
+    <!--查询 后一条图片  比如当前图片的排序是2 那么查询得到的是2- -->
+    <select id="findAfterInfoByOrderAndId" resultMap="I_image">
+        SELECT
+        <include refid="image_columns"/>
+        FROM HQ_PERSONAL_IMAGES AS T WHERE T.MEMBER_ID=#{memberId} AND T.IMAGE_ORDER &lt; ${imageOrder} ORDER by IMAGE_ORDER DESC limit 1
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="I_image">
+        SELECT
+        <include refid="image_columns"/>
+        FROM HQ_PERSONAL_IMAGES AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(imagePath)">AND T.IMAGE_PATH = #{imagePath}</if>
+            <if test="@Ognl@isNotEmpty(imageOrder)">AND T.IMAGE_ORDER = #{imageOrder}</if>
+        </where>
+    </select>
+
+
+</mapper>

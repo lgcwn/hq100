@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.SearchMapper">
+    <resultMap id="RM_search" type="com.up72.hq.model.Search">
+        <result property="id" column="ID" />
+        <result property="hqMenuId" column="HQ_MENU_ID" />
+        <result property="title" column="TITLE" />
+        <result property="link" column="LINK" />
+    </resultMap>
+    
+    <sql id="search_columns">
+        T.ID,T.HQ_MENU_ID,T.TITLE,T.LINK
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_SEARCH (
+         ID, HQ_MENU_ID, TITLE, LINK
+        ) VALUES (
+         #{id}, #{hqMenuId}, #{title}, #{link}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_SEARCH AS T SET
+            T.HQ_MENU_ID = #{hqMenuId} , T.TITLE = #{title} , T.LINK = #{link}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_SEARCH WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_search">
+        SELECT <include refid="search_columns" /> FROM HQ_SEARCH AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_search">
+     SELECT <include refid="search_columns" />  FROM HQ_SEARCH AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(hqMenuId)"> AND T.HQ_MENU_ID = #{hqMenuId} </if>
+           <if test="@Ognl@isNotEmpty(title)"> AND T.TITLE = #{title} </if>
+           <if test="@Ognl@isNotEmpty(link)"> AND T.LINK = #{link} </if>
+        </where>
+    </select>
+
+    
+</mapper>

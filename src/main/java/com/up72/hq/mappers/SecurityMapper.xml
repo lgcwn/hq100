@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.SecurityMapper">
+    <resultMap id="RM_security" type="com.up72.hq.model.Security">
+        <result property="id" column="ID" />
+        <result property="hqMemberId" column="HQ_MEMBER_ID" />
+        <result property="payPassword" column="PAY_PASSWORD" />
+        <result property="payPasswordLevel" column="PAY_PASSWORD_LEVEL" />
+        <result property="payScene" column="PAY_SCENE" />
+    </resultMap>
+    
+    <sql id="security_columns">
+        T.ID,T.HQ_MEMBER_ID,T.PAY_PASSWORD,T.PAY_PASSWORD_LEVEL,T.PAY_SCENE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_SECURITY (
+         ID, HQ_MEMBER_ID, PAY_PASSWORD, PAY_PASSWORD_LEVEL, PAY_SCENE
+        ) VALUES (
+         #{id}, #{hqMemberId}, #{payPassword}, #{payPasswordLevel}, #{payScene}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_SECURITY AS T SET
+            T.HQ_MEMBER_ID = #{hqMemberId} , T.PAY_PASSWORD = #{payPassword} , T.PAY_PASSWORD_LEVEL = #{payPasswordLevel} , T.PAY_SCENE = #{payScene}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_SECURITY WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_security">
+        SELECT <include refid="security_columns" /> FROM HQ_SECURITY AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_security">
+     SELECT <include refid="security_columns" />  FROM HQ_SECURITY AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(hqMemberId)"> AND T.HQ_MEMBER_ID = #{hqMemberId} </if>
+           <if test="@Ognl@isNotEmpty(payPassword)"> AND T.PAY_PASSWORD = #{payPassword} </if>
+           <if test="@Ognl@isNotEmpty(payPasswordLevel)"> AND T.PAY_PASSWORD_LEVEL = #{payPasswordLevel} </if>
+           <if test="@Ognl@isNotEmpty(payScene)"> AND T.PAY_SCENE = #{payScene} </if>
+        </where>
+    </select>
+
+    
+</mapper>

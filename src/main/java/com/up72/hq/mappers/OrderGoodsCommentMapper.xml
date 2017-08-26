@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.OrderGoodsCommentMapper">
+    <resultMap id="RM_orderGoodsComment" type="com.up72.hq.model.OrderGoodsComment">
+        <result property="id" column="ID" />
+        <result property="goodsId" column="GOODS_ID" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="content" column="CONTENT" />
+        <result property="level" column="LEVEL" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="prodId" column="PROD_ID" />
+        <result property="status" column="STATUS" />
+    </resultMap>
+
+    <resultMap id="RM_orderGoodsCommentResp" type="com.up72.hq.dto.resp.OrderGoodsCommentResp" extends="RM_orderGoodsComment">
+        <result property="userName" column="NICK_NAME" />
+        <result property="headImg" column="HEAD_IMG" />
+        <collection property="goods" column="GOODS_ID" javaType="com.up72.hq.model.Goods" ofType="com.up72.hq.model.Goods"
+                    select="com.up72.hq.dao.GoodsMapper.findById"></collection>
+    </resultMap>
+    
+    <sql id="orderGoodsComment_columns">
+        T.ID,T.GOODS_ID,T.MEMBER_ID,T.ORDER_ID,T.CONTENT,T.LEVEL,T.ADD_TIME,T.PROD_ID,T.STATUS
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+            <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+            <if test="@Ognl@isNotEmpty(level)"> AND T.LEVEL = #{level} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(good)"> AND T.LEVEL IN (4,5)</if>
+            <if test="@Ognl@isNotEmpty(middle)"> AND T.LEVEL IN (2,3)</if>
+            <if test="@Ognl@isNotEmpty(wrong)"> AND T.LEVEL = 1 </if>
+            <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+            <if test="@Ognl@isNotEmpty(userName)"> AND U.NICK_NAME LIKE '%${userName}%' </if>
+            <if test="@Ognl@isNotEmpty(fullName)"> AND G.FULL_NAME LIKE '%${fullName}%' </if>
+        </where>
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ORDER_GOODS_COMMENT (
+         ID, GOODS_ID, MEMBER_ID, ORDER_ID, CONTENT, LEVEL, ADD_TIME, PROD_ID, STATUS
+        ) VALUES (
+         #{id}, #{goodsId}, #{memberId}, #{orderId}, #{content}, #{level}, #{addTime}, #{prodId}, #{status}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ORDER_GOODS_COMMENT AS T SET
+            T.GOODS_ID = #{goodsId} , T.MEMBER_ID = #{memberId} , T.ORDER_ID = #{orderId} , T.CONTENT = #{content} , T.LEVEL = #{level} , T.ADD_TIME = #{addTime} , T.PROD_ID = #{prodId} , T.STATUS = #{status}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ORDER_GOODS_COMMENT WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_orderGoodsComment">
+        SELECT <include refid="orderGoodsComment_columns" /> FROM HQ_ORDER_GOODS_COMMENT AS T WHERE  T.ID = #{id}  
+    </select>
+
+    <select id="findCommentNumber" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_orderGoodsComment">
+     SELECT <include refid="orderGoodsComment_columns" />  FROM HQ_ORDER_GOODS_COMMENT AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findPageResp" parameterType="map" resultMap="RM_orderGoodsCommentResp">
+        SELECT <include refid="orderGoodsComment_columns" />,U.NICK_NAME AS NICK_NAME ,U.HEAD_IMG AS HEAD_IMG
+        FROM HQ_ORDER_GOODS_COMMENT AS T
+        LEFT JOIN HQ_MEMBER U ON U.ID = T.MEMBER_ID
+        LEFT JOIN HQ_GOODS G ON G.ID=T.GOODS_ID
+        <include refid="where_sql" />
+    </select>
+
+</mapper>

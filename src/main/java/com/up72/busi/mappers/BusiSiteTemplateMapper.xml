@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiSiteTemplateMapper">
+	<resultMap id="RM_busiSiteTemplate" type="com.up72.busi.model.BusiSiteTemplate">
+        <result property="id" column="ID" />
+        <result property="name" column="NAME" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="type" column="TYPE" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="modifyUserId" column="MODIFY_USER_ID" />
+        <result property="modifyUserName" column="MODIFY_USER_NAME" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+        <result property="isDel" column="IS_DEL" />
+        <result property="remark" column="REMARK" />
+	</resultMap>
+
+	<resultMap id="RM_busiSiteTemplateResp" type="com.up72.busi.dto.resp.BusiSiteTemplateResp" extends="RM_busiSiteTemplate">
+		<collection property="fileList" column="ID" javaType="ArrayList" ofType="com.up72.busi.model.BusiSiteTemplateFile" select="com.up72.busi.dao.BusiSiteTemplateFileMapper.findListBySiteTemplateId"/>
+	</resultMap>
+
+	
+	<sql id="busiSiteTemplate_columns">
+		T.ID,T.NAME,T.COMPANY_ID,T.TYPE,T.SORT_ID,T.ADD_TIME,T.ADD_USER_ID,T.ADD_USER_NAME,T.MODIFY_USER_ID,T.MODIFY_USER_NAME,T.MODIFY_TIME,T.IS_DEL,T.REMARK
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_SITE_TEMPLATE (
+         ID, NAME, COMPANY_ID, TYPE, SORT_ID, ADD_TIME, ADD_USER_ID, ADD_USER_NAME, MODIFY_USER_ID, MODIFY_USER_NAME, MODIFY_TIME, IS_DEL, REMARK
+        ) VALUES (
+         #{id}, #{name}, #{companyId}, #{type}, #{sortId}, #{addTime}, #{addUserId}, #{addUserName}, #{modifyUserId}, #{modifyUserName}, #{modifyTime}, #{isDel}, #{remark}
+        )
+	</insert>
+    
+	<update id="update" >
+        UPDATE BUSI_SITE_TEMPLATE AS T SET
+	        T.NAME = #{name} , T.COMPANY_ID = #{companyId} , T.TYPE = #{type} , T.SORT_ID = #{sortId} , T.ADD_TIME = #{addTime} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.MODIFY_USER_ID = #{modifyUserId} , T.MODIFY_USER_NAME = #{modifyUserName} , T.MODIFY_TIME = #{modifyTime} , T.IS_DEL = #{isDel} , T.REMARK = #{remark}  
+        WHERE T.ID = #{id}  
+	</update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_SITE_TEMPLATE WHERE ID = #{id} 
+    </delete>
+    
+    <select id="findById" resultMap="RM_busiSiteTemplate">
+		SELECT <include refid="busiSiteTemplate_columns" /> FROM BUSI_SITE_TEMPLATE  AS T WHERE T.ID = #{id} 
+	</select>
+
+    <select id="findRespById" resultMap="RM_busiSiteTemplateResp">
+		SELECT <include refid="busiSiteTemplate_columns" /> FROM BUSI_SITE_TEMPLATE  AS T WHERE T.ID = #{id}
+	</select>
+
+	<select id="findPage" parameterType="map" resultMap="RM_busiSiteTemplate">
+	 SELECT <include refid="busiSiteTemplate_columns" />  FROM BUSI_SITE_TEMPLATE AS T
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+	       <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+	       <if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+	       <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+	       <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+	       <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+	       <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+	       <if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+	       <if test="@Ognl@isNotEmpty(modifyUserId)"> AND T.MODIFY_USER_ID = #{modifyUserId} </if>
+	       <if test="@Ognl@isNotEmpty(modifyUserName)"> AND T.MODIFY_USER_NAME = #{modifyUserName} </if>
+	       <if test="@Ognl@isNotEmpty(modifyTime)"> AND T.MODIFY_TIME = #{modifyTime} </if>
+	       <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+	       <if test="@Ognl@isNotEmpty(remark)"> AND T.REMARK = #{remark} </if>
+		</where>
+		ORDER BY T.SORT_ID ASC,T.MODIFY_TIME DESC
+	</select>
+
+	<select id="findRespPage" parameterType="map" resultMap="RM_busiSiteTemplateResp">
+		SELECT <include refid="busiSiteTemplate_columns" />  FROM BUSI_SITE_TEMPLATE AS T
+		<where>
+			<if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+			<if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+			<if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+			<if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+			<if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+			<if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+			<if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+			<if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+			<if test="@Ognl@isNotEmpty(modifyUserId)"> AND T.MODIFY_USER_ID = #{modifyUserId} </if>
+			<if test="@Ognl@isNotEmpty(modifyUserName)"> AND T.MODIFY_USER_NAME = #{modifyUserName} </if>
+			<if test="@Ognl@isNotEmpty(modifyTime)"> AND T.MODIFY_TIME = #{modifyTime} </if>
+			<if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+			<if test="@Ognl@isNotEmpty(remark)"> AND T.REMARK = #{remark} </if>
+		</where>
+		ORDER BY T.SORT_ID ASC,T.MODIFY_TIME DESC
+	</select>
+
+	<select id="findListByType" parameterType="map" resultMap="RM_busiSiteTemplateResp">
+		SELECT <include refid="busiSiteTemplate_columns" />  FROM BUSI_SITE_TEMPLATE AS T
+			WHERE T.IS_DEL=0 AND T.TYPE=#{type} AND T.COMPANY_ID = #{companyId}
+			ORDER BY T.SORT_ID ASC,T.MODIFY_TIME DESC
+	</select>
+
+
+    <delete id="deleteByCompanyId" parameterType="long">
+        DELETE FROM BUSI_SITE_TEMPLATE WHERE COMPANY_ID = #{companyId}
+    </delete>
+</mapper>

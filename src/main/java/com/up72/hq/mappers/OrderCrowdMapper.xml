@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.OrderCrowdMapper">
+    <resultMap id="RM_orderCrowd" type="com.up72.hq.model.OrderCrowd">
+        <result property="id" column="ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="type" column="TYPE" />
+        <result property="goodsId" column="GOODS_ID" />
+        <result property="goodsPrice" column="GOODS_PRICE" />
+        <result property="goodsCount" column="GOODS_COUNT" />
+        <result property="goodsName" column="GOODS_NAME" />
+        <result property="createDate" column="CREATE_DATE" />
+        <result property="goodsSn" column="GOODS_SN" />
+        <result property="refundCount" column="REFUND_COUNT" />
+        <result property="reviewStatus" column="REVIEW_STATUS" />
+        <result property="goodsImg" column="GOODS_IMG" />
+        <result property="crowdId" column="CROWD_ID" />
+    </resultMap>
+    <resultMap id="RM_orderCrowdResp" type="com.up72.hq.dto.resp.OrderCrowdResp" extends="RM_orderCrowd">
+        <result property="orderSn" column="ORDER_SN" />
+        <result property="userName" column="USER_NAME" />
+        <result property="headImg" column="HEAD_IMG" />
+        <association property="crowd" column="CROWD_ID" select="com.up72.hq.dao.CrowdMapper.findById"/>
+        <association property="returnInfo" column="GOODS_ID" select="com.up72.hq.dao.ReturnInfoMapper.findById" />
+        <association property="crowdOrder" column="ORDER_ID" select="com.up72.hq.dao.CrowdOrderMapper.findId" />
+    </resultMap>
+    <sql id="orderCrowd_columns">
+        T.ID,T.ORDER_ID,T.TYPE,T.GOODS_ID,T.GOODS_PRICE,T.GOODS_COUNT,T.GOODS_NAME,T.CREATE_DATE,T.GOODS_SN,T.REFUND_COUNT,T.REVIEW_STATUS,T.GOODS_IMG,T.CROWD_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ORDER_CROWD (
+         ID, ORDER_ID, TYPE, GOODS_ID, GOODS_PRICE, GOODS_COUNT, GOODS_NAME, CREATE_DATE, GOODS_SN, REFUND_COUNT, REVIEW_STATUS, GOODS_IMG,CROWD_ID
+        ) VALUES (
+         #{id}, #{orderId}, #{type}, #{goodsId}, #{goodsPrice}, #{goodsCount}, #{goodsName}, #{createDate}, #{goodsSn}, #{refundCount}, #{reviewStatus}, #{goodsImg}, #{crowdId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ORDER_CROWD AS T SET
+            T.ORDER_ID = #{orderId} , T.TYPE = #{type} , T.GOODS_ID = #{goodsId} , T.GOODS_PRICE = #{goodsPrice} , T.GOODS_COUNT = #{goodsCount} , T.GOODS_NAME = #{goodsName} , T.CREATE_DATE = #{createDate},T.CROWD_ID = #{crowdId} , T.GOODS_SN = #{goodsSn} , T.REFUND_COUNT = #{refundCount} , T.REVIEW_STATUS = #{reviewStatus} , T.GOODS_IMG = #{goodsImg}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ORDER_CROWD WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_orderCrowd">
+        SELECT <include refid="orderCrowd_columns" /> FROM HQ_ORDER_CROWD AS T WHERE  T.ID = #{id}  
+    </select>
+
+    <select id="findPageResp" parameterType="map" resultMap="RM_orderCrowdResp">
+        <![CDATA[ SELECT T.*,HO.SN AS ORDER_SN,HM.NICK_NAME AS USER_NAME ,HM.HEAD_IMG AS HEAD_IMG FROM HQ_ORDER_CROWD T
+            LEFT JOIN HQ_CROWD_ORDER HO ON HO.ID = T.ORDER_ID
+            LEFT JOIN HQ_MEMBER HM ON HM.ID = HO.MEMBER_ID]]>
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+            <if test="@Ognl@isNotEmpty(goodsPrice)"> AND T.GOODS_PRICE = #{goodsPrice} </if>
+            <if test="@Ognl@isNotEmpty(goodsCount)"> AND T.GOODS_COUNT = #{goodsCount} </if>
+            <if test="@Ognl@isNotEmpty(goodsName)"> AND T.GOODS_NAME = #{goodsName} </if>
+            <if test="@Ognl@isNotEmpty(createDate)"> AND T.CREATE_DATE = #{createDate} </if>
+            <if test="@Ognl@isNotEmpty(goodsSn)"> AND T.GOODS_SN = #{goodsSn} </if>
+            <if test="@Ognl@isNotEmpty(refundCount)"> AND T.REFUND_COUNT = #{refundCount} </if>
+            <if test="@Ognl@isNotEmpty(reviewStatus)"> AND T.REVIEW_STATUS = #{reviewStatus} </if>
+            <if test="@Ognl@isNotEmpty(goodsImg)"> AND T.GOODS_IMG = #{goodsImg} </if>
+            <if test="@Ognl@isNotEmpty(crowdId)"> AND T.CROWD_ID = #{crowdId} </if>
+            AND  <![CDATA[  HO.ORDER_STATUS !=0 ]]>
+        </where>
+        ORDER BY T.ID DESC
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_orderCrowd">
+     SELECT <include refid="orderCrowd_columns" />  FROM HQ_ORDER_CROWD AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+           <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+           <if test="@Ognl@isNotEmpty(goodsId)"> AND T.GOODS_ID = #{goodsId} </if>
+           <if test="@Ognl@isNotEmpty(goodsPrice)"> AND T.GOODS_PRICE = #{goodsPrice} </if>
+           <if test="@Ognl@isNotEmpty(goodsCount)"> AND T.GOODS_COUNT = #{goodsCount} </if>
+           <if test="@Ognl@isNotEmpty(goodsName)"> AND T.GOODS_NAME = #{goodsName} </if>
+           <if test="@Ognl@isNotEmpty(createDate)"> AND T.CREATE_DATE = #{createDate} </if>
+           <if test="@Ognl@isNotEmpty(goodsSn)"> AND T.GOODS_SN = #{goodsSn} </if>
+           <if test="@Ognl@isNotEmpty(refundCount)"> AND T.REFUND_COUNT = #{refundCount} </if>
+           <if test="@Ognl@isNotEmpty(reviewStatus)"> AND T.REVIEW_STATUS = #{reviewStatus} </if>
+           <if test="@Ognl@isNotEmpty(goodsImg)"> AND T.GOODS_IMG = #{goodsImg} </if>
+           <if test="@Ognl@isNotEmpty(crowdId)"> AND T.CROWD_ID = #{crowdId} </if>
+        </where>
+    </select>
+
+    <select id="findByOrderId" resultMap="RM_orderCrowdResp">
+        SELECT T.* FROM HQ_ORDER_CROWD T
+        WHERE T.ORDER_ID = #{orderId}
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ReportMapper">
+    <resultMap id="RM_report" type="com.up72.hq.model.Report">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="totalCnt" column="TOTAL_CNT" />
+        <result property="issueCnt" column="ISSUE_CNT" />
+        <result property="sensitiveCount" column="SENSITIVE_COUNT" />
+        <result property="auditingCnt" column="AUDITING_CNT" />
+        <result property="notAuditingCnt" column="NOT_AUDITING_CNT" />
+        <result property="delCnt" column="DEL_CNT" />
+        <result property="reportDate" column="REPORT_DATE" />
+        <result property="isPc" column="IS_PC" />
+    </resultMap>
+    
+    <sql id="report_columns">
+        T.ID,T.SITE_MENU_ID,T.COMPANY_ID,T.TOTAL_CNT,T.ISSUE_CNT,T.SENSITIVE_COUNT,T.AUDITING_CNT,T.NOT_AUDITING_CNT,T.DEL_CNT,T.REPORT_DATE,T.IS_PC
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_REPORT (
+         ID, SITE_MENU_ID, COMPANY_ID, TOTAL_CNT, ISSUE_CNT, SENSITIVE_COUNT, AUDITING_CNT, NOT_AUDITING_CNT, DEL_CNT, REPORT_DATE, IS_PC
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{companyId}, #{totalCnt}, #{issueCnt}, #{sensitiveCount}, #{auditingCnt}, #{notAuditingCnt}, #{delCnt}, #{reportDate}, #{isPc}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE BUSI_REPORT AS T SET
+            T.SITE_MENU_ID = #{siteMenuId} , T.COMPANY_ID = #{companyId} , T.TOTAL_CNT = #{totalCnt} , T.ISSUE_CNT = #{issueCnt} , T.SENSITIVE_COUNT = #{sensitiveCount} , T.AUDITING_CNT = #{auditingCnt} , T.NOT_AUDITING_CNT = #{notAuditingCnt} , T.DEL_CNT = #{delCnt} , T.REPORT_DATE = #{reportDate} , T.IS_PC = #{isPc}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_REPORT WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_report">
+        SELECT <include refid="report_columns" /> FROM BUSI_REPORT AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_report">
+     SELECT <include refid="report_columns" />  FROM BUSI_REPORT AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+           <if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+           <if test="@Ognl@isNotEmpty(totalCnt)"> AND T.TOTAL_CNT = #{totalCnt} </if>
+           <if test="@Ognl@isNotEmpty(issueCnt)"> AND T.ISSUE_CNT = #{issueCnt} </if>
+           <if test="@Ognl@isNotEmpty(sensitiveCount)"> AND T.SENSITIVE_COUNT = #{sensitiveCount} </if>
+           <if test="@Ognl@isNotEmpty(auditingCnt)"> AND T.AUDITING_CNT = #{auditingCnt} </if>
+           <if test="@Ognl@isNotEmpty(notAuditingCnt)"> AND T.NOT_AUDITING_CNT = #{notAuditingCnt} </if>
+           <if test="@Ognl@isNotEmpty(delCnt)"> AND T.DEL_CNT = #{delCnt} </if>
+           <if test="@Ognl@isNotEmpty(reportDate)"> AND T.REPORT_DATE = #{reportDate} </if>
+           <if test="@Ognl@isNotEmpty(isPc)"> AND T.IS_PC = #{isPc} </if>
+        </where>
+    </select>
+
+    
+</mapper>

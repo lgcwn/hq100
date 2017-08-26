@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiSiteMenuMapper">
+	<resultMap id="RM_busiSiteMenu" type="com.up72.busi.model.BusiSiteMenu">
+        <result property="id" column="ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="name" column="NAME" />
+        <result property="parentId" column="PARENT_ID" />
+        <result property="rootId" column="ROOT_ID" />
+        <result property="idPath" column="ID_PATH" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="level" column="LEVEL" />
+        <result property="isShow" column="IS_SHOW" />
+        <result property="type" column="TYPE" />
+        <result property="fileName" column="FILE_NAME" />
+        <result property="fileUrl" column="FILE_URL" />
+        <result property="content" column="CONTENT" />
+        <result property="controlCnt" column="CONTROL_CNT" />
+        <result property="siteTemplateId" column="SITE_TEMPLATE_ID" />
+        <result property="siteWapTemplateId" column="SITE_WAP_TEMPLATE_ID" />
+        <result property="isDel" column="IS_DEL" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="correlationId" column="CORRELATION_ID" />
+        <result property="isPc" column="IS_PC" />
+        <result property="isWap" column="IS_WAP" />
+        <result property="isStatic" column="IS_STATIC" />
+	</resultMap>
+	<resultMap id="RM_busiSiteMenuResp" type="com.up72.busi.dto.resp.BusiSiteMenuResp" extends="RM_busiSiteMenu">
+		<result property="subMenuCnt" column="SUB_MENU_CNT" />
+	</resultMap>
+	
+	<sql id="busiSiteMenu_columns">
+		T.ID,T.COMPANY_ID,T.NAME,T.PARENT_ID,T.ROOT_ID,T.ID_PATH,T.SORT_ID,T.LEVEL,T.IS_SHOW,T.TYPE,T.FILE_NAME,T.FILE_URL,T.CONTENT,T.CONTROL_CNT,T.SITE_TEMPLATE_ID,T.IS_DEL,T.ADD_USER_ID,T.ADD_USER_NAME,T.ADD_TIME,T.CORRELATION_ID,T.IS_PC,T.IS_WAP,T.SITE_WAP_TEMPLATE_ID,T.IS_STATIC
+	</sql>
+
+	<sql id="select_sql">
+		SELECT <include refid="busiSiteMenu_columns" />
+		-- 如果是查询单页的树结构，需要知道旗下的子节点的数量，用来分辨是不是叶子节点
+		<if test="@Ognl@isNotEmpty(isSingle)">
+			,(SELECT COUNT(1) FROM BUSI_SITE_MENU AS SUB WHERE SUB.PARENT_ID=T.ID) AS SUB_MENU_CNT
+		</if>
+		FROM BUSI_SITE_MENU AS T
+		<where>
+			<if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+			<if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+			<if test="@Ognl@isNotEmpty(parentId)"> AND T.PARENT_ID = #{parentId} </if>
+			<if test="@Ognl@isNotEmpty(rootId)"> AND T.ROOT_ID = #{rootId} </if>
+			<if test="@Ognl@isNotEmpty(level)"> AND T.LEVEL = #{level} </if>
+			<if test="@Ognl@isNotEmpty(isShow)"> AND T.IS_SHOW = #{isShow} </if>
+			<if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+			<if test="@Ognl@isNotEmpty(siteTemplateId)"> AND T.SITE_TEMPLATE_ID = #{siteTemplateId} </if>
+			<if test="@Ognl@isNotEmpty(siteWapTemplateId)"> AND T.SITE_WAP_TEMPLATE_ID = #{siteWapTemplateId} </if>
+			<if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+			<if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+			<if test="@Ognl@isNotEmpty(correlationId)"> AND T.CORRELATION_ID = #{correlationId} </if>
+			<if test="@Ognl@isNotEmpty(isPc)"> AND T.IS_PC = #{isPc} </if>
+			<if test="@Ognl@isNotEmpty(isWap)"> AND T.IS_WAP = #{isWap} </if>
+			<if test="@Ognl@isNotEmpty(isStatic)"> AND T.IS_STATIC = #{isStatic} </if>
+			<if test="@Ognl@isNotEmpty(isSingle)"> AND (T.TYPE=0 OR T.TYPE=1) </if>
+		</where>
+		ORDER BY SORT_ID ASC
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_SITE_MENU (
+         ID, COMPANY_ID, NAME, PARENT_ID, ROOT_ID, ID_PATH, SORT_ID, LEVEL, IS_SHOW, TYPE, FILE_NAME, FILE_URL, CONTENT, CONTROL_CNT, SITE_TEMPLATE_ID, IS_DEL, ADD_USER_ID, ADD_USER_NAME, ADD_TIME, CORRELATION_ID, IS_PC, IS_WAP, SITE_WAP_TEMPLATE_ID,IS_STATIC
+        ) VALUES (
+         #{id}, #{companyId}, #{name}, #{parentId}, #{rootId}, #{idPath}, #{sortId}, #{level}, #{isShow}, #{type}, #{fileName}, #{fileUrl}, #{content}, #{controlCnt}, #{siteTemplateId}, #{isDel}, #{addUserId}, #{addUserName}, #{addTime}, #{correlationId}, #{isPc}, #{isWap}, #{siteWapTemplateId},#{isStatic}
+        )
+	</insert>
+    
+	<update id="update" >
+        UPDATE BUSI_SITE_MENU AS T SET
+	        T.COMPANY_ID = #{companyId} , T.NAME = #{name} , T.PARENT_ID = #{parentId} , T.ROOT_ID = #{rootId} , T.ID_PATH = #{idPath} , T.SORT_ID = #{sortId} , T.LEVEL = #{level} , T.IS_SHOW = #{isShow} , T.TYPE = #{type} , T.FILE_NAME = #{fileName} , T.FILE_URL = #{fileUrl} , T.CONTENT = #{content} , T.CONTROL_CNT = #{controlCnt} , T.SITE_TEMPLATE_ID = #{siteTemplateId} , T.IS_DEL = #{isDel} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.ADD_TIME = #{addTime} , CORRELATION_ID = #{correlationId}, IS_PC = #{isPc}, IS_WAP = #{isWap}, SITE_WAP_TEMPLATE_ID = #{siteWapTemplateId},IS_STATIC=#{isStatic}
+        WHERE T.ID = #{id}  
+	</update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_SITE_MENU WHERE ID = #{id} 
+    </delete>
+
+	<delete id="cascadeDelete" parameterType="long">
+		DELETE FROM BUSI_SITE_MENU WHERE ID_PATH LIKE CONCAT('%[${id}]%')
+	</delete>
+    
+    <select id="findById" resultMap="RM_busiSiteMenu">
+		SELECT <include refid="busiSiteMenu_columns" /> FROM BUSI_SITE_MENU  AS T WHERE T.ID = #{id} 
+	</select>
+	
+	<select id="findPage" parameterType="map" resultMap="RM_busiSiteMenu">
+		<include refid="select_sql" />
+	</select>
+
+	<select id="findList" parameterType="map" resultMap="RM_busiSiteMenuResp">
+		<include refid="select_sql" />
+	</select>
+
+	<select id="findNoteListByPid" parameterType="String" resultMap="RM_busiSiteMenuResp">
+		SELECT <include refid="busiSiteMenu_columns" />  FROM BUSI_SITE_MENU AS T
+		WHERE IS_DEL = 0 AND ID_PATH LIKE "%[${_parameter}]%" ORDER BY SORT_ID ASC
+	</select>
+
+	<select id="findLeftMenuBySingle" resultMap="RM_busiSiteMenuResp">
+		SELECT <include refid="busiSiteMenu_columns" />  FROM BUSI_SITE_MENU AS T
+			WHERE T.COMPANY_ID = #{companyId}
+			AND T.IS_SHOW = 1
+			AND (T.TYPE = 0 OR T.TYPE = 1)
+			AND T.IS_DEL = 0
+			AND T.PARENT_ID = #{parentId}
+		ORDER BY SORT_ID ASC
+	</select>
+
+	<!--获取单页管理的根节点-->
+	<select id="getRootSingleSiteMenu" resultMap="RM_busiSiteMenu">
+		SELECT <include refid="busiSiteMenu_columns" />  FROM BUSI_SITE_MENU AS T
+			WHERE (T.TYPE = 0 OR T.TYPE = 1)
+			AND T.COMPANY_ID = #{companyId}
+			AND T.IS_DEL = 0
+			AND T.LEVEL = 1
+			LIMIT 1
+	</select>
+
+	<!--获取文章系统菜单-->
+	<select id="getArticleSiteMenu" resultMap="RM_busiSiteMenu">
+		SELECT <include refid="busiSiteMenu_columns" />  FROM BUSI_SITE_MENU AS T
+		WHERE T.TYPE = 2
+		AND T.COMPANY_ID = #{companyId}
+		AND T.IS_DEL = 0
+		LIMIT 1
+	</select>
+
+    <delete id="deleteByCompanyId" parameterType="long">
+        DELETE FROM BUSI_SITE_MENU WHERE COMPANY_ID = #{companyId}
+    </delete>
+
+	<select id="cntUrl" resultType="int">
+		SELECT COUNT(1) FROM BUSI_SITE_MENU AS T WHERE T.FILE_URL = #{fileUrl}
+		<if test="@Ognl@isNotEmpty(id)"> AND T.ID != #{id} </if>
+	</select>
+
+	<update id="updateControlCnt" parameterType="long">
+		UPDATE BUSI_SITE_MENU AS T SET T.CONTROL_CNT=(SELECT COUNT(1) FROM BUSI_SITE_CTRL AS C WHERE C.SITE_MENU_ID=T.ID) WHERE T.ID=#{id}
+	</update>
+
+	<select id="findByUrl" resultMap="RM_busiSiteMenu">
+		SELECT <include refid="busiSiteMenu_columns" />  FROM BUSI_SITE_MENU AS T WHERE T.FILE_URL = #{fileUrl} LIMIT 1
+	</select>
+</mapper>

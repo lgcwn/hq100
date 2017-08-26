@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.VideoMapper">
+    <resultMap id="RM_video" type="com.up72.hq.model.Video">
+        <result property="id" column="ID"/>
+        <result property="catId" column="CAT_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="time" column="TIME"/>
+        <result property="url" column="URL"/>
+        <result property="introduction" column="INTRODUCTION"/>
+        <result property="quizId" column="QUIZ_ID"/>
+        <result property="quizName" column="QUIZ_NAME"/>
+        <result property="lookCnt" column="LOOK_CNT"/>
+        <result property="publishTime" column="PUBLISH_TIME"/>
+        <result property="status" column="STATUS"/>
+        <result property="img" column="IMG"/>
+        <result property="catSelect" column="CAT_SELECT"/>
+    </resultMap>
+
+    <resultMap id="RM_videoResp" type="com.up72.hq.dto.resp.VideoResp" extends="RM_video">
+        <result property="typeName" column="TYPE_NAME"/>
+        <result property="catSelectName" column="CAT_SELECT_NAME"/>
+    </resultMap>
+
+    <sql id="video_columns">
+        T.ID,T.CAT_ID,T.NAME,T.TIME,T.URL,T.INTRODUCTION,T.QUIZ_ID,T.QUIZ_NAME,T.LOOK_CNT,T.PUBLISH_TIME,T.STATUS,T.IMG,T.CAT_SELECT
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_VIDEO (
+         ID, CAT_ID, NAME, TIME, URL, INTRODUCTION, QUIZ_ID, QUIZ_NAME, LOOK_CNT,PUBLISH_TIME,STATUS,IMG,CAT_SELECT
+        ) VALUES (
+         #{id}, #{catId}, #{name}, #{time}, #{url}, #{introduction}, #{quizId}, #{quizName}, #{lookCnt}, #{publishTime}, #{status},#{img},#{catSelect}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_VIDEO  T SET
+            T.CAT_ID = #{catId} , T.NAME = #{name} , T.TIME = #{time} , T.URL = #{url} , T.INTRODUCTION = #{introduction} ,T.STATUS = #{status}, T.QUIZ_ID = #{quizId} ,T.CAT_SELECT = #{catSelect},T.IMG = #{img}, T.QUIZ_NAME = #{quizName} , T.LOOK_CNT = #{lookCnt} ,T.PUBLISH_TIME = #{publishTime}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_VIDEO WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_videoResp">
+        SELECT
+        <include refid="video_columns"/>
+        FROM HQ_VIDEO T WHERE T.ID = #{id}
+    </select>
+
+
+    <select id="findByCatId" resultMap="RM_video">
+        SELECT
+        <include refid="video_columns"/>
+        FROM HQ_VIDEO T WHERE T.CAT_ID = #{catId}
+    </select>
+
+
+    <select id="findHot" resultMap="RM_video">
+        SELECT
+        <include refid="video_columns"/>
+        FROM HQ_VIDEO T
+
+        ORDER BY T.LOOK_CNT ASC
+        LIMIT 6
+    </select>
+
+    <select id="findHome" resultMap="RM_video">
+        SELECT
+        <include refid="video_columns"/>
+        FROM HQ_VIDEO T WHERE T.CAT_ID = #{catId} LIMIT 7
+    </select>
+    <select id="findXgVideo" resultMap="RM_video">
+        SELECT
+        <include refid="video_columns"/>
+        FROM HQ_VIDEO T WHERE T.CAT_ID = #{catId} LIMIT 3
+    </select>
+
+    <select id="findLimit9" parameterType="map" resultMap="RM_video">
+        SELECT
+        <include refid="video_columns"/>
+        FROM HQ_VIDEO T
+        <where>
+            <if test="@Ognl@isNotEmpty(catSelect)">AND T.CAT_SELECT = #{catSelect}</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+        </where>
+        LIMIT 9
+    </select>
+
+
+    <select id="findPage" parameterType="map" resultMap="RM_videoResp">
+        SELECT<include refid="video_columns"/>,HC.`NAME` AS TYPE_NAME,HC1.`NAME` AS CAT_SELECT_NAME FROM HQ_VIDEO T
+        LEFT JOIN HQ_CAT HC ON HC.ID = T.CAT_ID
+        LEFT JOIN HQ_CAT HC1 ON HC1.ID = T.CAT_SELECT
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID IN ('${id}')</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(name)">AND T.NAME LIKE CONCAT('%',#{name},'%')</if>
+            <if test="@Ognl@isNotEmpty(time)">AND T.TIME = #{time}</if>
+            <if test="@Ognl@isNotEmpty(url)">AND T.URL = #{url}</if>
+            <if test="@Ognl@isNotEmpty(introduction)">AND T.INTRODUCTION = #{introduction}</if>
+            <if test="@Ognl@isNotEmpty(quizId)">AND T.QUIZ_ID = #{quizId}</if>
+            <if test="@Ognl@isNotEmpty(quizName)">AND T.QUIZ_NAME = #{quizName}</if>
+            <if test="@Ognl@isNotEmpty(lookCnt)">AND T.LOOK_CNT = #{lookCnt}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+            <if test="@Ognl@isNotEmpty(catSelect)">AND T.CAT_SELECT = #{catSelect}</if>
+        </where>
+    </select>
+
+
+</mapper>

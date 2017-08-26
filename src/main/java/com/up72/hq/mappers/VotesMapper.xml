@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.VotesMapper">
+    <resultMap id="RM_votes" type="com.up72.hq.model.Votes">
+        <result property="id" column="ID" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="type" column="TYPE" />
+        <result property="sourceId" column="SOURCE_ID" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="year" column="YEAR" />
+        <result property="month" column="MONTH" />
+        <result property="day" column="DAY" />
+        <result property="votes" column="VOTES" />
+        <result property="status" column="STATUS" />
+        <result property="number" column="NUMBER" />
+        <result property="ranking" column="RANKING" />
+    </resultMap>
+    
+    <sql id="votes_columns">
+        T.ID,T.MEMBER_ID,T.TYPE,T.SOURCE_ID,T.ADD_TIME,T.YEAR,T.MONTH,T.DAY,T.VOTES,T.STATUS,T.NUMBER ,T.RANKING
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(sourceId)"> AND T.SOURCE_ID = #{sourceId} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(addStartTime)"> AND T.ADD_TIME &gt;= #{addStartTime} </if>
+            <if test="@Ognl@isNotEmpty(addEndTime)"> AND T.ADD_TIME &lt;= #{addEndTime} </if>
+            <if test="@Ognl@isNotEmpty(year)"> AND T.YEAR = #{year} </if>
+            <if test="@Ognl@isNotEmpty(month)"> AND T.MONTH = #{month} </if>
+            <if test="@Ognl@isNotEmpty(day)"> AND T.DAY = #{day} </if>
+            <if test="@Ognl@isNotEmpty(votes)"> AND T.VOTES = #{votes} </if>
+            <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+        </where>
+    </sql>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_VOTES (
+         ID, MEMBER_ID, TYPE, SOURCE_ID, ADD_TIME, YEAR, MONTH, DAY, VOTES, STATUS,NUMBER ,RANKING
+        ) VALUES (
+         #{id}, #{memberId}, #{type}, #{sourceId}, #{addTime}, #{year}, #{month}, #{day}, #{votes},  #{status},  #{number},  #{ranking}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_VOTES AS T SET
+            T.MEMBER_ID = #{memberId} , T.TYPE = #{type} , T.SOURCE_ID = #{sourceId} , T.ADD_TIME = #{addTime} ,
+            T.YEAR = #{year} , T.MONTH = #{month} , T.DAY = #{day} , T.VOTES = #{votes} ,T.STATUS = #{status},T.NUMBER = #{number},T.RANKING = #{ranking}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_VOTES WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_votes">
+        SELECT <include refid="votes_columns" /> FROM HQ_VOTES AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_votes">
+     SELECT <include refid="votes_columns" />  FROM HQ_VOTES AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="statHighestVotes" parameterType="map" resultType="Long">
+        SELECT MAX(T.VOTES) FROM HQ_VOTES AS T
+        <include refid="where_sql" />
+    </select>
+    <select id="statLowestVotes" parameterType="map" resultType="Long">
+        SELECT MIN(T.VOTES) FROM HQ_VOTES AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findYearList" parameterType="map" resultMap="RM_votes">
+        SELECT DISTINCT (T.YEAR) FROM HQ_VOTES AS T
+        <include refid="where_sql" />
+        ORDER  BY  T.YEAR
+    </select>
+
+</mapper>

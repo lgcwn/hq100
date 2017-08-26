@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiEditorSetMapper">
+	<resultMap id="RM_busiEditorSet" type="com.up72.busi.model.BusiEditorSet">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="isShowSubtitlePc" column="IS_SHOW_SUBTITLE_PC" />
+        <result property="isShowSubtitleM" column="IS_SHOW_SUBTITLE_M" />
+        <result property="isShowOutlinkPc" column="IS_SHOW_OUTLINK_PC" />
+        <result property="isShowOutlinkM" column="IS_SHOW_OUTLINK_M" />
+        <result property="isShowLabelPc" column="IS_SHOW_LABEL_PC" />
+        <result property="isShowLabelM" column="IS_SHOW_LABEL_M" />
+        <result property="isShowSourcePc" column="IS_SHOW_SOURCE_PC" />
+        <result property="isShowSourceM" column="IS_SHOW_SOURCE_M" />
+        <result property="isShowSummaryPc" column="IS_SHOW_SUMMARY_PC" />
+        <result property="isShowSummaryM" column="IS_SHOW_SUMMARY_M" />
+	</resultMap>
+	
+	<sql id="busiEditorSet_columns">
+	    <![CDATA[
+		ID,SITE_MENU_ID,COMPANY_ID,IS_SHOW_SUBTITLE_PC,IS_SHOW_SUBTITLE_M,IS_SHOW_OUTLINK_PC,IS_SHOW_OUTLINK_M,IS_SHOW_LABEL_PC,IS_SHOW_LABEL_M,IS_SHOW_SOURCE_PC,IS_SHOW_SOURCE_M,IS_SHOW_SUMMARY_PC,IS_SHOW_SUMMARY_M
+	    ]]>
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO BUSI_EDITOR_SET (
+         ID, SITE_MENU_ID, COMPANY_ID, IS_SHOW_SUBTITLE_PC, IS_SHOW_SUBTITLE_M, IS_SHOW_OUTLINK_PC, IS_SHOW_OUTLINK_M, IS_SHOW_LABEL_PC, IS_SHOW_LABEL_M, IS_SHOW_SOURCE_PC, IS_SHOW_SOURCE_M, IS_SHOW_SUMMARY_PC, IS_SHOW_SUMMARY_M
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{companyId}, #{isShowSubtitlePc}, #{isShowSubtitleM}, #{isShowOutlinkPc}, #{isShowOutlinkM}, #{isShowLabelPc}, #{isShowLabelM}, #{isShowSourcePc}, #{isShowSourceM}, #{isShowSummaryPc}, #{isShowSummaryM}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE BUSI_EDITOR_SET SET
+	        SITE_MENU_ID = #{siteMenuId} , COMPANY_ID = #{companyId} , IS_SHOW_SUBTITLE_PC = #{isShowSubtitlePc} , IS_SHOW_SUBTITLE_M = #{isShowSubtitleM} , IS_SHOW_OUTLINK_PC = #{isShowOutlinkPc} , IS_SHOW_OUTLINK_M = #{isShowOutlinkM} , IS_SHOW_LABEL_PC = #{isShowLabelPc} , IS_SHOW_LABEL_M = #{isShowLabelM} , IS_SHOW_SOURCE_PC = #{isShowSourcePc} , IS_SHOW_SOURCE_M = #{isShowSourceM} , IS_SHOW_SUMMARY_PC = #{isShowSummaryPc} , IS_SHOW_SUMMARY_M = #{isShowSummaryM}  
+        WHERE 
+        	ID = #{id}  
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM BUSI_EDITOR_SET WHERE
+        ID = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="findById" resultMap="RM_busiEditorSet">
+		SELECT <include refid="busiEditorSet_columns" />
+	    <![CDATA[
+		    FROM BUSI_EDITOR_SET 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+	
+	<select id="findPage" parameterType="map" resultMap="RM_busiEditorSet">
+	 SELECT <include refid="busiEditorSet_columns" />  FROM BUSI_EDITOR_SET  
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(siteMenuId)">
+				AND SITE_MENU_ID = #{siteMenuId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(companyId)">
+				AND COMPANY_ID = #{companyId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowSubtitlePc)">
+				AND IS_SHOW_SUBTITLE_PC = #{isShowSubtitlePc}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowSubtitleM)">
+				AND IS_SHOW_SUBTITLE_M = #{isShowSubtitleM}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowOutlinkPc)">
+				AND IS_SHOW_OUTLINK_PC = #{isShowOutlinkPc}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowOutlinkM)">
+				AND IS_SHOW_OUTLINK_M = #{isShowOutlinkM}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowLabelPc)">
+				AND IS_SHOW_LABEL_PC = #{isShowLabelPc}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowLabelM)">
+				AND IS_SHOW_LABEL_M = #{isShowLabelM}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowSourcePc)">
+				AND IS_SHOW_SOURCE_PC = #{isShowSourcePc}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowSourceM)">
+				AND IS_SHOW_SOURCE_M = #{isShowSourceM}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowSummaryPc)">
+				AND IS_SHOW_SUMMARY_PC = #{isShowSummaryPc}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isShowSummaryM)">
+				AND IS_SHOW_SUMMARY_M = #{isShowSummaryM}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="findByCompanyIdSiteMenuId" parameterType="map" resultMap="RM_busiEditorSet">
+		SELECT <include refid="busiEditorSet_columns" />  FROM BUSI_EDITOR_SET
+		<where>
+		<if test="@Ognl@isNotEmpty(siteMenuId)">
+			AND SITE_MENU_ID = #{siteMenuId}
+		</if>
+		<if test="@Ognl@isNotEmpty(companyId)">
+			AND COMPANY_ID = #{companyId}
+		</if>
+		</where>
+	</select>
+
+    <delete id="deleteByCompanyId" parameterType="long">
+        DELETE FROM BUSI_EDITOR_SET WHERE COMPANY_ID = #{companyId}
+    </delete>
+</mapper>
+

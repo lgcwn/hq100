@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ChooseMapper">
+    <resultMap id="RM_choose" type="com.up72.hq.model.Choose">
+        <result property="id" column="ID"/>
+        <result property="title" column="TITLE"/>
+        <result property="year" column="YEAR"/>
+        <result property="startTime" column="START_TIME"/>
+        <result property="endTime" column="END_TIME"/>
+        <result property="status" column="STATUS"/>
+        <result property="creator" column="CREATOR"/>
+        <result property="addTime" column="ADD_TIME"/>
+        <result property="type" column="TYPE"/>
+        <result property="banner" column="BANNER"/>
+        <result property="voteCnt" column="VOTE_CNT"/>
+        <result property="newsId" column="NEWS_ID"/>
+        <result property="newsName" column="NEWS_NAME"/>
+    </resultMap>
+
+    <resultMap id="RM_chooseResp" type="com.up72.hq.dto.resp.ChooseResp" extends="RM_choose">
+        <result property="sumVotes" column="SUM_VOTES"/>
+        <collection property="chooseLists" column="ID" javaType="ArrayList" ofType="com.up72.hq.dto.resp.ChooseListResp"
+                    select="com.up72.hq.dao.ChooseListMapper.findListByChooseId"/>
+    </resultMap>
+
+    <sql id="choose_columns">
+        T.ID,T.TITLE,T.YEAR,T.START_TIME,T.END_TIME,T.STATUS,T.CREATOR,T.ADD_TIME,T.TYPE,T.BANNER,T.VOTE_CNT,T.NEWS_ID,T.NEWS_NAME
+    </sql>
+
+    <sql id="wheresql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID=#{id}</if>
+            <if test="@Ognl@isNotEmpty(ids)">AND T.ID IN ('${ids}')</if>
+            <if test="@Ognl@isNotEmpty(title)">AND T.TITLE LIKE CONCAT('%',#{title},'%')</if>
+            <if test="@Ognl@isNotEmpty(year)">AND T.YEAR = #{year}</if>
+            <if test="@Ognl@isNotEmpty(startTime)">AND T.START_TIME = #{startTime}</if>
+            <if test="@Ognl@isNotEmpty(endTime)">AND T.END_TIME = #{endTime}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+            <if test="@Ognl@isNotEmpty(statusGt)">AND T.STATUS &gt; #{statusGt}</if>
+            <if test="@Ognl@isNotEmpty(statusLt)">AND T.STATUS &lt; #{statusLt}</if>
+            <if test="@Ognl@isNotEmpty(statusNot)">AND T.STATUS != #{statusNot}</if>
+            <if test="@Ognl@isNotEmpty(creator)">AND T.CREATOR = #{creator}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(type)">AND T.TYPE = #{type}</if>
+            <if test="@Ognl@isNotEmpty(banner)">AND T.BANNER = #{banner}</if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_CHOOSE (
+         ID, TITLE, YEAR, START_TIME, END_TIME, STATUS, CREATOR, ADD_TIME, TYPE, BANNER,VOTE_CNT,NEWS_ID,NEWS_NAME
+        ) VALUES (
+         #{id}, #{title}, #{year}, #{startTime}, #{endTime}, #{status}, #{creator}, #{addTime}, #{type}, #{banner}, #{voteCnt}, #{newsId}, #{newsName}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_CHOOSE AS T SET
+            T.TITLE = #{title} , T.YEAR = #{year} , T.START_TIME = #{startTime} , T.END_TIME = #{endTime} , T.STATUS = #{status} ,
+             T.CREATOR = #{creator} , T.ADD_TIME = #{addTime} , T.TYPE = #{type} , T.BANNER = #{banner}   , T.VOTE_CNT = #{voteCnt} , T.NEWS_ID = #{newsId} , T.NEWS_NAME = #{newsName}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_CHOOSE WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_chooseResp">
+        SELECT
+        <include refid="choose_columns"/>
+        FROM HQ_CHOOSE AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_chooseResp">
+        SELECT
+        <include refid="choose_columns"/>
+        ,IFNULL ((SELECT SUM(REAL_VOTES)+SUM(VIRTUAL_VOTES) FROM HQ_CHOOSE_LIST AS CL WHERE T.ID=CL.HQ_CHOOSE_ID),0) AS
+        SUM_VOTES FROM HQ_CHOOSE AS T
+        <include refid="wheresql"/>
+    </select>
+
+
+</mapper>

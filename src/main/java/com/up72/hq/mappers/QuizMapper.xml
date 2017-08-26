@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.QuizMapper">
+    <resultMap id="RM_quiz" type="com.up72.hq.model.Quiz">
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="arenaId" column="ARENA_ID" />
+        <result property="startTime" column="START_TIME" />
+        <result property="endTime" column="END_TIME" />
+        <result property="issueTime" column="ISSUE_TIME" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="status" column="STATUS" />
+        <result property="img" column="IMG" />
+        <result property="autoOrManually" column="AUTO_OR_MANUALLY"/>
+        <result property="content" column="CONTENT"/>
+    </resultMap>
+
+    <resultMap id="RM_quizResp" type="com.up72.hq.dto.resp.QuizResp" extends="RM_quiz">
+        <result property="totalNums" column="TOTAL_NUMS" />
+        <result property="sc" column="SC" />
+        <result property="memberNums" column="MEMBER_NUMS" />
+        <result property="hqqId" column="HQQ_ID" />
+        <result property="quizId" column="QUIZ_ID" />
+        <result property="hqqName" column="HQQ_NAME" />
+        <association property="quizQuestios" column="HQQ_ID" select="com.up72.hq.dao.QuizSelectMapper.findByQuestioIdLimit"/>
+    </resultMap>
+
+    <resultMap id="RM_quizResp1" type="com.up72.hq.dto.resp.QuizResp" extends="RM_quiz">
+        <result property="totalNums" column="TOTAL_NUMS" />
+        <result property="sc" column="SC" />
+        <result property="memberNums" column="MEMBER_NUMS" />
+        <association property="quizQuestios" column="ID" select="com.up72.hq.dao.QuizQuestioMapper.findByQuizIdResp"/>
+    </resultMap>
+    
+    <sql id="quiz_columns">
+        T.ID,T.TITLE,T.ARENA_ID,T.START_TIME,T.END_TIME,T.ISSUE_TIME,T.ADD_TIME,T.STATUS,T.IMG,AUTO_OR_MANUALLY,T.CONTENT
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_QUIZ (
+         ID, TITLE, ARENA_ID, START_TIME, END_TIME, ISSUE_TIME, ADD_TIME,STATUS,IMG,AUTO_OR_MANUALLY,CONTENT
+        ) VALUES (
+         #{id}, #{title}, #{arenaId}, #{startTime}, #{endTime}, #{issueTime}, #{addTime}, #{status}, #{img},#{autoOrManually},#{content}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_QUIZ  T SET
+            T.TITLE = #{title} , T.ARENA_ID = #{arenaId} , T.START_TIME = #{startTime} , T.END_TIME = #{endTime},T.IMG = #{img} , T.ISSUE_TIME = #{issueTime},T.STATUS = #{status} , T.ADD_TIME = #{addTime},AUTO_OR_MANUALLY = #{autoOrManually},T.CONTENT = #{content}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_QUIZ WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_quiz">
+        SELECT <include refid="quiz_columns" /> FROM HQ_QUIZ  T WHERE  T.ID = #{id}  
+    </select>
+    <select id="findByIdResp" resultMap="RM_quizResp1">
+        SELECT <include refid="quiz_columns" />,A.TOTAL_NUMS,HC.`NAME` AS SC FROM HQ_QUIZ  T
+        LEFT JOIN HQ_CAT HC ON HC.ID = T.ARENA_ID
+        LEFT JOIN (SELECT QUIZ_ID,COUNT(*) AS TOTAL_NUMS FROM HQ_QUIZ_QUESTIO GROUP BY QUIZ_ID ) A ON A.QUIZ_ID = T.ID
+        WHERE  T.ID = #{id}
+    </select>
+    <select id="findListBy4" resultMap="RM_quizResp">
+   SELECT T.*,hqq.ID AS HQQ_ID,hqq.QUIZ_ID,hqq.`NAME` AS HQQ_NAME FROM HQ_QUIZ  T
+        LEFT JOIN (SELECT qq.* FROM HQ_QUIZ_QUESTIO qq  GROUP BY qq.QUIZ_ID) AS hqq ON hqq.QUIZ_ID = T.ID
+        WHERE  T.ARENA_ID = #{arenaId}
+        AND T.STATUS = 1
+        LIMIT 4
+    </select>
+    <select id="findListByArenaId" resultMap="RM_quizResp">
+      SELECT T.*,hqq.ID AS HQQ_ID,hqq.QUIZ_ID,hqq.`NAME` AS HQQ_NAME FROM HQ_QUIZ  T
+      LEFT JOIN (SELECT qq.* FROM HQ_QUIZ_QUESTIO qq  GROUP BY qq.QUIZ_ID) AS hqq ON hqq.QUIZ_ID = T.ID
+         WHERE  T.ARENA_ID = #{arenaId}
+        AND T.STATUS = 1
+    </select>
+    <select id="findResp" parameterType="map" resultMap="RM_quizResp">
+        SELECT T.*,hqq.ID AS HQQ_ID,hqq.QUIZ_ID,hqq.`NAME` AS HQQ_NAME FROM HQ_QUIZ  T
+        LEFT JOIN (SELECT qq.* FROM HQ_QUIZ_QUESTIO qq  GROUP BY qq.QUIZ_ID) AS hqq ON hqq.QUIZ_ID = T.ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(title)"> AND T.TITLE LIKE CONCAT('%',#{title},'%' )</if>
+            <if test="@Ognl@isNotEmpty(arenaId)"> AND T.ARENA_ID = #{arenaId} </if>
+            <if test="@Ognl@isNotEmpty(startTime)"> AND T.START_TIME = #{startTime} </if>
+            <if test="@Ognl@isNotEmpty(endTime)"> AND T.END_TIME = #{endTime} </if>
+            <if test="@Ognl@isNotEmpty(issueTime)"> AND T.ISSUE_TIME = #{issueTime} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+            <if test="@Ognl@isNotEmpty(autoOrManually)"> AND AUTO_OR_MANUALLY = #{autoOrManually} </if>
+        </where>
+    </select>
+    <!--热门竞猜-->
+    <select id="findHot" resultMap="RM_quizResp">
+    SELECT T.*,HC.`NAME` AS SC FROM HQ_QUIZ  T
+        LEFT JOIN HQ_CAT HC ON HC.ID = T.ARENA_ID
+        WHERE   T.STATUS = 1
+         LIMIT 8
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_quizResp">
+     SELECT <include refid="quiz_columns" /> ,A.TOTAL_NUMS ,INFO.NAME AS SC,B.MEMBER_NUMS FROM HQ_QUIZ  T
+        LEFT JOIN (SELECT QUIZ_ID,COUNT(*) AS TOTAL_NUMS FROM HQ_QUIZ_QUESTIO GROUP BY QUIZ_ID ) A ON A.QUIZ_ID = T.ID
+        LEFT JOIN HQ_CAT INFO ON INFO.ID = T.ARENA_ID
+        LEFT JOIN (SELECT C.QUIZ_ID,COUNT(C.MEMBER_NUM) AS MEMBER_NUMS FROM (SELECT HQQ.*,B.* FROM HQ_QUIZ_QUESTIO HQQ
+        LEFT JOIN (SELECT HQ_QUIZ_QUESTIO_ID,COUNT(*) AS MEMBER_NUM FROM HQ_QUIZ_ORDER  GROUP BY HQ_QUIZ_QUESTIO_ID) B ON B.HQ_QUIZ_QUESTIO_ID = HQQ.ID
+        ) C GROUP BY C.QUIZ_ID) B ON B.QUIZ_ID = T.ID
+        <where>
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(title)"> AND T.TITLE LIKE CONCAT('%',#{title},'%' )</if>
+           <if test="@Ognl@isNotEmpty(arenaId)"> AND T.ARENA_ID = #{arenaId} </if>
+           <if test="@Ognl@isNotEmpty(startTime)"> AND T.START_TIME = #{startTime} </if>
+           <if test="@Ognl@isNotEmpty(endTime)"> AND T.END_TIME = #{endTime} </if>
+           <if test="@Ognl@isNotEmpty(issueTime)"> AND T.ISSUE_TIME = #{issueTime} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+            <if test="@Ognl@isNotEmpty(autoOrManually)"> AND AUTO_OR_MANUALLY = #{autoOrManually} </if>
+        </where>
+        ORDER BY T.ID DESC
+    </select>
+    <select id="findPages" parameterType="map" resultMap="RM_quiz">
+        SELECT <include refid="quiz_columns" />  FROM HQ_QUIZ  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(title)"> AND T.TITLE LIKE CONCAT('%',#{title},'%' )</if>
+            <if test="@Ognl@isNotEmpty(arenaId)"> AND T.ARENA_ID = #{arenaId} </if>
+            <if test="@Ognl@isNotEmpty(startTime)"> AND T.START_TIME = #{startTime} </if>
+            <if test="@Ognl@isNotEmpty(endTime)"> AND T.END_TIME = #{endTime} </if>
+            <if test="@Ognl@isNotEmpty(issueTime)"> AND T.ISSUE_TIME = #{issueTime} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+            <if test="@Ognl@isNotEmpty(autoOrManually)"> AND AUTO_OR_MANUALLY = #{autoOrManually} </if>
+        </where>
+        ORDER BY T.ID DESC
+    </select>
+    
+</mapper>

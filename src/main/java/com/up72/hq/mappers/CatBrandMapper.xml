@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.CatBrandMapper">
+    <resultMap id="RM_catBrand" type="com.up72.hq.model.CatBrand">
+        <result property="id" column="ID" />
+        <result property="brandId" column="BRAND_ID" />
+        <result property="catId" column="CAT_ID" />
+        <result property="addTime" column="ADD_TIME" />
+    </resultMap>
+    
+    <sql id="catBrand_columns">
+        T.ID,T.BRAND_ID,T.CAT_ID,T.ADD_TIME
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_CAT_BRAND (
+         ID, BRAND_ID, CAT_ID, ADD_TIME
+        ) VALUES (
+         #{id}, #{brandId}, #{catId}, #{addTime}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_CAT_BRAND AS T SET
+            T.BRAND_ID = #{brandId} , T.CAT_ID = #{catId} , T.ADD_TIME = #{addTime}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_CAT_BRAND WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_catBrand">
+        SELECT <include refid="catBrand_columns" /> FROM HQ_CAT_BRAND AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_catBrand">
+     SELECT <include refid="catBrand_columns" />  FROM HQ_CAT_BRAND AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(brandId)"> AND T.BRAND_ID = #{brandId} </if>
+           <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+        </where>
+    </select>
+
+    
+</mapper>

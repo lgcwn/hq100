@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.OrderRefundLogMapper">
+    <resultMap id="RM_orderRefundLog" type="com.up72.hq.model.OrderRefundLog">
+        <result property="id" column="ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="chargbackRequestId" column="CHARGBACK_REQUEST_ID" />
+        <result property="orderPayLogId" column="ORDER_PAY_LOG_ID" />
+        <result property="refundSn" column="REFUND_SN" />
+        <result property="refundTradeNo" column="REFUND_TRADE_NO" />
+        <result property="rerundAmount" column="RERUND_AMOUNT" />
+        <result property="status" column="STATUS" />
+        <result property="addTime" column="ADD_TIME" />
+    </resultMap>
+    
+    <sql id="orderRefundLog_columns">
+        T.ID,T.ORDER_ID,T.CHARGBACK_REQUEST_ID,T.ORDER_PAY_LOG_ID,T.REFUND_SN,T.REFUND_TRADE_NO,T.RERUND_AMOUNT,T.STATUS,T.ADD_TIME
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ORDER_REFUND_LOG (
+         ID, ORDER_ID, CHARGBACK_REQUEST_ID, ORDER_PAY_LOG_ID, REFUND_SN, REFUND_TRADE_NO, RERUND_AMOUNT, STATUS, ADD_TIME
+        ) VALUES (
+         #{id}, #{orderId}, #{chargbackRequestId}, #{orderPayLogId}, #{refundSn}, #{refundTradeNo}, #{rerundAmount}, #{status}, #{addTime}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ORDER_REFUND_LOG AS T SET
+            T.ORDER_ID = #{orderId} , T.CHARGBACK_REQUEST_ID = #{chargbackRequestId} , T.ORDER_PAY_LOG_ID = #{orderPayLogId} , T.REFUND_SN = #{refundSn} , T.REFUND_TRADE_NO = #{refundTradeNo} , T.RERUND_AMOUNT = #{rerundAmount} , T.STATUS = #{status} , T.ADD_TIME = #{addTime}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ORDER_REFUND_LOG WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_orderRefundLog">
+        SELECT <include refid="orderRefundLog_columns" /> FROM HQ_ORDER_REFUND_LOG AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_orderRefundLog">
+     SELECT <include refid="orderRefundLog_columns" />  FROM HQ_ORDER_REFUND_LOG AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+           <if test="@Ognl@isNotEmpty(chargbackRequestId)"> AND T.CHARGBACK_REQUEST_ID = #{chargbackRequestId} </if>
+           <if test="@Ognl@isNotEmpty(orderPayLogId)"> AND T.ORDER_PAY_LOG_ID = #{orderPayLogId} </if>
+           <if test="@Ognl@isNotEmpty(refundSn)"> AND T.REFUND_SN = #{refundSn} </if>
+           <if test="@Ognl@isNotEmpty(refundTradeNo)"> AND T.REFUND_TRADE_NO = #{refundTradeNo} </if>
+           <if test="@Ognl@isNotEmpty(rerundAmount)"> AND T.RERUND_AMOUNT = #{rerundAmount} </if>
+           <if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+        </where>
+    </select>
+
+
+    <select id="findByRefundId" resultMap="RM_orderRefundLog">
+        SELECT <include refid="orderRefundLog_columns" /> FROM HQ_ORDER_REFUND_LOG AS T WHERE  T.CHARGBACK_REQUEST_ID = #{id}
+    </select>
+
+
+    <select id="findByRefundTradeNo" resultMap="RM_orderRefundLog">
+        SELECT <include refid="orderRefundLog_columns" /> FROM HQ_ORDER_REFUND_LOG AS T WHERE  T.REFUND_TRADE_NO = #{refundTradeNo}
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.OrderShippingMapper">
+    <resultMap id="RM_orderShipping" type="com.up72.hq.model.OrderShipping">
+        <result property="id" column="ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="exCmpId" column="EX_CMP_ID" />
+        <result property="deliveryNumber" column="DELIVERY_NUMBER" />
+        <result property="sender" column="SENDER" />
+        <result property="sendAddress" column="SEND_ADDRESS" />
+        <result property="sendMobile" column="SEND_MOBILE" />
+        <result property="zipCode" column="ZIP_CODE" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="sysUserId" column="SYS_USER_ID" />
+    </resultMap>
+    
+    <sql id="orderShipping_columns">
+        T.ID,T.ORDER_ID,T.EX_CMP_ID,T.DELIVERY_NUMBER,T.SENDER,T.SEND_ADDRESS,T.SEND_MOBILE,T.ZIP_CODE,T.ADD_TIME,T.SYS_USER_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ORDER_SHIPPING (
+         ID, ORDER_ID, EX_CMP_ID, DELIVERY_NUMBER, SENDER, SEND_ADDRESS, SEND_MOBILE, ZIP_CODE, ADD_TIME, SYS_USER_ID
+        ) VALUES (
+         #{id}, #{orderId}, #{exCmpId}, #{deliveryNumber}, #{sender}, #{sendAddress}, #{sendMobile}, #{zipCode}, #{addTime}, #{sysUserId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ORDER_SHIPPING AS T SET
+            T.ORDER_ID = #{orderId} , T.EX_CMP_ID = #{exCmpId} , T.DELIVERY_NUMBER = #{deliveryNumber} , T.SENDER = #{sender} , T.SEND_ADDRESS = #{sendAddress} , T.SEND_MOBILE = #{sendMobile} , T.ZIP_CODE = #{zipCode} , T.ADD_TIME = #{addTime} , T.SYS_USER_ID = #{sysUserId}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ORDER_SHIPPING WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_orderShipping">
+        SELECT <include refid="orderShipping_columns" /> FROM HQ_ORDER_SHIPPING AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_orderShipping">
+     SELECT <include refid="orderShipping_columns" />  FROM HQ_ORDER_SHIPPING AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+           <if test="@Ognl@isNotEmpty(exCmpId)"> AND T.EX_CMP_ID = #{exCmpId} </if>
+           <if test="@Ognl@isNotEmpty(deliveryNumber)"> AND T.DELIVERY_NUMBER = #{deliveryNumber} </if>
+           <if test="@Ognl@isNotEmpty(sender)"> AND T.SENDER = #{sender} </if>
+           <if test="@Ognl@isNotEmpty(sendAddress)"> AND T.SEND_ADDRESS = #{sendAddress} </if>
+           <if test="@Ognl@isNotEmpty(sendMobile)"> AND T.SEND_MOBILE = #{sendMobile} </if>
+           <if test="@Ognl@isNotEmpty(zipCode)"> AND T.ZIP_CODE = #{zipCode} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(sysUserId)"> AND T.SYS_USER_ID = #{sysUserId} </if>
+        </where>
+    </select>
+
+    
+</mapper>

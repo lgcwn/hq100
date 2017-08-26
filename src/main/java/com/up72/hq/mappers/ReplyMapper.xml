@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ReplyMapper">
+    <resultMap id="RM_reply" type="com.up72.hq.model.Reply">
+        <result property="id" column="ID" />
+        <result property="hqReviewId" column="HQ_REVIEW_ID" />
+        <result property="content" column="CONTENT" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="addTime" column="ADD_TIME" />
+
+        <result property="rootId" column="ROOT_ID" />
+        <result property="parentId" column="PARENT_ID" />
+    </resultMap>
+    <resultMap id="RM_replyResp" type="com.up72.hq.dto.resp.ReplyResp" extends="RM_reply">
+        <result property="nickName" column="NICK_NAME" />
+        <association property="member" column="MEMBER_ID" select="com.up72.hq.dao.MemberMapper.findById"/>
+        <association property="replyResp" column="PARENT_ID" select="com.up72.hq.dao.ReplyMapper.findByIdResp"/>
+    </resultMap>
+    
+    <sql id="reply_columns">
+        T.ID,T.HQ_REVIEW_ID,T.CONTENT,T.MEMBER_ID,T.ADD_TIME,T.ROOT_ID,T.PARENT_ID
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_REPLY (
+         ID, HQ_REVIEW_ID, CONTENT, MEMBER_ID, ADD_TIME, ROOT_ID, PARENT_ID
+        ) VALUES (
+         #{id}, #{hqReviewId}, #{content}, #{memberId}, #{addTime}, #{rootId}, #{parentId}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_REPLY  T SET
+            T.HQ_REVIEW_ID = #{hqReviewId} , T.CONTENT = #{content} , T.MEMBER_ID = #{memberId} , T.ADD_TIME = #{addTime}  , T.ROOT_ID = #{rootId} , T.PARENT_ID = #{parentId}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_REPLY WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_reply">
+        SELECT <include refid="reply_columns" /> FROM HQ_REPLY  T WHERE  T.ID = #{id}
+    </select>
+    <select id="findByIdResp" resultMap="RM_replyResp">
+        SELECT <include refid="reply_columns" /> FROM HQ_REPLY  T WHERE  T.ID = #{id}
+    </select>
+    <select id="findByReviewId" resultMap="RM_replyResp">
+        SELECT <include refid="reply_columns" /> FROM HQ_REPLY  T WHERE  T.HQ_REVIEW_ID = #{hqReviewId}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_replyResp">
+        SELECT <include refid="reply_columns" />,hme.NICK_NAME FROM HQ_REPLY  T
+        LEFT JOIN HQ_MEMBER hme ON hme.ID=T.MEMBER_ID
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(hqReviewId)"> AND T.HQ_REVIEW_ID = #{hqReviewId} </if>
+           <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+
+           <if test="@Ognl@isNotEmpty(rootId)"> AND T.ROOT_ID = #{rootId} </if>
+           <if test="@Ognl@isNotEmpty(parentId)"> AND T.PARENT_ID = #{parentId} </if>
+        </where>
+    </select>
+
+    
+</mapper>

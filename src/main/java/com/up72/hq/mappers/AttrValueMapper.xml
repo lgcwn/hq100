@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.AttrValueMapper">
+    <resultMap id="RM_AttrValue" type="com.up72.hq.model.AttrValue">
+        <result property="id" column="ID" />
+        <result property="attrId" column="ATTR_ID" />
+        <result property="attrValue" column="ATTR_VALUE" />
+        <result property="sortId" column="SORT_ID" />
+    </resultMap>
+
+    <sql id="attrValue_columns">
+        T.ID,T.ATTR_ID,T.ATTR_VALUE,T.SORT_ID
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ATTR_VALUE (
+        ID, ATTR_ID, ATTR_VALUE, SORT_ID
+        ) VALUES (
+        #{id}, #{attrId}, #{attrValue}, #{sortId}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_ATTR_VALUE AS T SET
+        T.ATTR_ID = #{attrId} , T.ATTR_VALUE = #{attrValue} , T.SORT_ID = #{sortId}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ATTR_VALUE WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteByAttrId" parameterType="long">
+        DELETE FROM HQ_ATTR_VALUE WHERE ATTR_ID = #{attrId}
+    </delete>
+
+    <select id="findById" resultMap="RM_AttrValue">
+        SELECT <include refid="attrValue_columns" /> FROM HQ_ATTR_VALUE  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findAndOrderByIds" resultMap="RM_AttrValue">
+        SELECT <include refid="attrValue_columns" /> FROM HQ_ATTR_VALUE  AS T WHERE T.ID in(${ids}) ORDER  BY field(T.ID,${ids})
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_AttrValue">
+        SELECT <include refid="attrValue_columns" />  FROM HQ_ATTR_VALUE AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(attrId)"> AND T.ATTR_ID = #{attrId} </if>
+            <if test="@Ognl@isNotEmpty(attrValue)"> AND T.ATTR_VALUE = #{attrValue} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+        </where>
+    </select>
+
+    <select id="findListByAttrId" parameterType="long" resultMap="RM_AttrValue">
+        SELECT <include refid="attrValue_columns" />  FROM HQ_ATTR_VALUE AS T WHERE T.ATTR_ID = #{attrId} ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="cntUsing" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT(T.PROD_ID)) FROM HQ_PROD_ATTR AS T WHERE T.ATTR_VALUE_ID=#{attrValueId}
+    </select>
+    
+</mapper>

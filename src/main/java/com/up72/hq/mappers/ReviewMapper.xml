@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ReviewMapper">
+    <resultMap id="RM_review" type="com.up72.hq.model.Review">
+        <result property="id" column="ID"/>
+        <result property="catId" column="CAT_ID"/>
+        <result property="content" column="CONTENT"/>
+        <result property="addTime" column="ADD_TIME"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="sourceId" column="SOURCE_ID"/>
+        <result property="idPath" column="ID_PATH"/>
+        <result property="likeNum" column="LIKE_NUM" />
+        <result property="hootingNum" column="HOOTING_NUM" />
+    </resultMap>
+    <resultMap id="RM_reviewResp" type="com.up72.hq.dto.resp.ReviewResp" extends="RM_review">
+        <result property="menuName" column="MENU_NAME"/>
+        <result property="memberName" column="MEMBER_NAME"/>
+        <result property="countReplay" column="COUNT_REPLAY"/>
+        <association property="memberResp" column="MEMBER_ID" select="com.up72.hq.dao.MemberMapper.findById"/>
+        <collection property="replys" column="ID" select="com.up72.hq.dao.ReplyMapper.findByReviewId"/>
+    </resultMap>
+
+    <sql id="review_columns">
+        T.ID,T.CAT_ID,T.CONTENT,T.ADD_TIME,T.MEMBER_ID,T.SOURCE_ID,T.ID_PATH,T.LIKE_NUM,T.HOOTING_NUM
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_REVIEW (
+         ID, CAT_ID, CONTENT, ADD_TIME, MEMBER_ID, SOURCE_ID, ID_PATH, LIKE_NUM, HOOTING_NUM
+        ) VALUES (
+         #{id}, #{catId}, #{content}, #{addTime}, #{memberId}, #{sourceId}, #{idPath}, #{likeNum}, #{hootingNum}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_REVIEW AS T SET
+            T.CAT_ID = #{catId} , T.CONTENT = #{content} , T.ADD_TIME = #{addTime} , T.MEMBER_ID = #{memberId}, T.LIKE_NUM = #{likeNum} , T.HOOTING_NUM = #{hootingNum} , T.SOURCE_ID = #{sourceId} , T.ID_PATH = #{idPath}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_REVIEW WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_review">
+        SELECT
+        <include refid="review_columns"/>
+        FROM HQ_REVIEW AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_review">
+        SELECT
+        <include refid="review_columns"/>
+        FROM HQ_REVIEW AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(content)">AND T.CONTENT = #{content}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+            <if test="@Ognl@isNotEmpty(idPath)">AND T.ID_PATH = #{idPath}</if>
+        </where>
+    </select>
+    <select id="findPageResp" parameterType="map" resultMap="RM_reviewResp">
+        SELECT
+        <include refid="review_columns"/>
+        FROM HQ_REVIEW  T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(content)">AND T.CONTENT = #{content}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(memberId)">AND T.MEMBER_ID = #{memberId}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+            <if test="@Ognl@isNotEmpty(idPath)">AND T.ID_PATH = #{idPath}</if>
+        </where>
+        ORDER BY T.ID DESC
+    </select>
+    <select id="findByIdResp" resultMap="RM_reviewResp">
+        SELECT
+        <include refid="review_columns"/>
+        FROM HQ_REVIEW  T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findReviewRespPage" parameterType="map" resultMap="RM_reviewResp">
+        SELECT R.*,
+        (SELECT M.NAME FROM HQ_MENU M WHERE M.ID= R.CAT_ID)AS MENU_NAME,
+        HM.NICK_NAME AS MEMBER_NAME,
+        (SELECT COUNT(*) FROM HQ_REPLY RE WHERE R.ID = RE.HQ_REVIEW_ID )AS COUNT_REPLAY
+        FROM HQ_REVIEW R
+        LEFT JOIN HQ_MEMBER HM ON HM.ID = R.MEMBER_ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND R.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND R.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(content)">AND R.CONTENT LIKE CONCAT(CONCAT('%', #{content}), '%')</if>
+            <if test="@Ognl@isNotEmpty(memberName)">AND HM.NICK_NAME LIKE CONCAT(CONCAT('%', #{memberName}), '%')</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND R.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND R.SOURCE_ID = #{sourceId}</if>
+            <if test="@Ognl@isNotEmpty(idPath)">AND R.ID_PATH = #{idPath}</if>
+        </where>
+    </select>
+
+
+    <select id="findViewCountBySourceId" parameterType="map" resultType="int">
+        SELECT count(*) FROM HQ_REVIEW AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(sourceId)">AND T.SOURCE_ID = #{sourceId}</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+        </where>
+    </select>
+</mapper>

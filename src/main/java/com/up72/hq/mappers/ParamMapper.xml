@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ParamMapper">
+    <resultMap id="RM_Param" type="com.up72.hq.model.Param">
+        <result property="id" column="ID" />
+        <result property="catId" column="CAT_ID" />
+        <result property="name" column="NAME" />
+        <result property="sortId" column="SORT_ID" />
+    </resultMap>
+
+    <resultMap id="RM_ParamResp" type="com.up72.hq.dto.resp.ParamResp" extends="RM_Param">
+        <result property="catName" column="CAT_NAME" />
+        <collection property="paramValueList" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.ParamValue" select="com.up72.hq.dao.ParamValueMapper.findListByParamId"/>
+    </resultMap>
+
+    <sql id="param_columns">
+        T.ID,T.CAT_ID,T.NAME,T.SORT_ID
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PARAM (
+        CAT_ID, NAME, SORT_ID
+        ) VALUES (
+        #{catId}, #{name}, #{sortId}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_PARAM AS T SET T.CAT_ID = #{catId} , T.NAME = #{name} , T.SORT_ID = #{sortId}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PARAM WHERE ID = #{id}
+    </delete>
+
+    <select id="findById" resultMap="RM_Param">
+        SELECT <include refid="param_columns" /> FROM HQ_PARAM  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findRespById" resultMap="RM_ParamResp">
+        SELECT <include refid="param_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_PARAM  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_Param">
+        SELECT <include refid="param_columns" />  FROM HQ_PARAM AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+        </where>
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_ParamResp">
+        SELECT <include refid="param_columns" />,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_PARAM AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+        </where>
+        ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="cntUsing" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT(T.PROD_ID)) FROM HQ_PROD_PARAM AS T WHERE T.PARAM_ID=#{paramId}
+    </select>
+
+    <select id="findListByCat" parameterType="map" resultMap="RM_ParamResp">
+        SELECT <include refid="param_columns" /> FROM HQ_PARAM AS T WHERE T.CAT_ID=
+        (SELECT MAX(T.CAT_ID) FROM HQ_PARAM AS T WHERE FIND_IN_SET(T.CAT_ID,(SELECT C.ID_PATH FROM HQ_CAT AS C WHERE C.ID=#{catId})))
+        ORDER BY SORT_ID ASC
+    </select>
+
+
+</mapper>

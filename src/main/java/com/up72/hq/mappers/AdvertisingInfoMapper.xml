@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.AdvertisingInfoMapper">
+    <resultMap id="RM_advertisingInfo" type="com.up72.hq.model.AdvertisingInfo">
+        <result property="id" column="ID" />
+        <result property="hqAdvertisingManagementId" column="HQ_ADVERTISING_MANAGEMENT_ID" />
+        <result property="name" column="NAME" />
+        <result property="linkAddress" column="LINK_ADDRESS" />
+        <result property="wapLinkAddress" column="WAP_LINK_ADDRESS" />
+        <result property="startTime" column="START_TIME" />
+        <result property="endTime" column="END_TIME" />
+        <result property="img" column="IMG" />
+        <result property="content" column="CONTENT" />
+        <result property="sequence" column="SEQUENCE" />
+        <result property="enable" column="ENABLE" />
+        <result property="summary" column="SUMMARY" />
+    </resultMap>
+    
+    <sql id="advertisingInfo_columns">
+        T.ID,T.HQ_ADVERTISING_MANAGEMENT_ID,T.NAME,T.LINK_ADDRESS,T.WAP_LINK_ADDRESS,T.START_TIME,T.END_TIME,T.IMG,T.CONTENT,T.SEQUENCE,T.ENABLE,T.SUMMARY
+    </sql>
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(hqAdvertisingManagementId)"> AND T.HQ_ADVERTISING_MANAGEMENT_ID = #{hqAdvertisingManagementId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE CONCAT('%',#{name},'%' ) </if>
+            <if test="@Ognl@isNotEmpty(linkAddress)"> AND T.LINK_ADDRESS = #{linkAddress} </if>
+            <if test="@Ognl@isNotEmpty(wapLinkAddress)"> AND T.WAP_LINK_ADDRESS = #{wapLinkAddress} </if>
+            <if test="@Ognl@isNotEmpty(startTime)"> AND T.START_TIME = #{startTime} </if>
+            <if test="@Ognl@isNotEmpty(endTime)"> AND T.END_TIME = #{endTime} </if>
+            <if test="@Ognl@isNotEmpty(img)"> AND T.IMG = #{img} </if>
+            <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+            <if test="@Ognl@isNotEmpty(sequence)"> AND T.SEQUENCE = #{sequence} </if>
+            <if test="@Ognl@isNotEmpty(enable)"> AND T.ENABLE = #{enable} </if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ADVERTISING_INFO (
+         ID, HQ_ADVERTISING_MANAGEMENT_ID, NAME, LINK_ADDRESS,WAP_LINK_ADDRESS, START_TIME, END_TIME, IMG, CONTENT, SEQUENCE, ENABLE,SUMMARY
+        ) VALUES (
+         #{id}, #{hqAdvertisingManagementId}, #{name}, #{linkAddress},#{wapLinkAddress}, #{startTime}, #{endTime}, #{img}, #{content}, #{sequence}, #{enable},#{summary}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ADVERTISING_INFO AS T SET
+            T.HQ_ADVERTISING_MANAGEMENT_ID = #{hqAdvertisingManagementId} , T.NAME = #{name} , T.LINK_ADDRESS = #{linkAddress} , T.WAP_LINK_ADDRESS = #{wapLinkAddress} , T.START_TIME = #{startTime} , T.END_TIME = #{endTime} , T.IMG = #{img} , T.CONTENT = #{content} , T.SEQUENCE = #{sequence} , T.ENABLE = #{enable},T.SUMMARY = #{summary}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ADVERTISING_INFO WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_advertisingInfo">
+        SELECT <include refid="advertisingInfo_columns" /> FROM HQ_ADVERTISING_INFO AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_advertisingInfo">
+     SELECT <include refid="advertisingInfo_columns" />  FROM HQ_ADVERTISING_INFO AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findListByColumns" parameterType="map" resultMap="RM_advertisingInfo">
+        SELECT <include refid="advertisingInfo_columns" /> FROM HQ_ADVERTISING_INFO AS  T WHERE T.HQ_ADVERTISING_MANAGEMENT_ID=( SELECT ID FROM  HQ_ADVERTISING_MANAGEMENT WHERE `COLUMNS`=#{columns} AND TYPES=#{types})
+    </select>
+</mapper>

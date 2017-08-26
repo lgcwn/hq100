@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.RoleSelectMapper">
+    <resultMap id="RM_roleSelect" type="com.up72.hq.model.RoleSelect">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="tile" column="TILE"/>
+        <result property="signMoney" column="SIGN_MONEY"/>
+        <result property="votePoints" column="VOTE_POINTS"/>
+        <result property="signStartTime" column="SIGN_START_TIME"/>
+        <result property="signEndTime" column="SIGN_END_TIME"/>
+        <result property="voteStartTime" column="VOTE_START_TIME"/>
+        <result property="voteEndTime" column="VOTE_END_TIME"/>
+        <result property="addTime" column="ADD_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="banner" column="BANNER"/>
+        <result property="coverImg" column="COVER_IMG"/>
+        <result property="cpIntro" column="CP_INTRO"/>
+        <result property="jqIntro" column="JQ_INTRO"/>
+        <result property="pxIntro" column="PX_INTRO"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+    <resultMap id="RM_roleSelectResp" type="com.up72.hq.dto.resp.RoleSelectResp" extends="RM_roleSelect">
+        <result property="signPeoples" column="SIGN_PEOPLES"/>
+        <result property="canvassPeoples" column="CANVASS_PEOPLES"/>
+        <collection property="ruleManagerOrderRespList" column="ID" javaType="ArrayList"
+                    ofType="com.up72.hq.dto.resp.RuleManagerOrderResp"
+                    select="com.up72.hq.dao.RuleManagerOrderMapper.findListByRoleSelectId"/>
+    </resultMap>
+
+    <sql id="roleSelect_columns">
+        T.ID,T.NAME,T.TILE,T.SIGN_MONEY,T.VOTE_POINTS,T.SIGN_START_TIME,T.SIGN_END_TIME,T.VOTE_START_TIME,T.VOTE_END_TIME,T.ADD_TIME,T.REMARK,T.BANNER,T.CP_INTRO,T.JQ_INTRO,T.PX_INTRO,T.STATUS,T.COVER_IMG
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID IN ('${id}')</if>
+            <if test="@Ognl@isNotEmpty(name)">AND T.NAME LIKE CONCAT('%',#{name},'%')</if>
+            <if test="@Ognl@isNotEmpty(tile)">AND T.TILE = #{tile}</if>
+            <if test="@Ognl@isNotEmpty(signMoney)">AND T.SIGN_MONEY = #{signMoney}</if>
+            <if test="@Ognl@isNotEmpty(votePoints)">AND T.VOTE_POINTS = #{votePoints}</if>
+            <if test="@Ognl@isNotEmpty(signStartTime)">AND T.SIGN_START_TIME = #{signStartTime}</if>
+            <if test="@Ognl@isNotEmpty(signEndTime)">AND T.SIGN_END_TIME = #{signEndTime}</if>
+            <if test="@Ognl@isNotEmpty(voteStartTime)">AND T.VOTE_START_TIME = #{voteStartTime}</if>
+            <if test="@Ognl@isNotEmpty(voteEndTime)">AND T.VOTE_END_TIME = #{voteEndTime}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(remark)">AND T.REMARK = #{remark}</if>
+            <if test="@Ognl@isNotEmpty(banner)">AND T.BANNER = #{banner}</if>
+            <if test="@Ognl@isNotEmpty(cpIntro)">AND T.CP_INTRO = #{cpIntro}</if>
+            <if test="@Ognl@isNotEmpty(jqIntro)">AND T.JQ_INTRO = #{jqIntro}</if>
+            <if test="@Ognl@isNotEmpty(pxIntro)">AND T.PX_INTRO = #{pxIntro}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+            <if test="@Ognl@isNotEmpty(statusIn)">AND T.STATUS IN (${statusIn})</if>
+            <if test="@Ognl@isNotEmpty(statusNot)">AND T.STATUS !=#{statusNot}</if>
+        </where>
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ROLE_SELECT (
+         ID, NAME, TILE, SIGN_MONEY,VOTE_POINTS, SIGN_START_TIME, SIGN_END_TIME, VOTE_START_TIME, VOTE_END_TIME, ADD_TIME, REMARK, BANNER, CP_INTRO, JQ_INTRO, PX_INTRO,STATUS,COVER_IMG
+        ) VALUES (
+         #{id}, #{name}, #{tile}, #{signMoney},#{votePoints}, #{signStartTime}, #{signEndTime}, #{voteStartTime}, #{voteEndTime}, #{addTime}, #{remark}, #{banner}, #{cpIntro}, #{jqIntro}, #{pxIntro}, #{status},#{coverImg}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_ROLE_SELECT AS T SET
+            T.NAME = #{name} , T.TILE = #{tile} , T.SIGN_MONEY = #{signMoney} ,T.VOTE_POINTS = #{votePoints} , T.SIGN_START_TIME = #{signStartTime} , T.SIGN_END_TIME = #{signEndTime} , T.VOTE_START_TIME = #{voteStartTime} , T.VOTE_END_TIME = #{voteEndTime} ,
+             T.ADD_TIME = #{addTime} , T.REMARK = #{remark} , T.BANNER = #{banner} , T.CP_INTRO = #{cpIntro} , T.JQ_INTRO = #{jqIntro} , T.PX_INTRO = #{pxIntro}, T.STATUS = #{status},T.COVER_IMG = #{coverImg}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ROLE_SELECT WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_roleSelectResp">
+        SELECT
+        <include refid="roleSelect_columns"/>
+        FROM HQ_ROLE_SELECT AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_roleSelectResp">
+        SELECT
+        <include refid="roleSelect_columns"/>
+        ,IFNULL((SELECT COUNT(*) FROM HQ_RULE_MANAGER_ORDER AS O WHERE O.ROLE_SELECT_ID=T.ID AND O.ORDER_STATUS=3),0) AS
+        SIGN_PEOPLES
+        ,IFNULL((SELECT COUNT(*) FROM HQ_RULE_CANVASS AS C WHERE C.ROLE_SELECT_ID=T.ID AND C.STATUS=2),0) AS
+        CANVASS_PEOPLES
+        FROM HQ_ROLE_SELECT AS T
+        <include refid="where_sql"/>
+    </select>
+
+</mapper>

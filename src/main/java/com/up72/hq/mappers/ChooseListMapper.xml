@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ChooseListMapper">
+    <resultMap id="RM_chooseList" type="com.up72.hq.model.ChooseList">
+        <result property="id" column="id" />
+        <result property="hqChooseId" column="HQ_CHOOSE_ID" />
+        <result property="name" column="NAME" />
+        <result property="img" column="IMG" />
+        <result property="realVotes" column="REAL_VOTES" />
+        <result property="virtualVotes" column="VIRTUAL_VOTES" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="content" column="CONTENT" />
+    </resultMap>
+
+    <resultMap id="RM_chooseListResp" type="com.up72.hq.dto.resp.ChooseListResp" extends="RM_chooseList">
+        <result property="ranking" column="RANKING" />
+        <collection property="chooseResp" column="HQ_CHOOSE_ID" ofType="com.up72.hq.dto.resp.ChooseResp" javaType="com.up72.hq.dto.resp.ChooseResp"
+                    select="com.up72.hq.dao.ChooseMapper.findById" />
+    </resultMap>
+    
+    <sql id="chooseList_columns">
+        T.id,T.HQ_CHOOSE_ID,T.NAME,T.IMG,T.REAL_VOTES,T.VIRTUAL_VOTES,T.ADD_TIME,T.CONTENT
+        ,(SELECT  COUNT(DISTINCT(T1.REAL_VOTES+T1.VIRTUAL_VOTES))+1 FROM HQ_CHOOSE_LIST AS T1  WHERE (T1.REAL_VOTES+T1.VIRTUAL_VOTES) >(T.REAL_VOTES+T.VIRTUAL_VOTES) AND T1.HQ_CHOOSE_ID=T.HQ_CHOOSE_ID) AS  RANKING
+    </sql>
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.id = #{id} </if>
+            <if test="@Ognl@isNotEmpty(hqChooseId)"> AND T.HQ_CHOOSE_ID = #{hqChooseId} </if>
+            <if test="@Ognl@isNotEmpty(name)">AND T.NAME LIKE CONCAT('%',#{name},'%')</if>
+            <if test="@Ognl@isNotEmpty(img)"> AND T.IMG = #{img} </if>
+            <if test="@Ognl@isNotEmpty(realVotes)"> AND T.REAL_VOTES = #{realVotes} </if>
+            <if test="@Ognl@isNotEmpty(virtualVotes)"> AND T.VIRTUAL_VOTES = #{virtualVotes} </if>
+            <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+            <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+        </where>
+         ORDER  BY  RANKING ASC
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_CHOOSE_LIST (
+         id, HQ_CHOOSE_ID, NAME, IMG, REAL_VOTES, VIRTUAL_VOTES,ADD_TIME, CONTENT
+        ) VALUES (
+         #{id}, #{hqChooseId}, #{name}, #{img}, #{realVotes}, #{virtualVotes}, #{addTime}, #{content}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_CHOOSE_LIST AS T SET
+            T.HQ_CHOOSE_ID = #{hqChooseId} , T.NAME = #{name} , T.IMG = #{img} , T.REAL_VOTES = #{realVotes} ,
+            T.VIRTUAL_VOTES = #{virtualVotes} , T.ADD_TIME = #{addTime} , T.CONTENT = #{content}
+        WHERE T.id = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_CHOOSE_LIST WHERE  id = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_chooseListResp">
+        SELECT <include refid="chooseList_columns" />
+        FROM HQ_CHOOSE_LIST AS T WHERE  T.ID = #{id}
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_chooseListResp">
+     SELECT <include refid="chooseList_columns" />  FROM HQ_CHOOSE_LIST AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findListByChooseId" parameterType="Long" resultMap="RM_chooseListResp">
+      SELECT <include refid="chooseList_columns" /> FROM HQ_CHOOSE_LIST AS T WHERE  T.HQ_CHOOSE_ID = #{id}  ORDER  BY  RANKING ASC
+    </select>
+
+    
+</mapper>

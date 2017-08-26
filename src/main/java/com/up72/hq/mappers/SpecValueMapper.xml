@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.SpecValueMapper">
+    <resultMap id="RM_SpecValue" type="com.up72.hq.model.SpecValue">
+        <result property="id" column="ID" />
+        <result property="specId" column="SPEC_ID" />
+        <result property="specValue" column="SPEC_VALUE" />
+        <result property="sortId" column="SORT_ID" />
+    </resultMap>
+    
+    <sql id="specValue_columns">
+        T.ID,T.SPEC_ID,T.SPEC_VALUE,T.SORT_ID
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_SPEC_VALUE (
+        ID, SPEC_ID, SPEC_VALUE, SORT_ID
+        ) VALUES (
+        #{id}, #{specId}, #{specValue}, #{sortId}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_SPEC_VALUE AS T SET
+        T.SPEC_ID = #{specId} , T.SPEC_VALUE = #{specValue} , T.SORT_ID = #{sortId}
+        WHERE T.ID = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_SPEC_VALUE WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteByCatId" parameterType="long">
+        DELETE FROM HQ_SPEC_VALUE WHERE SPEC_ID IN (SELECT ID FROM HQ_SPEC WHERE IS_COLOR=1 AND CAT_ID=#{catId})
+    </delete>
+
+    <select id="findById" resultMap="RM_SpecValue">
+        SELECT <include refid="specValue_columns" /> FROM HQ_SPEC_VALUE  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_SpecValue">
+        SELECT <include refid="specValue_columns" />  FROM HQ_SPEC_VALUE AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(specId)"> AND T.SPEC_ID = #{specId} </if>
+            <if test="@Ognl@isNotEmpty(specValue)"> AND T.SPEC_VALUE = #{specValue} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+        </where>
+    </select>
+
+    <select id="cntUsing" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT(T.PROD_ID)) FROM HQ_PROD_SPEC AS T WHERE T.SPEC_VALUE_ID=#{specValueId}
+    </select>
+
+    <select id="findListBySpecId" parameterType="long" resultMap="RM_SpecValue">
+        SELECT <include refid="specValue_columns" />  FROM HQ_SPEC_VALUE AS T
+        WHERE T.SPEC_ID = #{specId} ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="findListByProdIdAndSpecId" parameterType="map" resultMap="RM_SpecValue">
+        SELECT <include refid="specValue_columns" /> FROM HQ_SPEC_VALUE AS T
+        WHERE T.SPEC_ID = #{specId} AND T.ID IN (SELECT P.SPEC_VALUE_ID FROM HQ_PROD_SPEC AS P WHERE P.PROD_ID=#{prodId})
+        ORDER BY T.SORT_ID ASC
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ProdMapper">
+    <resultMap id="RM_Prod" type="com.up72.hq.model.Prod">
+        <result property="id" column="ID" />
+        <result property="catId" column="CAT_ID" />
+        <result property="name" column="NAME" />
+        <result property="itemNumber" column="ITEM_NUMBER" />
+        <result property="intro" column="INTRO" />
+        <result property="isMarketable" column="IS_MARKETABLE" />
+        <result property="isEnableSpec" column="IS_ENABLE_SPEC" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="reMark" column="REMARK" />
+        <result property="sales" column="SALES" />
+        <result property="isShowInHome" column="IS_SHOW_INTRO" />
+        <result property="commentCount" column="COMMENT_COUNT" />
+        <result property="specFull" column="SPEC_FULL" />
+        <result property="specColorFull" column="SPEC_COLOR_FULL" />
+        <result property="minPrice" column="MIN_PRICE" />
+        <result property="isNewProd" column="IS_NEW_PROD" />
+        <result property="compositeScore" column="COMPOSITE_SCORE" />
+        <result property="brandId" column="BRAND_ID" />
+        <result property="packingList" column="PACKING_LIST" />
+        <result property="attrIds" column="ATTR_IDS" />
+        <result property="attrFull" column="ATTR_FULL" />
+        <result property="type" column="TYPE" />
+        <result property="goodsNameFull" column="GOODS_NAME_FULL" />
+        <result property="catIdFull" column="CAT_ID_FULL" />
+        <result property="catNameFull" column="CAT_NAME_FULL" />
+        <result property="attrNameFull" column="ATTR_NAME_FULL" />
+        <result property="stock" column="STOCK" />
+    </resultMap>
+
+    <resultMap id="RM_ProdResp" type="com.up72.hq.dto.resp.ProdResp" extends="RM_Prod">
+        <result property="catName" column="CAT_NAME" />
+        <result property="serviceStock" column="serviceStock" />
+        <result property="commentCount" column="commentCount" />
+        <collection property="goodsList" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.Goods" select="com.up72.hq.dao.GoodsMapper.findListByProdId"/>
+        <collection property="prodAttrList" column="ID" javaType="ArrayList" ofType="com.up72.hq.dto.resp.ProdAttrResp" select="com.up72.hq.dao.ProdAttrMapper.findListByProdId"/>
+        <collection property="prodParamList" column="ID" javaType="ArrayList" ofType="com.up72.hq.dto.resp.ProdParamResp" select="com.up72.hq.dao.ProdParamMapper.findListByProdId"/>
+        <collection property="prodImgList" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.ProdImg" select="com.up72.hq.dao.ProdImgMapper.findListByProdId"/>
+    </resultMap>
+
+    <resultMap id="RM_Prod2Resp" type="com.up72.hq.dto.resp.Prod2Resp" extends="RM_Prod">
+        <result property="catName" column="CAT_NAME" />
+        <result property="realSaleCnt" column="REAL_SALE_CNT" />
+        <result property="goodsSaleCnt" column="GOODS_SALE_CNT" />
+        <result property="stockCnt" column="STOCK_CNT" />
+    </resultMap>
+
+    <sql id="prod_columns">
+        T.ID,T.CAT_ID,T.NAME,T.ITEM_NUMBER,T.INTRO,T.IS_MARKETABLE,T.IS_ENABLE_SPEC,T.ADD_TIME,
+        T.ADD_USER_ID,T.SORT_ID,T.IS_SHOW_INTRO,T.REMARK,T.SALES,T.COMMENT_COUNT,T.SPEC_FULL,T.SPEC_COLOR_FULL,
+        T.MIN_PRICE,T.IS_NEW_PROD,T.COMPOSITE_SCORE,T.BRAND_ID,T.PACKING_LIST,T.ATTR_FULL,T.ATTR_IDS,T.TYPE,
+        T.GOODS_NAME_FULL,T.CAT_ID_FULL,T.CAT_NAME_FULL,T.ATTR_NAME_FULL,T.STOCK
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PROD (
+        ID, CAT_ID, NAME, ITEM_NUMBER, INTRO, IS_MARKETABLE, IS_ENABLE_SPEC, ADD_TIME,
+        ADD_USER_ID, SORT_ID, IS_SHOW_INTRO,REMARK,SALES,COMMENT_COUNT,SPEC_FULL,SPEC_COLOR_FULL,
+        MIN_PRICE,IS_NEW_PROD,COMPOSITE_SCORE,BRAND_ID,PACKING_LIST,ATTR_FULL,ATTR_IDS,TYPE,GOODS_NAME_FULL,
+        CAT_ID_FULL,CAT_NAME_FULL,ATTR_NAME_FULL,STOCK
+        ) VALUES (
+        #{id}, #{catId}, #{name}, #{itemNumber}, #{intro}, #{isMarketable}, #{isEnableSpec}, #{addTime},
+        #{addUserId}, #{sortId}, #{isShowInHome}, #{reMark}, #{sales},#{commentCount},#{specFull},#{specColorFull},
+        #{minPrice},#{isNewProd},#{compositeScore},#{brandId},#{packingList},#{attrFull},#{attrIds},#{type}
+        ,#{goodsNameFull},#{catIdFull},#{catNameFull},#{attrNameFull},#{stock}
+        )
+    </insert>
+
+    <update id="update" >
+        UPDATE HQ_PROD AS T SET
+        T.CAT_ID = #{catId} , T.NAME = #{name} , T.ITEM_NUMBER = #{itemNumber} , T.INTRO = #{intro} , T.IS_MARKETABLE = #{isMarketable} ,
+        T.IS_ENABLE_SPEC = #{isEnableSpec} , T.ADD_TIME = #{addTime} , T.ADD_USER_ID = #{addUserId} ,
+        T.SORT_ID = #{sortId}, T.REMARK = #{reMark} ,T.IS_SHOW_INTRO = #{isShowInHome}, T.SALES = #{sales},T.COMMENT_COUNT = #{commentCount},
+        T.SPEC_FULL = #{specFull},T.SPEC_COLOR_FULL = #{specColorFull},T.MIN_PRICE = #{minPrice},T.IS_NEW_PROD = #{isNewProd},
+        T.COMPOSITE_SCORE = #{compositeScore},T.BRAND_ID = #{brandId},T.PACKING_LIST = #{packingList},T.ATTR_FULL = #{attrFull},T.ATTR_IDS = #{attrIds},T.TYPE = #{type}
+        ,T.GOODS_NAME_FULL=#{goodsNameFull},T.CAT_ID_FULL=#{catIdFull},T.CAT_NAME_FULL=#{catNameFull},T.ATTR_NAME_FULL=#{attrNameFull},T.STOCK = #{stock}
+        WHERE T.ID = #{id}
+    </update>
+
+    <update id="updateCommentCount" >
+        UPDATE HQ_PROD p set p.COMMENT_COUNT=(SELECT count(PROD_ID) FROM HQ_ORDER_GOODS_COMMENT WHERE PROD_ID=p.ID ORDER BY PROD_ID);
+    </update>
+
+    <update id="updateStock" >
+        UPDATE HQ_PROD p SET p.STOCK=(SELECT SUM(STOCK) FROM HQ_GOODS WHERE PROD_ID=p.ID AND IS_MARKETABLE =1) WHERE p.ID=#{prodId};
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PROD WHERE ID = #{id}
+    </delete>
+
+    <select id="findById" resultMap="RM_Prod">
+        SELECT <include refid="prod_columns" /> FROM HQ_PROD  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findByGoodsId" resultMap="RM_ProdResp">
+        SELECT <include refid="prod_columns" /> FROM HQ_PROD  AS T
+        LEFT JOIN HQ_GOODS S ON S.PROD_ID = T.ID
+        WHERE S.ID = #{goodsId}
+    </select>
+
+    <select id="findMinPriceById" resultType="java.lang.Double">
+        SELECT MIN(G.PRICE) FROM HQ_PROD P
+        LEFT JOIN HQ_GOODS G ON G.PROD_ID = P.ID
+        WHERE P.ID = #{id} AND G.IS_DELETE = 0 AND G.IS_MARKETABLE = 1 AND G.TYPE=1
+    </select>
+
+    <select id="findMaxPriceById" resultType="java.lang.Double">
+        SELECT MAX(G.PRICE) FROM HQ_PROD P
+        LEFT JOIN HQ_GOODS G ON G.PROD_ID = P.ID
+        WHERE P.ID = #{id} AND G.IS_DELETE = 0 AND G.IS_MARKETABLE = 1 AND G.TYPE=1
+    </select>
+
+    <select id="findRespById" resultMap="RM_ProdResp">
+        SELECT <include refid="prod_columns" />,
+        (SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT AS M WHERE M.PROD_ID = T.ID AND M.STATUS=1) AS commentCount,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_PROD  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_Prod">
+        SELECT <include refid="prod_columns" /> FROM HQ_PROD AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE '%${name}%' </if>
+            <if test="@Ognl@isNotEmpty(itemNumber)"> AND T.ITEM_NUMBER LIKE '%${itemNumber}%' </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isEnableSpec)"> AND T.IS_ENABLE_SPEC = #{isEnableSpec} </if>
+            <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+            <if test="@Ognl@isNotEmpty(isShowInHome)"> AND T.IS_SHOW_INTRO = #{isShowInHome} </if>
+            <if test="@Ognl@isNotEmpty(sales)"> AND T.SALES = #{sales} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+        </where>
+        ORDER BY T.ADD_TIME DESC
+    </select>
+
+    <select id="findRespPage" parameterType="map" resultMap="RM_ProdResp">
+        SELECT <include refid="prod_columns" />,
+        (SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT AS M WHERE M.PROD_ID = T.ID) AS commentCount,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME
+        FROM HQ_PROD AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE '%${name}%' </if>
+            <if test="@Ognl@isNotEmpty(itemNumber)"> AND T.ITEM_NUMBER LIKE '%${itemNumber}%' </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isEnableSpec)"> AND T.IS_ENABLE_SPEC = #{isEnableSpec} </if>
+            <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+            <if test="@Ognl@isNotEmpty(isShowInHome)"> AND T.IS_SHOW_INTRO = #{isShowInHome} </if>
+            <if test="@Ognl@isNotEmpty(sales)"> AND T.SALES = #{sales} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+        </where>
+    </select>
+    <select id="findListByCatIdPath" parameterType="map" resultMap="RM_ProdResp">
+        SELECT *,(SELECT SUM(G.STOCK) FROM HQ_GOODS G  WHERE G.PROD_ID = P.ID AND G.IS_DELETE = 0 AND G.IS_MARKETABLE = 1 AND G.TYPE=1 ) AS serviceStock from(
+        SELECT <include refid="prod_columns" />,C.ID_PATH ,
+        (SELECT COUNT(*) FROM HQ_ORDER_GOODS_COMMENT AS M WHERE M.PROD_ID = T.ID) AS commentCount,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME,
+        (SELECT G.PRICE FROM HQ_GOODS AS G WHERE G.PROD_ID = T.ID AND G.IS_MARKETABLE = 1 AND G.TYPE=1 AND G.IS_DELETE = 0 LIMIT 0,1) AS goodsPrice
+        FROM HQ_PROD AS T
+        LEFT JOIN HQ_CAT C ON C.ID = T.CAT_ID
+        ) as P
+        <where>
+            <if test="@Ognl@isNotEmpty(catId)"> AND P.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(attrValues)">
+                <foreach item="item" collection="attrValues" separator="," open="P.ID IN (" close=")" index="index">
+                    #{item.prodId, jdbcType=NUMERIC}
+                </foreach>
+            </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND P.NAME LIKE '%${name}%' </if>
+            <if test="@Ognl@isNotEmpty(itemNumber)"> AND P.ITEM_NUMBER LIKE '%${itemNumber}%' </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND P.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(idPathStr)"> AND P.ID_PATH LIKE '%${idPathStr}%'</if>
+            <if test="@Ognl@isNotEmpty(onlyStock)">
+                AND (SELECT SUM(G.STOCK) FROM HQ_GOODS G WHERE G.PROD_ID = P.ID AND G.IS_DELETE = 0 AND G.IS_MARKETABLE = 1 AND G.TYPE=1 ) > 0
+            </if>
+            <if test="@Ognl@isNotEmpty(all)"> ORDER BY P.SORT_ID ASC </if>
+            <if test="@Ognl@isNotEmpty(salesCount)"> ORDER BY P.SALES DESC </if>
+            <if test="@Ognl@isNotEmpty(newProd)"> ORDER BY P.ADD_TIME DESC  </if>
+            <if test="@Ognl@isNotEmpty(commentCount)"> ORDER BY P.commentCount DESC </if>
+            <if test="@Ognl@isNotEmpty(priceSerch)"> ORDER BY P.goodsPrice ASC </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+        </where>
+    </select>
+
+    <select id="cntResp2" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM HQ_PROD AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE '%${name}%' </if>
+            <if test="@Ognl@isNotEmpty(itemNumber)"> AND T.ITEM_NUMBER LIKE '%${itemNumber}%' </if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isEnableSpec)"> AND T.IS_ENABLE_SPEC = #{isEnableSpec} </if>
+            <if test="@Ognl@isNotEmpty(sales)"> AND T.SALES = #{sales} </if>
+            <if test="@Ognl@isNotEmpty(isShowInHome)"> AND T.IS_SHOW_INTRO = #{isShowInHome} </if>
+        </where>
+    </select>
+
+    <select id="findResp2List" parameterType="map" resultMap="RM_Prod2Resp">
+        SELECT <include refid="prod_columns" />  ,
+        (SELECT GROUP_CONCAT(C.NAME) FROM HQ_CAT AS C WHERE FIND_IN_SET(C.ID,(SELECT C2.ID_PATH FROM HQ_CAT AS C2 WHERE C2.ID=T.CAT_ID))) AS CAT_NAME,
+        <!--(SELECT IFNULL(SUM(OG.GOODS_COUNT),0)  FROM HQ_ORDER_GOODS AS OG WHERE OG.ORDER_ID IN (SELECT ID FROM HQ_ORDER AS O WHERE O.STATUS=30)-->
+        <!--AND OG.GOODS_ID IN (SELECT G.ID FROM HQ_GOODS AS G WHERE G.PROD_ID=T.ID)) AS REAL_SALE_CNT,-->
+        0 AS REAL_SALE_CNT,
+        (SELECT IFNULL(SUM(G.MONTH_SALES),0) FROM HQ_GOODS AS G WHERE G.PROD_ID=T.ID) AS GOODS_SALE_CNT,
+        (SELECT IFNULL(SUM(G.STOCK),0) FROM HQ_GOODS AS G WHERE G.PROD_ID=T.ID) AS STOCK_CNT
+        FROM HQ_PROD AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(catId)"> AND T.CAT_ID = #{catId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE '%${name}%' </if>
+            <if test="@Ognl@isNotEmpty(itemNumber)"> AND T.ITEM_NUMBER LIKE '%${itemNumber}%' </if>
+            <if test="@Ognl@isNotEmpty(catNameFull)"> AND T.CAT_NAME_FULL LIKE CONCAT('%',#{catNameFull},'%')</if>
+            <if test="@Ognl@isNotEmpty(isMarketable)"> AND T.IS_MARKETABLE = #{isMarketable} </if>
+            <if test="@Ognl@isNotEmpty(isEnableSpec)"> AND T.IS_ENABLE_SPEC = #{isEnableSpec} </if>
+            <if test="@Ognl@isNotEmpty(isShowInHome)"> AND T.IS_SHOW_INTRO = #{isShowInHome} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+        </where>
+        ORDER BY T.ADD_TIME DESC
+        LIMIT #{start}, #{pageSize}
+    </select>
+
+
+
+</mapper>

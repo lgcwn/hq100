@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.CatMapper">
+    <resultMap id="RM_Cat" type="com.up72.hq.model.Cat">
+        <result property="id" column="ID" />
+        <result property="idPath" column="ID_PATH" />
+        <result property="rootId" column="ROOT_ID" />
+        <result property="parentId" column="PARENT_ID" />
+        <result property="name" column="NAME" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="level" column="LEVEL" />
+        <result property="isLeaf" column="IS_LEAF" />
+        <result property="type" column="TYPE" />
+        <result property="img" column="IMG" />
+        <result property="synopsis" column="SYNOPSIS" />
+    </resultMap>
+
+
+    <resultMap id="RM_CatResp" type="com.up72.hq.dto.resp.CatResp" extends="RM_Cat">
+        <collection property="subCatList" column="ID" javaType="ArrayList" ofType="com.up72.hq.dto.resp.CatResp" select="com.up72.hq.dao.CatMapper.findListByParentId"/>
+    </resultMap>
+
+    <resultMap id="RM_CatTwoLevelResp" type="com.up72.hq.dto.resp.CatTwoLevelResp" extends="RM_Cat">
+        <collection property="subCatList" column="ID" javaType="ArrayList" ofType="com.up72.hq.model.Cat" select="com.up72.hq.dao.CatMapper.findAllLeafByRootId"/>
+    </resultMap>
+
+    <resultMap id="RM_CatUsingCntResp" type="com.up72.hq.dto.resp.CatUsingCntResp" >
+        <result property="attrCnt" column="ATTR_CNT" />
+        <result property="paramCnt" column="PARAM_CNT" />
+        <result property="tagCnt" column="TAG_CNT" />
+        <result property="specCnt" column="SPEC_CNT" />
+        <result property="prodCnt" column="PROD_CNT" />
+        <result property="salesCnt" column="SALES_CNT" />
+        <result property="salesCnt" column="SALES_CNT" />
+        <result property="starCnt" column="STAR_CNT" />
+    </resultMap>
+
+    <resultMap id="RM_CatRankingResp" type="com.up72.hq.dto.resp.CatRankingResp" extends="RM_Cat" >
+        <collection property="starRankingList" column="ID" javaType="ArrayList" ofType="com.up72.hq.dto.resp.StarRankingResp"
+                    select="com.up72.hq.dao.StarRankingMapper.findListByCatId" />
+    </resultMap>
+
+    <sql id="cat_columns">
+        T.ID,T.ID_PATH,T.ROOT_ID,T.PARENT_ID,T.NAME,T.SORT_ID,T.LEVEL,T.IS_LEAF,T.TYPE,T.IMG,T.SYNOPSIS
+    </sql>
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(idPath)"> AND T.ID_PATH = #{idPath} </if>
+            <if test="@Ognl@isNotEmpty(rootId)"> AND T.ROOT_ID = #{rootId} </if>
+            <if test="@Ognl@isNotEmpty(parentId)"> AND T.PARENT_ID = #{parentId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+            <if test="@Ognl@isNotEmpty(level)"> AND T.LEVEL = #{level} </if>
+            <if test="@Ognl@isNotEmpty(isLeaf)"> AND T.IS_LEAF = #{isLeaf} </if>
+            <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+            <if test="@Ognl@isNotEmpty(idPathStr)"> AND T.ID_PATH LIKE '%${idPathStr}%' </if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_CAT (
+         ID, ID_PATH, ROOT_ID, PARENT_ID, NAME, SORT_ID, LEVEL, IS_LEAF, TYPE, IMG,SYNOPSIS
+        ) VALUES (
+         #{id}, #{idPath}, #{rootId}, #{parentId}, #{name}, #{sortId}, #{level}, #{isLeaf}, #{type}, #{img}, #{synopsis}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_CAT AS T SET
+            T.ID_PATH = #{idPath} , T.ROOT_ID = #{rootId} , T.PARENT_ID = #{parentId},T.SYNOPSIS = #{synopsis} , T.NAME = #{name} , T.SORT_ID = #{sortId} , T.LEVEL = #{level} , T.IS_LEAF = #{isLeaf} , T.TYPE = #{type} , T.IMG = #{img}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_CAT WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_Cat">
+        SELECT <include refid="cat_columns" /> FROM HQ_CAT AS T WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findRespById" resultMap="RM_CatResp">
+        SELECT <include refid="cat_columns" /> FROM HQ_CAT  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findTowLevelCat" resultMap="RM_CatTwoLevelResp">
+        SELECT <include refid="cat_columns" /> FROM HQ_CAT  AS T WHERE T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_Cat">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findPageResp" parameterType="map" resultMap="RM_CatResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findTopLevelList" parameterType="Integer" resultMap="RM_CatResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE  T.LEVEL=1 AND T.TYPE=#{type} ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="findTopLevelListById" parameterType="long" resultMap="RM_CatResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE  T.LEVEL=1 AND T.TYPE=1 AND T.ID=#{id}  ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="findTowLevelList" parameterType="long" resultMap="RM_CatTwoLevelResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE  T.LEVEL=1 ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="findListByParentId" parameterType="long" resultMap="RM_CatResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE T.PARENT_ID = #{parentId} ORDER BY T.SORT_ID ASC
+    </select>
+
+    <select id="findByName" parameterType="java.lang.String" resultMap="RM_CatResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE T.NAME = #{name}
+    </select>
+
+    <select id="findAndOrderByIds" parameterType="java.lang.String" resultMap="RM_CatResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE T.ID in(${ids}) ORDER  BY field(T.ID,${ids})
+    </select>
+
+    <select id="findAllLeafByRootId" parameterType="long" resultMap="RM_Cat">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE T.ROOT_ID = #{rootId} AND T.LEVEL > 1 AND T.IS_LEAF=1
+    </select>
+
+    <select id="cntSub" parameterType="long" resultType="int">
+        SELECT COUNT(1) FROM HQ_CAT AS T WHERE T.PARENT_ID = #{parentId}
+    </select>
+
+    <select id="findUsingCnt" parameterType="long" resultMap="RM_CatUsingCntResp">
+        SELECT
+        (SELECT COUNT(1) FROM HQ_ATTR WHERE CAT_ID=#{catId}) AS ATTR_CNT,
+        (SELECT COUNT(1) FROM HQ_PARAM WHERE CAT_ID=#{catId}) AS PARAM_CNT,
+        (SELECT COUNT(1) FROM HQ_TAG WHERE CAT_ID=#{catId}) AS TAG_CNT,
+        (SELECT COUNT(1) FROM HQ_SPEC WHERE IS_COLOR=0 AND CAT_ID=#{catId}) AS SPEC_CNT,
+        (SELECT COUNT(1) FROM HQ_PROD WHERE CAT_ID=#{catId}) AS PROD_CNT,
+        (SELECT COUNT(1) FROM HQ_STAR_RANKING WHERE CAT_ID=#{catId}) AS STAR_CNT
+        FROM DUAL
+    </select>
+
+    <select id="findTop10OfToday" parameterType="map" resultMap="RM_CatUsingCntResp">
+        SELECT A.* FROM
+        (SELECT T.*,
+        (SELECT IFNULL(SUM(OG.GOODS_COUNT),0) FROM HQ_ORDER_GOODS AS OG WHERE OG.ORDER_ID IN
+        (SELECT ID FROM _ORDER AS O WHERE  O.STATUS=30
+        AND O.CREATE_DATE >= #{createDateStart} AND O.CREATE_DATE <![CDATA[ <= ]]> #{createDateEnd}
+        )
+        AND OG.GOODS_ID IN (SELECT G.ID FROM _GOODS AS G WHERE G.CAT_ID=T.ID)
+        ) AS SALES_CNT
+        FROM HQ_CAT AS T ) AS A
+        ORDER BY A.SALES_CNT DESC LIMIT 10
+    </select>
+
+    <select id="findLeafList" parameterType="long" resultMap="RM_Cat">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T WHERE  T.IS_LEAF=1
+    </select>
+    <select id="findFavouriteCatList" parameterType="map" resultMap="RM_Cat">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T
+        LEFT JOIN HQ_GOODS G ON G.CAT_ID = T.ID
+        LEFT JOIN HQ_FAVOURITE F ON F.SOURCE_ID = G.ID
+        WHERE G.IS_DELETE = 0 AND G.IS_MARKETABLE = 1
+        <if test="@Ognl@isNotEmpty(UserId)"> AND F._USER_ID = #{UserId} </if>
+        <if test="@Ognl@isNotEmpty(memberId)"> AND F.MEMBER_ID = #{memberId} </if>
+        <if test="@Ognl@isNotEmpty(type)"> AND F.TYPE = #{type} </if>
+    </select>
+
+    <select id="findListByParams" parameterType="map" resultMap="RM_Cat">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T
+        <include refid="where_sql" />
+    </select>
+
+    <select id="findListByRanking" parameterType="map" resultMap="RM_CatRankingResp">
+        SELECT <include refid="cat_columns" />  FROM HQ_CAT AS T
+        <include refid="where_sql" />
+    </select>
+
+</mapper>

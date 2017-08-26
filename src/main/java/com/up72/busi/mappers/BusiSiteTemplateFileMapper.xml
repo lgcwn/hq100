@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiSiteTemplateFileMapper">
+	<resultMap id="RM_busiSiteTemplateFile" type="com.up72.busi.model.BusiSiteTemplateFile">
+		<result property="id" column="ID" />
+		<result property="siteTemplateId" column="SITE_TEMPLATE_ID" />
+		<result property="companyId" column="COMPANY_ID" />
+		<result property="name" column="NAME" />
+		<result property="fileType" column="FILE_TYPE" />
+		<result property="fileUrl" column="FILE_URL" />
+		<result property="content" column="CONTENT" />
+		<result property="sortId" column="SORT_ID" />
+		<result property="addTime" column="ADD_TIME" />
+		<result property="addUserId" column="ADD_USER_ID" />
+		<result property="addUserName" column="ADD_USER_NAME" />
+		<result property="modifyUserId" column="MODIFY_USER_ID" />
+		<result property="modifyTime" column="MODIFY_TIME" />
+		<result property="modifyUserName" column="MODIFY_USER_NAME" />
+		<result property="isDel" column="IS_DEL" />
+		<result property="remark" column="REMARK" />
+		<result property="status" column="STATUS" />
+		<result property="bakCnt" column="BAK_CNT" />
+		<result property="isDefault" column="IS_DEFAULT" />
+	</resultMap>
+
+	<sql id="busiSiteTemplateFile_columns">
+		T.ID,T.SITE_TEMPLATE_ID,T.COMPANY_ID,T.NAME,T.FILE_TYPE,T.FILE_URL,T.CONTENT,T.SORT_ID,T.ADD_TIME,T.ADD_USER_ID,T.ADD_USER_NAME,T.MODIFY_USER_ID,T.MODIFY_TIME,T.MODIFY_USER_NAME,T.IS_DEL,T.REMARK,T.STATUS,T.BAK_CNT,T.IS_DEFAULT
+	</sql>
+	<sql id="select_sql">
+		SELECT <include refid="busiSiteTemplateFile_columns" />  FROM BUSI_SITE_TEMPLATE_FILE AS T
+		<where>
+			<if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+			<if test="@Ognl@isNotEmpty(siteTemplateId)"> AND T.SITE_TEMPLATE_ID = #{siteTemplateId} </if>
+			<if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+			<if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+			<if test="@Ognl@isNotEmpty(fileType)"> AND T.FILE_TYPE = #{fileType} </if>
+			<if test="@Ognl@isNotEmpty(fileUrl)"> AND T.FILE_URL = #{fileUrl} </if>
+			<if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+			<if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+			<if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+			<if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+			<if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+			<if test="@Ognl@isNotEmpty(modifyUserId)"> AND T.MODIFY_USER_ID = #{modifyUserId} </if>
+			<if test="@Ognl@isNotEmpty(modifyTime)"> AND T.MODIFY_TIME = #{modifyTime} </if>
+			<if test="@Ognl@isNotEmpty(modifyUserName)"> AND T.MODIFY_USER_NAME = #{modifyUserName} </if>
+			<if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+			<if test="@Ognl@isNotEmpty(remark)"> AND T.REMARK = #{remark} </if>
+			<if test="@Ognl@isNotEmpty(status)"> AND T.STATUS = #{status} </if>
+			<if test="@Ognl@isNotEmpty(bakCnt)"> AND T.BAK_CNT = #{bakCnt} </if>
+			<if test="@Ognl@isNotEmpty(isDefault)"> AND T.IS_DEFAULT = #{isDefault} </if>
+		</where>
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO BUSI_SITE_TEMPLATE_FILE (
+		ID, SITE_TEMPLATE_ID, COMPANY_ID, NAME, FILE_TYPE, FILE_URL, CONTENT, SORT_ID, ADD_TIME, ADD_USER_ID, ADD_USER_NAME, MODIFY_USER_ID, MODIFY_TIME, MODIFY_USER_NAME, IS_DEL, REMARK, STATUS, BAK_CNT, IS_DEFAULT
+		) VALUES (
+		#{id}, #{siteTemplateId}, #{companyId}, #{name}, #{fileType}, #{fileUrl}, #{content}, #{sortId}, #{addTime}, #{addUserId}, #{addUserName}, #{modifyUserId}, #{modifyTime}, #{modifyUserName}, #{isDel}, #{remark}, #{status}, #{bakCnt}, #{isDefault}
+		)
+	</insert>
+
+	<update id="update" >
+		UPDATE BUSI_SITE_TEMPLATE_FILE AS T SET
+		T.SITE_TEMPLATE_ID = #{siteTemplateId} , T.COMPANY_ID = #{companyId} , T.NAME = #{name} , T.FILE_TYPE = #{fileType} , T.FILE_URL = #{fileUrl} , T.CONTENT = #{content} , T.SORT_ID = #{sortId} , T.ADD_TIME = #{addTime} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.MODIFY_USER_ID = #{modifyUserId} , T.MODIFY_TIME = #{modifyTime} , T.MODIFY_USER_NAME = #{modifyUserName} , T.IS_DEL = #{isDel} , T.REMARK = #{remark} , T.STATUS = #{status} , T.BAK_CNT = #{bakCnt} , T.IS_DEFAULT = #{isDefault}
+		WHERE T.ID = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM BUSI_SITE_TEMPLATE_FILE WHERE ID = #{id}
+	</delete>
+
+	<select id="findById" resultMap="RM_busiSiteTemplateFile">
+		SELECT <include refid="busiSiteTemplateFile_columns" /> FROM BUSI_SITE_TEMPLATE_FILE  AS T WHERE T.ID = #{id}
+	</select>
+
+	<select id="findPage" parameterType="map" resultMap="RM_busiSiteTemplateFile">
+		<include refid="select_sql"/>
+	</select>
+
+	<select id="findList" parameterType="map" resultMap="RM_busiSiteTemplateFile">
+		<include refid="select_sql"/>
+	</select>
+
+	<select id="findListBySiteTemplateId" parameterType="long" resultMap="RM_busiSiteTemplateFile">
+		SELECT <include refid="busiSiteTemplateFile_columns" />  FROM BUSI_SITE_TEMPLATE_FILE AS T
+		WHERE T.SITE_TEMPLATE_ID = #{siteTemplateId} ORDER BY T.FILE_TYPE ASC
+	</select>
+
+	<select id="findCountBy" parameterType="map" resultType="int">
+		SELECT COUNT(1) FROM BUSI_SITE_TEMPLATE_FILE AS T WHERE T.SITE_TEMPLATE_ID = #{siteTemplateId} AND T.FILE_TYPE=#{fileType} AND T.IS_DEFAULT=1
+	</select>
+
+	<update id="setOthersUndefault" parameterType="map" >
+		UPDATE BUSI_SITE_TEMPLATE_FILE AS T SET T.IS_DEFAULT=0 WHERE T.ID != #{id} AND T.SITE_TEMPLATE_ID=#{siteTemplateId} AND T.FILE_TYPE=#{fileType}
+	</update>
+
+
+	<delete id="deleteByCompanyId" parameterType="long">
+		DELETE FROM BUSI_SITE_TEMPLATE_FILE WHERE COMPANY_ID = #{companyId}
+	</delete>
+</mapper>

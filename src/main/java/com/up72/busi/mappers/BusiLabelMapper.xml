@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.busi.dao.BusiLabelMapper">
+	<resultMap id="RM_busiLabel" type="com.up72.busi.model.BusiLabel">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="companyId" column="COMPANY_ID" />
+		<result property="siteMenuId" column="SITE_MENU_ID" />
+		<result property="isEnable" column="IS_ENABLE" />
+		<result property="addUserId" column="ADD_USER_ID" />
+		<result property="addUserName" column="ADD_USER_NAME" />
+		<result property="addTime" column="ADD_TIME" />
+		<result property="sortId" column="SORT_ID" />
+	</resultMap>
+
+	<sql id="busiLabel_columns">
+		T.ID,T.NAME,T.COMPANY_ID,T.SITE_MENU_ID,T.IS_ENABLE,T.ADD_USER_ID,T.ADD_USER_NAME,T.ADD_TIME,T.SORT_ID
+	</sql>
+
+	<sql id="select_sql">
+		SELECT <include refid="busiLabel_columns" />  FROM BUSI_LABEL AS T
+		<where>
+			<if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+			<if test="@Ognl@isNotEmpty(name)"> AND T.NAME = #{name} </if>
+			<if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+			<if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+			<if test="@Ognl@isNotEmpty(isEnable)"> AND T.IS_ENABLE = #{isEnable} </if>
+			<if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+			<if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+			<if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+			<if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+		</where>
+		ORDER BY T.SORT_ID ASC
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO BUSI_LABEL (
+		ID, NAME, COMPANY_ID, SITE_MENU_ID, IS_ENABLE, ADD_USER_ID, ADD_USER_NAME, ADD_TIME, SORT_ID
+		) VALUES (
+		#{id}, #{name}, #{companyId}, #{siteMenuId}, #{isEnable}, #{addUserId}, #{addUserName}, #{addTime}, #{sortId}
+		)
+	</insert>
+
+	<update id="update" >
+		UPDATE BUSI_LABEL AS T SET
+		T.NAME = #{name} , T.COMPANY_ID = #{companyId} , T.SITE_MENU_ID = #{siteMenuId} , T.IS_ENABLE = #{isEnable} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.ADD_TIME = #{addTime} , T.SORT_ID = #{sortId}
+		WHERE T.ID = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM BUSI_LABEL WHERE ID = #{id}
+	</delete>
+
+	<select id="findById" resultMap="RM_busiLabel">
+		SELECT <include refid="busiLabel_columns" /> FROM BUSI_LABEL  AS T WHERE T.ID = #{id}
+	</select>
+
+	<select id="findPage" parameterType="map" resultMap="RM_busiLabel">
+		<include refid="select_sql" />
+	</select>
+
+
+	<select id="findList" parameterType="map" resultMap="RM_busiLabel">
+		<include refid="select_sql" />
+	</select>
+
+
+	<delete id="deleteByCompanyId" parameterType="long">
+		DELETE FROM BUSI_LABEL WHERE COMPANY_ID = #{companyId}
+	</delete>
+</mapper>

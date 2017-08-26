@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.PraiseMapper">
+    <resultMap id="RM_praise" type="com.up72.hq.model.Praise">
+        <result property="id" column="ID" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="type" column="TYPE" />
+        <result property="sourceId" column="SOURCE_ID" />
+        <result property="isSupport" column="IS_SUPPORT" />
+    </resultMap>
+    
+    <sql id="praise_columns">
+        T.ID,T.MEMBER_ID,T.TYPE,T.SOURCE_ID,T.IS_SUPPORT
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PRAISE (
+         ID , MEMBER_ID, TYPE, SOURCE_ID, IS_SUPPORT
+        ) VALUES (
+         #{id},  #{memberId}, #{type}, #{sourceId}, #{isSupport}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_PRAISE AS T SET
+             T.MEMBER_ID = #{memberId} , T.TYPE = #{type} , T.SOURCE_ID = #{sourceId} , T.IS_SUPPORT = #{isSupport}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PRAISE WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_praise">
+        SELECT <include refid="praise_columns" /> FROM HQ_PRAISE AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_praise">
+         SELECT <include refid="praise_columns" />  FROM HQ_PRAISE AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+           <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+           <if test="@Ognl@isNotEmpty(sourceId)"> AND T.SOURCE_ID = #{sourceId} </if>
+           <if test="@Ognl@isNotEmpty(isSupport)"> AND T.IS_SUPPORT = #{isSupport} </if>
+        </where>
+    </select>
+    <select id="findByParam" parameterType="map" resultMap="RM_praise">
+         SELECT <include refid="praise_columns" />  FROM HQ_PRAISE AS T
+        <where>
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+           <if test="@Ognl@isNotEmpty(type)"> AND T.TYPE = #{type} </if>
+           <if test="@Ognl@isNotEmpty(sourceId)"> AND T.SOURCE_ID = #{sourceId} </if>
+           <if test="@Ognl@isNotEmpty(isSupport)"> AND T.IS_SUPPORT = #{isSupport} </if>
+        </where>
+    </select>
+
+    
+</mapper>

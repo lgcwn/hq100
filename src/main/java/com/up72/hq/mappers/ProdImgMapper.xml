@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ProdImgMapper">
+    <resultMap id="RM_prodImg" type="com.up72.hq.model.ProdImg">
+        <result property="id" column="ID" />
+        <result property="prodId" column="PROD_ID" />
+        <result property="specId" column="SPEC_ID" />
+        <result property="specValueId" column="SPEC_VALUE_ID" />
+        <result property="imgs" column="IMGS" />
+    </resultMap>
+    
+    <sql id="prodImg_columns">
+        T.ID,T.PROD_ID,T.SPEC_ID,T.SPEC_VALUE_ID,T.IMGS
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PROD_IMG (
+         ID, PROD_ID, SPEC_ID, SPEC_VALUE_ID, IMGS
+        ) VALUES (
+         #{id}, #{prodId}, #{specId}, #{specValueId}, #{imgs}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_PROD_IMG AS T SET
+            T.PROD_ID = #{prodId} , T.SPEC_ID = #{specId} , T.SPEC_VALUE_ID = #{specValueId} , T.IMGS = #{imgs}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PROD_IMG WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_prodImg">
+        SELECT <include refid="prodImg_columns" /> FROM HQ_PROD_IMG AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_prodImg">
+     SELECT <include refid="prodImg_columns" />  FROM HQ_PROD_IMG AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+           <if test="@Ognl@isNotEmpty(specId)"> AND T.SPEC_ID = #{specId} </if>
+           <if test="@Ognl@isNotEmpty(specValueId)"> AND T.SPEC_VALUE_ID = #{specValueId} </if>
+           <if test="@Ognl@isNotEmpty(imgs)"> AND T.IMGS = #{imgs} </if>
+        </where>
+    </select>
+
+    <select id="findByParams" parameterType="map" resultMap="RM_prodImg">
+        SELECT <include refid="prodImg_columns" /> FROM HQ_PROD_IMG  AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(prodId)"> AND T.PROD_ID = #{prodId} </if>
+            <if test="@Ognl@isNotEmpty(specId)"> AND T.SPEC_ID = #{specId} </if>
+            <if test="@Ognl@isNotEmpty(specValueId)"> AND T.SPEC_VALUE_ID = #{specValueId} </if>
+            <if test="@Ognl@isNotEmpty(imgs)"> AND T.IMGS = #{imgs} </if>
+        </where>
+    </select>
+
+    <select id="findListByProdId" parameterType="long" resultMap="RM_prodImg">
+        SELECT <include refid="prodImg_columns" />  FROM HQ_PROD_IMG AS T WHERE T.PROD_ID = #{prodId}
+    </select>
+
+    <delete id="deleteByProdId" parameterType="long">
+        DELETE FROM HQ_PROD_IMG WHERE PROD_ID = #{prodId}
+    </delete>
+
+    
+</mapper>

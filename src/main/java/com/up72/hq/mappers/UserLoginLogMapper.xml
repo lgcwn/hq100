@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.UserLoginLogMapper">
+    <resultMap id="RM_userLoginLog" type="com.up72.hq.model.UserLoginLog">
+        <result property="id" column="ID" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="loginType" column="LOGIN_TYPE" />
+        <result property="loginUserType" column="LOGIN_USER_TYPE" />
+        <result property="loginTime" column="LOGIN_TIME" />
+        <result property="loginIp" column="LOGIN_IP" />
+        <result property="message" column="MESSAGE" />
+    </resultMap>
+    
+    <sql id="userLoginLog_columns">
+        T.ID,T.MEMBER_ID,T.LOGIN_TYPE,T.LOGIN_USER_TYPE,T.LOGIN_TIME,T.LOGIN_IP,T.MESSAGE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_USER_LOGIN_LOG (
+         ID, MEMBER_ID, LOGIN_TYPE, LOGIN_USER_TYPE, LOGIN_TIME, LOGIN_IP, MESSAGE
+        ) VALUES (
+         #{id}, #{memberId}, #{loginType}, #{loginUserType}, #{loginTime}, #{loginIp}, #{message}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_USER_LOGIN_LOG AS T SET
+            T.MEMBER_ID = #{memberId} , T.LOGIN_TYPE = #{loginType} , T.LOGIN_USER_TYPE = #{loginUserType} , T.LOGIN_TIME = #{loginTime} , T.LOGIN_IP = #{loginIp} , T.MESSAGE = #{message}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_USER_LOGIN_LOG WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_userLoginLog">
+        SELECT <include refid="userLoginLog_columns" /> FROM HQ_USER_LOGIN_LOG AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_userLoginLog">
+     SELECT <include refid="userLoginLog_columns" />  FROM HQ_USER_LOGIN_LOG AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+           <if test="@Ognl@isNotEmpty(loginType)"> AND T.LOGIN_TYPE = #{loginType} </if>
+           <if test="@Ognl@isNotEmpty(loginUserType)"> AND T.LOGIN_USER_TYPE = #{loginUserType} </if>
+           <if test="@Ognl@isNotEmpty(loginTime)"> AND T.LOGIN_TIME = #{loginTime} </if>
+           <if test="@Ognl@isNotEmpty(loginIp)"> AND T.LOGIN_IP = #{loginIp} </if>
+           <if test="@Ognl@isNotEmpty(message)"> AND T.MESSAGE = #{message} </if>
+        </where>
+    </select>
+
+    <select id="findLastLoginLog" parameterType="Long" resultMap="RM_userLoginLog">
+        SELECT <include refid="userLoginLog_columns" /> FROM HQ_USER_LOGIN_LOG AS T WHERE T.MEMBER_ID = #{memberId} ORDER BY T.LOGIN_TIME DESC LIMIT 0,1
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ResourceMapper">
+    <resultMap id="RM_resource" type="com.up72.hq.model.Resource">
+        <result property="id" column="ID" />
+        <result property="categoryId" column="CATEGORY_ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="title" column="TITLE" />
+        <result property="subTitle" column="SUB_TITLE" />
+        <result property="shortTitle" column="SHORT_TITLE" />
+        <result property="summary" column="SUMMARY" />
+        <result property="outLink" column="OUT_LINK" />
+        <result property="content" column="CONTENT" />
+        <result property="source" column="SOURCE" />
+        <result property="author" column="AUTHOR" />
+        <result property="labels" column="LABELS" />
+        <result property="publishTime" column="PUBLISH_TIME" />
+        <result property="isDel" column="IS_DEL" />
+        <result property="delUserId" column="DEL_USER_ID" />
+        <result property="delUserName" column="DEL_USER_NAME" />
+        <result property="delTime" column="DEL_TIME" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="addUserId" column="ADD_USER_ID" />
+        <result property="addUserName" column="ADD_USER_NAME" />
+        <result property="editTime" column="EDIT_TIME" />
+        <result property="isAuditing" column="IS_AUDITING" />
+        <result property="isIssue" column="IS_ISSUE" />
+        <result property="issueTime" column="ISSUE_TIME" />
+        <result property="uuid" column="UUID" />
+        <result property="issueLink" column="ISSUE_LINK" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="img" column="IMG" />
+    </resultMap>
+    
+    <sql id="resource_columns">
+        T.ID,T.CATEGORY_ID,T.SITE_MENU_ID,T.TITLE,T.SUB_TITLE,T.SHORT_TITLE,T.SUMMARY,T.OUT_LINK,T.CONTENT,T.SOURCE,T.AUTHOR,T.LABELS,T.PUBLISH_TIME,T.IS_DEL,T.DEL_USER_ID,T.DEL_USER_NAME,T.DEL_TIME,T.ADD_TIME,T.ADD_USER_ID,T.ADD_USER_NAME,T.EDIT_TIME,T.IS_AUDITING,T.IS_ISSUE,T.ISSUE_TIME,T.UUID,T.ISSUE_LINK,T.COMPANY_ID,T.IMG
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_RESOURCE (
+         ID, CATEGORY_ID, SITE_MENU_ID, TITLE, SUB_TITLE, SHORT_TITLE, SUMMARY, OUT_LINK, CONTENT, SOURCE, AUTHOR, LABELS, PUBLISH_TIME, IS_DEL, DEL_USER_ID, DEL_USER_NAME, DEL_TIME, ADD_TIME, ADD_USER_ID, ADD_USER_NAME, EDIT_TIME, IS_AUDITING, IS_ISSUE, ISSUE_TIME, UUID, ISSUE_LINK, COMPANY_ID, IMG
+        ) VALUES (
+         #{id}, #{categoryId}, #{siteMenuId}, #{title}, #{subTitle}, #{shortTitle}, #{summary}, #{outLink}, #{content}, #{source}, #{author}, #{labels}, #{publishTime}, #{isDel}, #{delUserId}, #{delUserName}, #{delTime}, #{addTime}, #{addUserId}, #{addUserName}, #{editTime}, #{isAuditing}, #{isIssue}, #{issueTime}, #{uuid}, #{issueLink}, #{companyId}, #{img}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE BUSI_RESOURCE AS T SET
+            T.CATEGORY_ID = #{categoryId} , T.SITE_MENU_ID = #{siteMenuId} , T.TITLE = #{title} , T.SUB_TITLE = #{subTitle} , T.SHORT_TITLE = #{shortTitle} , T.SUMMARY = #{summary} , T.OUT_LINK = #{outLink} , T.CONTENT = #{content} , T.SOURCE = #{source} , T.AUTHOR = #{author} , T.LABELS = #{labels} , T.PUBLISH_TIME = #{publishTime} , T.IS_DEL = #{isDel} , T.DEL_USER_ID = #{delUserId} , T.DEL_USER_NAME = #{delUserName} , T.DEL_TIME = #{delTime} , T.ADD_TIME = #{addTime} , T.ADD_USER_ID = #{addUserId} , T.ADD_USER_NAME = #{addUserName} , T.EDIT_TIME = #{editTime} , T.IS_AUDITING = #{isAuditing} , T.IS_ISSUE = #{isIssue} , T.ISSUE_TIME = #{issueTime} , T.UUID = #{uuid} , T.ISSUE_LINK = #{issueLink} , T.COMPANY_ID = #{companyId} , T.IMG = #{img}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_RESOURCE WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_resource">
+        SELECT <include refid="resource_columns" /> FROM BUSI_RESOURCE AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_resource">
+     SELECT <include refid="resource_columns" />  FROM BUSI_RESOURCE AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(categoryId)"> AND T.CATEGORY_ID = #{categoryId} </if>
+           <if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+           <if test="@Ognl@isNotEmpty(title)"> AND T.TITLE = #{title} </if>
+           <if test="@Ognl@isNotEmpty(subTitle)"> AND T.SUB_TITLE = #{subTitle} </if>
+           <if test="@Ognl@isNotEmpty(shortTitle)"> AND T.SHORT_TITLE = #{shortTitle} </if>
+           <if test="@Ognl@isNotEmpty(summary)"> AND T.SUMMARY = #{summary} </if>
+           <if test="@Ognl@isNotEmpty(outLink)"> AND T.OUT_LINK = #{outLink} </if>
+           <if test="@Ognl@isNotEmpty(content)"> AND T.CONTENT = #{content} </if>
+           <if test="@Ognl@isNotEmpty(source)"> AND T.SOURCE = #{source} </if>
+           <if test="@Ognl@isNotEmpty(author)"> AND T.AUTHOR = #{author} </if>
+           <if test="@Ognl@isNotEmpty(labels)"> AND T.LABELS = #{labels} </if>
+           <if test="@Ognl@isNotEmpty(publishTime)"> AND T.PUBLISH_TIME = #{publishTime} </if>
+           <if test="@Ognl@isNotEmpty(isDel)"> AND T.IS_DEL = #{isDel} </if>
+           <if test="@Ognl@isNotEmpty(delUserId)"> AND T.DEL_USER_ID = #{delUserId} </if>
+           <if test="@Ognl@isNotEmpty(delUserName)"> AND T.DEL_USER_NAME = #{delUserName} </if>
+           <if test="@Ognl@isNotEmpty(delTime)"> AND T.DEL_TIME = #{delTime} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(addUserId)"> AND T.ADD_USER_ID = #{addUserId} </if>
+           <if test="@Ognl@isNotEmpty(addUserName)"> AND T.ADD_USER_NAME = #{addUserName} </if>
+           <if test="@Ognl@isNotEmpty(editTime)"> AND T.EDIT_TIME = #{editTime} </if>
+           <if test="@Ognl@isNotEmpty(isAuditing)"> AND T.IS_AUDITING = #{isAuditing} </if>
+           <if test="@Ognl@isNotEmpty(isIssue)"> AND T.IS_ISSUE = #{isIssue} </if>
+           <if test="@Ognl@isNotEmpty(issueTime)"> AND T.ISSUE_TIME = #{issueTime} </if>
+           <if test="@Ognl@isNotEmpty(uuid)"> AND T.UUID = #{uuid} </if>
+           <if test="@Ognl@isNotEmpty(issueLink)"> AND T.ISSUE_LINK = #{issueLink} </if>
+           <if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+           <if test="@Ognl@isNotEmpty(img)"> AND T.IMG = #{img} </if>
+        </where>
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ReturnInfoMapper">
+    <resultMap id="RM_returnInfo" type="com.up72.hq.model.ReturnInfo">
+        <result property="id" column="ID" />
+        <result property="crowdId" column="CROWD_ID" />
+        <result property="title" column="TITLE" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="returnInfo" column="RETURN_INFO" />
+        <result property="returnCnt" column="RETURN_CNT" />
+        <result property="restrictionNum" column="RESTRICTION_NUM" />
+        <result property="img" column="IMG" />
+        <result property="shippingMethods" column="SHIPPING_METHODS" />
+        <result property="sendTim" column="SEND_TIM" />
+        <result property="isPoints" column="IS_POINTS" />
+        <result property="isTb" column="IS_TB" />
+        <result property="money" column="MONEY" />
+        <result property="isDelete" column="IS_DELETE" />
+        <result property="givePoints" column="GIVE_POINTS" />
+    </resultMap>
+    <resultMap id="RM_returnInfoResp" type="com.up72.hq.dto.resp.ReturnInfoResp" extends="RM_returnInfo">
+        <result property="buyNum" column="BUY_NUM" />
+    </resultMap>
+    
+    <sql id="returnInfo_columns">
+        T.ID,T.CROWD_ID,T.TITLE,T.SORT_ID,T.RETURN_INFO,T.RETURN_CNT,T.RESTRICTION_NUM,T.IMG,T.SHIPPING_METHODS,T.SEND_TIM,T.IS_POINTS,T.IS_TB,T.MONEY,T.IS_DELETE,T.GIVE_POINTS
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_RETURN_INFO (
+         ID, CROWD_ID, TITLE, SORT_ID, RETURN_INFO, RETURN_CNT, RESTRICTION_NUM, IMG, SHIPPING_METHODS, SEND_TIM, IS_POINTS, IS_TB, MONEY,IS_DELETE,GIVE_POINTS
+        ) VALUES (
+         #{id}, #{crowdId}, #{title}, #{sortId}, #{returnInfo}, #{returnCnt}, #{restrictionNum}, #{img}, #{shippingMethods}, #{sendTim}, #{isPoints}, #{isTb}, #{money},#{isDelete},#{givePoints}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_RETURN_INFO  T SET
+            T.CROWD_ID = #{crowdId} , T.TITLE = #{title} , T.SORT_ID = #{sortId} , T.RETURN_INFO = #{returnInfo} , T.RETURN_CNT = #{returnCnt} , T.RESTRICTION_NUM = #{restrictionNum} , T.IMG = #{img} , T.SHIPPING_METHODS = #{shippingMethods} , T.SEND_TIM = #{sendTim} , T.IS_POINTS = #{isPoints} , T.IS_TB = #{isTb},T.MONEY=#{money} ,T.IS_DELETE = #{isDelete},T.GIVE_POINTS=#{givePoints}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_RETURN_INFO WHERE  ID = #{id}  
+    </delete>
+    <delete id="deleteByCrowdId">
+        DELETE FROM HQ_RETURN_INFO WHERE  CROWD_ID = #{crowdId}
+    </delete>
+
+    <select id="findById" resultMap="RM_returnInfo">
+        SELECT <include refid="returnInfo_columns" /> FROM HQ_RETURN_INFO  T WHERE  T.ID = #{id}  
+    </select>
+
+    <select id="findByCrowdId" resultMap="RM_returnInfoResp">
+        SELECT <include refid="returnInfo_columns" />,AA.BUY_NUM FROM HQ_RETURN_INFO  T
+        LEFT JOIN (SELECT HOC.*,COUNT(HOC.ID) AS BUY_NUM FROM HQ_ORDER_CROWD HOC
+        LEFT JOIN HQ_ORDER HO ON HO.ID=HOC.ORDER_ID
+        WHERE HOC.TYPE=0 AND HO.ORDER_STATUS !=0
+        GROUP BY HOC.CROWD_ID) AA ON AA.GOODS_ID = T.ID AND AA.CROWD_ID = T.CROWD_ID
+        WHERE  T.CROWD_ID = #{crowdId} AND T.IS_DELETE = 1
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_returnInfo">
+     SELECT <include refid="returnInfo_columns" />  FROM HQ_RETURN_INFO  T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(crowdId)"> AND T.CROWD_ID = #{crowdId} </if>
+           <if test="@Ognl@isNotEmpty(title)"> AND T.TITLE = #{title} </if>
+           <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+           <if test="@Ognl@isNotEmpty(returnInfo)"> AND T.RETURN_INFO = #{returnInfo} </if>
+           <if test="@Ognl@isNotEmpty(returnCnt)"> AND T.RETURN_CNT = #{returnCnt} </if>
+           <if test="@Ognl@isNotEmpty(restrictionNum)"> AND T.RESTRICTION_NUM = #{restrictionNum} </if>
+           <if test="@Ognl@isNotEmpty(img)"> AND T.IMG = #{img} </if>
+           <if test="@Ognl@isNotEmpty(shippingMethods)"> AND T.SHIPPING_METHODS = #{shippingMethods} </if>
+           <if test="@Ognl@isNotEmpty(sendTim)"> AND T.SEND_TIM = #{sendTim} </if>
+           <if test="@Ognl@isNotEmpty(isPoints)"> AND T.IS_POINTS = #{isPoints} </if>
+           <if test="@Ognl@isNotEmpty(isTb)"> AND T.IS_TB = #{isTb} </if>
+           <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+        </where>
+    </select>
+</mapper>

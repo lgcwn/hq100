@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.EditorSetMapper">
+    <resultMap id="RM_editorSet" type="com.up72.hq.model.EditorSet">
+        <result property="id" column="ID" />
+        <result property="siteMenuId" column="SITE_MENU_ID" />
+        <result property="companyId" column="COMPANY_ID" />
+        <result property="isShowSubtitlePc" column="IS_SHOW_SUBTITLE_PC" />
+        <result property="isShowSubtitleM" column="IS_SHOW_SUBTITLE_M" />
+        <result property="isShowOutlinkPc" column="IS_SHOW_OUTLINK_PC" />
+        <result property="isShowOutlinkM" column="IS_SHOW_OUTLINK_M" />
+        <result property="isShowLabelPc" column="IS_SHOW_LABEL_PC" />
+        <result property="isShowLabelM" column="IS_SHOW_LABEL_M" />
+        <result property="isShowSourcePc" column="IS_SHOW_SOURCE_PC" />
+        <result property="isShowSourceM" column="IS_SHOW_SOURCE_M" />
+        <result property="isShowSummaryPc" column="IS_SHOW_SUMMARY_PC" />
+        <result property="isShowSummaryM" column="IS_SHOW_SUMMARY_M" />
+    </resultMap>
+    
+    <sql id="editorSet_columns">
+        T.ID,T.SITE_MENU_ID,T.COMPANY_ID,T.IS_SHOW_SUBTITLE_PC,T.IS_SHOW_SUBTITLE_M,T.IS_SHOW_OUTLINK_PC,T.IS_SHOW_OUTLINK_M,T.IS_SHOW_LABEL_PC,T.IS_SHOW_LABEL_M,T.IS_SHOW_SOURCE_PC,T.IS_SHOW_SOURCE_M,T.IS_SHOW_SUMMARY_PC,T.IS_SHOW_SUMMARY_M
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BUSI_EDITOR_SET (
+         ID, SITE_MENU_ID, COMPANY_ID, IS_SHOW_SUBTITLE_PC, IS_SHOW_SUBTITLE_M, IS_SHOW_OUTLINK_PC, IS_SHOW_OUTLINK_M, IS_SHOW_LABEL_PC, IS_SHOW_LABEL_M, IS_SHOW_SOURCE_PC, IS_SHOW_SOURCE_M, IS_SHOW_SUMMARY_PC, IS_SHOW_SUMMARY_M
+        ) VALUES (
+         #{id}, #{siteMenuId}, #{companyId}, #{isShowSubtitlePc}, #{isShowSubtitleM}, #{isShowOutlinkPc}, #{isShowOutlinkM}, #{isShowLabelPc}, #{isShowLabelM}, #{isShowSourcePc}, #{isShowSourceM}, #{isShowSummaryPc}, #{isShowSummaryM}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE BUSI_EDITOR_SET AS T SET
+            T.SITE_MENU_ID = #{siteMenuId} , T.COMPANY_ID = #{companyId} , T.IS_SHOW_SUBTITLE_PC = #{isShowSubtitlePc} , T.IS_SHOW_SUBTITLE_M = #{isShowSubtitleM} , T.IS_SHOW_OUTLINK_PC = #{isShowOutlinkPc} , T.IS_SHOW_OUTLINK_M = #{isShowOutlinkM} , T.IS_SHOW_LABEL_PC = #{isShowLabelPc} , T.IS_SHOW_LABEL_M = #{isShowLabelM} , T.IS_SHOW_SOURCE_PC = #{isShowSourcePc} , T.IS_SHOW_SOURCE_M = #{isShowSourceM} , T.IS_SHOW_SUMMARY_PC = #{isShowSummaryPc} , T.IS_SHOW_SUMMARY_M = #{isShowSummaryM}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM BUSI_EDITOR_SET WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_editorSet">
+        SELECT <include refid="editorSet_columns" /> FROM BUSI_EDITOR_SET AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_editorSet">
+     SELECT <include refid="editorSet_columns" />  FROM BUSI_EDITOR_SET AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(siteMenuId)"> AND T.SITE_MENU_ID = #{siteMenuId} </if>
+           <if test="@Ognl@isNotEmpty(companyId)"> AND T.COMPANY_ID = #{companyId} </if>
+           <if test="@Ognl@isNotEmpty(isShowSubtitlePc)"> AND T.IS_SHOW_SUBTITLE_PC = #{isShowSubtitlePc} </if>
+           <if test="@Ognl@isNotEmpty(isShowSubtitleM)"> AND T.IS_SHOW_SUBTITLE_M = #{isShowSubtitleM} </if>
+           <if test="@Ognl@isNotEmpty(isShowOutlinkPc)"> AND T.IS_SHOW_OUTLINK_PC = #{isShowOutlinkPc} </if>
+           <if test="@Ognl@isNotEmpty(isShowOutlinkM)"> AND T.IS_SHOW_OUTLINK_M = #{isShowOutlinkM} </if>
+           <if test="@Ognl@isNotEmpty(isShowLabelPc)"> AND T.IS_SHOW_LABEL_PC = #{isShowLabelPc} </if>
+           <if test="@Ognl@isNotEmpty(isShowLabelM)"> AND T.IS_SHOW_LABEL_M = #{isShowLabelM} </if>
+           <if test="@Ognl@isNotEmpty(isShowSourcePc)"> AND T.IS_SHOW_SOURCE_PC = #{isShowSourcePc} </if>
+           <if test="@Ognl@isNotEmpty(isShowSourceM)"> AND T.IS_SHOW_SOURCE_M = #{isShowSourceM} </if>
+           <if test="@Ognl@isNotEmpty(isShowSummaryPc)"> AND T.IS_SHOW_SUMMARY_PC = #{isShowSummaryPc} </if>
+           <if test="@Ognl@isNotEmpty(isShowSummaryM)"> AND T.IS_SHOW_SUMMARY_M = #{isShowSummaryM} </if>
+        </where>
+    </select>
+
+    
+</mapper>

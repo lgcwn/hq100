@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ExchangePointsMapper">
+    <resultMap id="RM_exchangePoints" type="com.up72.hq.model.ExchangePoints">
+        <result property="id" column="ID" />
+        <result property="rmb" column="RMB" />
+        <result property="points" column="POINTS" />
+        <result property="ratio" column="RATIO" />
+    </resultMap>
+    
+    <sql id="exchangePoints_columns">
+        T.ID,T.RMB,T.POINTS,T.RATIO
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_EXCHANGE_POINTS (
+         ID, RMB, POINTS, RATIO
+        ) VALUES (
+         #{id}, #{rmb}, #{points}, #{ratio}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_EXCHANGE_POINTS AS T SET
+            T.RMB = #{rmb} , T.POINTS = #{points} , T.RATIO = #{ratio}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_EXCHANGE_POINTS WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_exchangePoints">
+        SELECT <include refid="exchangePoints_columns" /> FROM HQ_EXCHANGE_POINTS AS T WHERE  T.ID = #{id}  
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_exchangePoints">
+     SELECT <include refid="exchangePoints_columns" />  FROM HQ_EXCHANGE_POINTS AS T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(rmb)"> AND T.RMB = #{rmb} </if>
+           <if test="@Ognl@isNotEmpty(points)"> AND T.POINTS = #{points} </if>
+           <if test="@Ognl@isNotEmpty(ratio)"> AND T.RATIO = #{ratio} </if>
+        </where>
+    </select>
+
+    
+</mapper>

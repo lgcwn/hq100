@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.RefundRequestMapper">
+    <resultMap id="RM_refundRequest" type="com.up72.hq.model.RefundRequest">
+        <result property="id" column="ID" />
+        <result property="orderGoodsId" column="ORDER_GOODS_ID" />
+        <result property="goodsCount" column="GOODS_COUNT" />
+        <result property="memberId" column="MEMBER_ID" />
+        <result property="orderId" column="ORDER_ID" />
+        <result property="returnSn" column="RETURN_SN" />
+        <result property="sysUserId" column="SYS_USER_ID" />
+        <result property="refundType" column="REFUND_TYPE" />
+        <result property="goodsStatus" column="GOODS_STATUS" />
+        <result property="refundReason" column="REFUND_REASON" />
+        <result property="refundAmount" column="REFUND_AMOUNT" />
+        <result property="refundRemark" column="REFUND_REMARK" />
+        <result property="csStatus" column="CS_STATUS" />
+        <result property="csStatusTime" column="CS_STATUS_TIME" />
+        <result property="csRetunrInfo" column="CS_RETUNR_INFO" />
+        <result property="shippingMethodsId" column="SHIPPING_METHODS_ID" />
+        <result property="shippingMethodsName" column="SHIPPING_METHODS_NAME" />
+        <result property="deliveryNumber" column="DELIVERY_NUMBER" />
+        <result property="consignee" column="CONSIGNEE" />
+        <result property="addressDetail" column="ADDRESS_DETAIL" />
+        <result property="zipCode" column="ZIP_CODE" />
+        <result property="mobilePhone" column="MOBILE_PHONE" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="isDelete" column="IS_DELETE" />
+        <result property="isSmallTicket" column="IS_SMALL_TICKET" />
+        <result property="isTestReport" column="IS_TEST_REPORT" />
+        <result property="images" column="IMAGES" />
+        <result property="pickupAddress" column="PICKUP_ADDRESS" />
+        <result property="pickupMethod" column="PICKUP_METHOD" />
+        <result property="pickupTime" column="PICKUP_TIME" />
+        <result property="orderSn" column="ORDER_SN" />
+        <result property="actualAmount" column="ACTUAL_AMOUNT" />
+        <result property="deliveryTime" column="DELIVERY_TIME" />
+        <result property="receivingTime" column="RECEIVING_TIME" />
+        <result property="completeTime" column="COMPLETE_TIME" />
+        <result property="cancelTime" column="CANCEL_TIME" />
+        <result property="pickupTimeType" column="PICKUP_TIME_TYPE" />
+    </resultMap>
+    
+    <sql id="refundRequest_columns">
+        T.ID,T.ORDER_GOODS_ID,T.GOODS_COUNT,T.MEMBER_ID,T.ORDER_ID,T.RETURN_SN,T.SYS_USER_ID,T.REFUND_TYPE,T.GOODS_STATUS,T.REFUND_REASON,T.REFUND_AMOUNT,T.REFUND_REMARK,T.CS_STATUS,T.CS_STATUS_TIME,T.CS_RETUNR_INFO,T.SHIPPING_METHODS_ID,T.SHIPPING_METHODS_NAME,T.DELIVERY_NUMBER,T.CONSIGNEE,T.ADDRESS_DETAIL,T.ZIP_CODE,T.MOBILE_PHONE,T.ADD_TIME,T.IS_DELETE,T.IS_SMALL_TICKET,T.IS_TEST_REPORT,T.IMAGES,T.PICKUP_ADDRESS,T.PICKUP_METHOD,T.PICKUP_TIME,T.ORDER_SN,T.ACTUAL_AMOUNT,T.DELIVERY_TIME,T.RECEIVING_TIME,T.COMPLETE_TIME,T.CANCEL_TIME,T.PICKUP_TIME_TYPE
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_REFUND_REQUEST (
+         ID, ORDER_GOODS_ID, GOODS_COUNT, MEMBER_ID, ORDER_ID, RETURN_SN, SYS_USER_ID, REFUND_TYPE, GOODS_STATUS, REFUND_REASON, REFUND_AMOUNT, REFUND_REMARK, CS_STATUS, CS_STATUS_TIME, CS_RETUNR_INFO, SHIPPING_METHODS_ID, SHIPPING_METHODS_NAME, DELIVERY_NUMBER, CONSIGNEE, ADDRESS_DETAIL, ZIP_CODE, MOBILE_PHONE, ADD_TIME, IS_DELETE, IS_SMALL_TICKET, IS_TEST_REPORT, IMAGES, PICKUP_ADDRESS, PICKUP_METHOD, PICKUP_TIME, ORDER_SN, ACTUAL_AMOUNT, DELIVERY_TIME, RECEIVING_TIME, COMPLETE_TIME, CANCEL_TIME, PICKUP_TIME_TYPE
+        ) VALUES (
+         #{id}, #{orderGoodsId}, #{goodsCount}, #{memberId}, #{orderId}, #{returnSn}, #{sysUserId}, #{refundType}, #{goodsStatus}, #{refundReason}, #{refundAmount}, #{refundRemark}, #{csStatus}, #{csStatusTime}, #{csRetunrInfo}, #{shippingMethodsId}, #{shippingMethodsName}, #{deliveryNumber}, #{consignee}, #{addressDetail}, #{zipCode}, #{mobilePhone}, #{addTime}, #{isDelete}, #{isSmallTicket}, #{isTestReport}, #{images}, #{pickupAddress}, #{pickupMethod}, #{pickupTime}, #{orderSn}, #{actualAmount}, #{deliveryTime}, #{receivingTime}, #{completeTime}, #{cancelTime}, #{pickupTimeType}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_REFUND_REQUEST AS T SET
+            T.ORDER_GOODS_ID = #{orderGoodsId} , T.GOODS_COUNT = #{goodsCount} , T.MEMBER_ID = #{memberId} , T.ORDER_ID = #{orderId} , T.RETURN_SN = #{returnSn} , T.SYS_USER_ID = #{sysUserId} , T.REFUND_TYPE = #{refundType} , T.GOODS_STATUS = #{goodsStatus} , T.REFUND_REASON = #{refundReason} , T.REFUND_AMOUNT = #{refundAmount} , T.REFUND_REMARK = #{refundRemark} , T.CS_STATUS = #{csStatus} , T.CS_STATUS_TIME = #{csStatusTime} , T.CS_RETUNR_INFO = #{csRetunrInfo} , T.SHIPPING_METHODS_ID = #{shippingMethodsId} , T.SHIPPING_METHODS_NAME = #{shippingMethodsName} , T.DELIVERY_NUMBER = #{deliveryNumber} , T.CONSIGNEE = #{consignee} , T.ADDRESS_DETAIL = #{addressDetail} , T.ZIP_CODE = #{zipCode} , T.MOBILE_PHONE = #{mobilePhone} , T.ADD_TIME = #{addTime} , T.IS_DELETE = #{isDelete} , T.IS_SMALL_TICKET = #{isSmallTicket} , T.IS_TEST_REPORT = #{isTestReport} , T.IMAGES = #{images} , T.PICKUP_ADDRESS = #{pickupAddress} , T.PICKUP_METHOD = #{pickupMethod} , T.PICKUP_TIME = #{pickupTime} , T.ORDER_SN = #{orderSn} , T.ACTUAL_AMOUNT = #{actualAmount} , T.DELIVERY_TIME = #{deliveryTime} , T.RECEIVING_TIME = #{receivingTime} , T.COMPLETE_TIME = #{completeTime} , T.CANCEL_TIME = #{cancelTime} , T.PICKUP_TIME_TYPE = #{pickupTimeType}  
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_REFUND_REQUEST WHERE  ID = #{id}  
+    </delete>
+    
+    <select id="findById" resultMap="RM_refundRequest">
+        SELECT <include refid="refundRequest_columns" />,U.USER_NAME AS userName,O.SN AS orderSn,OG.GOODS_NAME AS goodsName,OG.GOODS_IMG AS goodsImg  FROM HQ_REFUND_REQUEST AS T
+        LEFT JOIN HQ_MEMBER U ON U.ID = T.MEMBER_ID
+        LEFT JOIN HQ_ORDER O ON O.ID = T.ORDER_ID
+        LEFT JOIN HQ_ORDER_GOODS OG ON OG.ID = T.ORDER_GOODS_ID
+        WHERE  T.ID = #{id}
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_refundRequest">
+        SELECT <include refid="refundRequest_columns" />,U.USER_NAME AS userName,O.SN AS orderSn,OG.GOODS_NAME AS goodsName,OG.GOODS_IMG AS goodsImg  FROM HQ_REFUND_REQUEST AS T
+        LEFT JOIN HQ_MEMBER U ON U.ID = T.MEMBER_ID
+        LEFT JOIN HQ_ORDER O ON O.ID = T.ORDER_ID
+        LEFT JOIN HQ_ORDER_GOODS OG ON OG.ID = T.ORDER_GOODS_ID
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(orderGoodsId)"> AND T.ORDER_GOODS_ID = #{orderGoodsId} </if>
+           <if test="@Ognl@isNotEmpty(goodsCount)"> AND T.GOODS_COUNT = #{goodsCount} </if>
+           <if test="@Ognl@isNotEmpty(memberId)"> AND T.MEMBER_ID = #{memberId} </if>
+           <if test="@Ognl@isNotEmpty(orderId)"> AND T.ORDER_ID = #{orderId} </if>
+           <if test="@Ognl@isNotEmpty(returnSn)"> AND T.RETURN_SN = #{returnSn} </if>
+           <if test="@Ognl@isNotEmpty(sysUserId)"> AND T.SYS_USER_ID = #{sysUserId} </if>
+           <if test="@Ognl@isNotEmpty(refundType)"> AND T.REFUND_TYPE = #{refundType} </if>
+           <if test="@Ognl@isNotEmpty(goodsStatus)"> AND T.GOODS_STATUS = #{goodsStatus} </if>
+           <if test="@Ognl@isNotEmpty(refundReason)"> AND T.REFUND_REASON = #{refundReason} </if>
+           <if test="@Ognl@isNotEmpty(refundAmount)"> AND T.REFUND_AMOUNT = #{refundAmount} </if>
+           <if test="@Ognl@isNotEmpty(refundRemark)"> AND T.REFUND_REMARK = #{refundRemark} </if>
+           <if test="@Ognl@isNotEmpty(csStatus)"> AND T.CS_STATUS = #{csStatus} </if>
+           <if test="@Ognl@isNotEmpty(csStatusTime)"> AND T.CS_STATUS_TIME = #{csStatusTime} </if>
+           <if test="@Ognl@isNotEmpty(csRetunrInfo)"> AND T.CS_RETUNR_INFO = #{csRetunrInfo} </if>
+           <if test="@Ognl@isNotEmpty(shippingMethodsId)"> AND T.SHIPPING_METHODS_ID = #{shippingMethodsId} </if>
+           <if test="@Ognl@isNotEmpty(shippingMethodsName)"> AND T.SHIPPING_METHODS_NAME = #{shippingMethodsName} </if>
+           <if test="@Ognl@isNotEmpty(deliveryNumber)"> AND T.DELIVERY_NUMBER = #{deliveryNumber} </if>
+           <if test="@Ognl@isNotEmpty(consignee)"> AND T.CONSIGNEE = #{consignee} </if>
+           <if test="@Ognl@isNotEmpty(addressDetail)"> AND T.ADDRESS_DETAIL = #{addressDetail} </if>
+           <if test="@Ognl@isNotEmpty(zipCode)"> AND T.ZIP_CODE = #{zipCode} </if>
+           <if test="@Ognl@isNotEmpty(mobilePhone)"> AND T.MOBILE_PHONE = #{mobilePhone} </if>
+           <if test="@Ognl@isNotEmpty(addTime)"> AND T.ADD_TIME = #{addTime} </if>
+           <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+           <if test="@Ognl@isNotEmpty(isSmallTicket)"> AND T.IS_SMALL_TICKET = #{isSmallTicket} </if>
+           <if test="@Ognl@isNotEmpty(isTestReport)"> AND T.IS_TEST_REPORT = #{isTestReport} </if>
+           <if test="@Ognl@isNotEmpty(images)"> AND T.IMAGES = #{images} </if>
+           <if test="@Ognl@isNotEmpty(pickupAddress)"> AND T.PICKUP_ADDRESS = #{pickupAddress} </if>
+           <if test="@Ognl@isNotEmpty(pickupMethod)"> AND T.PICKUP_METHOD = #{pickupMethod} </if>
+           <if test="@Ognl@isNotEmpty(pickupTime)"> AND T.PICKUP_TIME = #{pickupTime} </if>
+           <if test="@Ognl@isNotEmpty(orderSn)"> AND T.ORDER_SN = #{orderSn} </if>
+           <if test="@Ognl@isNotEmpty(actualAmount)"> AND T.ACTUAL_AMOUNT = #{actualAmount} </if>
+           <if test="@Ognl@isNotEmpty(deliveryTime)"> AND T.DELIVERY_TIME = #{deliveryTime} </if>
+           <if test="@Ognl@isNotEmpty(receivingTime)"> AND T.RECEIVING_TIME = #{receivingTime} </if>
+           <if test="@Ognl@isNotEmpty(completeTime)"> AND T.COMPLETE_TIME = #{completeTime} </if>
+           <if test="@Ognl@isNotEmpty(cancelTime)"> AND T.CANCEL_TIME = #{cancelTime} </if>
+           <if test="@Ognl@isNotEmpty(pickupTimeType)"> AND T.PICKUP_TIME_TYPE = #{pickupTimeType} </if>
+            <if test="@Ognl@isNotEmpty(toSn)">
+                AND (T.RETURN_SN LIKE '%${toSn}%'  OR  OG.GOODS_NAME LIKE '%${toSn}%' OR O.SN LIKE '%${toSn}%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findByOrderIdGoodsId" parameterType="map" resultMap="RM_refundRequest">
+        SELECT <include refid="refundRequest_columns" />,U.USER_NAME AS userName,O.SN AS orderSn,OG.GOODS_NAME AS goodsName,OG.GOODS_IMG AS goodsImg FROM HQ_REFUND_REQUEST AS T
+        LEFT JOIN HQ_MEMBER U ON U.ID = T.MEMBER_ID
+        LEFT JOIN HQ_ORDER O ON O.ID = T.ORDER_ID
+        LEFT JOIN HQ_ORDER_GOODS OG ON OG.ID = T.ORDER_GOODS_ID
+        WHERE  T.ORDER_GOODS_ID = #{orderGoodsId} AND T.ORDER_ID = #{orderId} ORDER BY T.ADD_TIME DESC LIMIT 0,1
+    </select>
+
+    <select id="findUserOrderCount" parameterType="map" resultType="java.lang.Integer">
+        SELECT count(1) FROM HQ_REFUND_REQUEST AS T
+        <where>
+            <if test="@Ognl@isNotEmpty(memberId)">  T.MEMBER_ID = #{memberId} </if>
+        </where>
+        AND (T.GOODS_STATUS = -2 OR T.GOODS_STATUS = -1 OR T.GOODS_STATUS = 0 OR T.GOODS_STATUS = 1)
+    </select>
+
+    <select id="findByReturnSn" resultMap="RM_refundRequest">
+        SELECT <include refid="refundRequest_columns" />,U.USER_NAME AS userName,O.SN AS orderSn,OG.GOODS_NAME AS goodsName,OG.GOODS_IMG AS goodsImg FROM HQ_REFUND_REQUEST AS T
+        LEFT JOIN HQ_MEMBER U ON U.ID = T.MEMBER_ID
+        LEFT JOIN HQ_ORDER O ON O.ID = T.ORDER_ID
+        LEFT JOIN HQ_ORDER_GOODS OG ON OG.ID = T.ORDER_GOODS_ID
+        WHERE  T.RETURN_SN = #{orderRefundSn}
+    </select>
+
+</mapper>

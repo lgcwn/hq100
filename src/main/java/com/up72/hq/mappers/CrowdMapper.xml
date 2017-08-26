@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.CrowdMapper">
+    <resultMap id="RM_crowd" type="com.up72.hq.model.Crowd">
+        <result property="id" column="ID"/>
+        <result property="catId" column="CAT_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="startTime" column="START_TIME"/>
+        <result property="img" column="IMG"/>
+        <result property="days" column="DAYS"/>
+        <result property="targetAmount" column="TARGET_AMOUNT"/>
+        <result property="projectOverview" column="PROJECT_OVERVIEW"/>
+        <result property="projectIntro" column="PROJECT_INTRO"/>
+        <result property="addTime" column="ADD_TIME"/>
+        <result property="status" column="STATUS"/>
+        <result property="endTime" column="END_TIME"/>
+    </resultMap>
+    <resultMap id="RM_crowdResp" type="com.up72.hq.dto.resp.CrowdResp" extends="RM_crowd">
+        <result property="percentage" column="PERCENTAGE"/>
+        <result property="peopleNum" column="PEOPLE_NUM"/>
+        <result property="realMoney" column="REAL_MONEY"/>
+        <result property="catName" column="CAT_NAME"/>
+        <result property="wsNum" column="WS_NUM"/>
+    </resultMap>
+
+    <sql id="crowd_columns">
+        T.ID,T.CAT_ID,T.NAME,T.START_TIME,T.IMG,T.DAYS,T.TARGET_AMOUNT,T.PROJECT_OVERVIEW,T.PROJECT_INTRO,T.ADD_TIME,T.STATUS,T.END_TIME
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_CROWD (
+         ID, CAT_ID, NAME, START_TIME, IMG, DAYS, TARGET_AMOUNT, PROJECT_OVERVIEW, PROJECT_INTRO, ADD_TIME, STATUS, END_TIME
+        ) VALUES (
+         #{id}, #{catId}, #{name}, #{startTime}, #{img}, #{days}, #{targetAmount}, #{projectOverview}, #{projectIntro}, #{addTime}, #{status}, #{endTime}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE HQ_CROWD  T SET
+            T.CAT_ID = #{catId} , T.NAME = #{name} , T.START_TIME = #{startTime} , T.IMG = #{img} , T.DAYS = #{days} , T.TARGET_AMOUNT = #{targetAmount} , T.PROJECT_OVERVIEW = #{projectOverview} , T.PROJECT_INTRO = #{projectIntro} , T.ADD_TIME = #{addTime} , T.STATUS = #{status},T.END_TIME = #{endTime}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_CROWD WHERE  ID = #{id}  
+    </delete>
+
+    <select id="findById" resultMap="RM_crowd">
+        SELECT
+        <include refid="crowd_columns"/>
+        FROM HQ_CROWD T WHERE T.ID = #{id}
+    </select>
+    <select id="findRespById" resultMap="RM_crowdResp">
+          SELECT T.*,AA.*,cast((AA.REAL_MONEY/T.TARGET_AMOUNT) as decimal(10,2)) AS PERCENTAGE,HCAT.NAME AS CAT_NAME,BB.WS_NUM FROM HQ_CROWD  T
+            LEFT JOIN (SELECT HOC.CROWD_ID,SUM(HO.ACTUAL_PAYMENTS ) AS REAL_MONEY,COUNT(HO.ID) AS PEOPLE_NUM FROM HQ_ORDER_CROWD HOC
+            LEFT JOIN HQ_CROWD_ORDER HO ON HO.ID = HOC.ORDER_ID AND HO.ORDER_STATUS!=0
+            GROUP BY HOC.CROWD_ID) AA ON AA.CROWD_ID = T.ID
+            LEFT JOIN HQ_CAT HCAT on HCAT.ID = T.CAT_ID
+            LEFT JOIN (SELECT HOC.*,COUNT(HOC.ID) AS WS_NUM FROM HQ_ORDER_CROWD HOC
+            LEFT JOIN HQ_CROWD_ORDER HO ON HO.ID=HOC.ORDER_ID
+            WHERE HOC.TYPE=0 AND HO.ORDER_STATUS !=0
+            GROUP BY HOC.CROWD_ID) BB ON  BB.CROWD_ID = T.ID
+
+        WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_crowdResp">
+        SELECT T.*,AA.*,cast((AA.REAL_MONEY/T.TARGET_AMOUNT) as decimal(10,2)) AS PERCENTAGE,HCAT.NAME AS CAT_NAME FROM HQ_CROWD T
+        LEFT JOIN (SELECT HOC.CROWD_ID,SUM(HO.ACTUAL_PAYMENTS ) AS REAL_MONEY,COUNT(HO.ID) AS PEOPLE_NUM FROM
+        HQ_ORDER_CROWD HOC
+        LEFT JOIN HQ_CROWD_ORDER HO ON HO.ID = HOC.ORDER_ID AND HO.ORDER_STATUS!=0
+        GROUP BY HOC.CROWD_ID) AA ON AA.CROWD_ID = T.ID
+        LEFT JOIN HQ_CAT HCAT on HCAT.ID = T.CAT_ID
+        <where>
+            <if test="@Ognl@isNotEmpty(id)">AND T.ID = #{id}</if>
+            <if test="@Ognl@isNotEmpty(catId)">AND T.CAT_ID = #{catId}</if>
+            <if test="@Ognl@isNotEmpty(name)">AND T.NAME LIKE CONCAT('%',#{name},'%' )</if>
+            <if test="@Ognl@isNotEmpty(startTime)">AND T.START_TIME = #{startTime}</if>
+            <if test="@Ognl@isNotEmpty(endTime)">AND T.END_TIME = #{endTime}</if>
+            <if test="@Ognl@isNotEmpty(img)">AND T.IMG = #{img}</if>
+            <if test="@Ognl@isNotEmpty(days)">AND T.DAYS = #{days}</if>
+            <if test="@Ognl@isNotEmpty(targetAmount)">AND T.TARGET_AMOUNT = #{targetAmount}</if>
+            <if test="@Ognl@isNotEmpty(projectOverview)">AND T.PROJECT_OVERVIEW = #{projectOverview}</if>
+            <if test="@Ognl@isNotEmpty(projectIntro)">AND T.PROJECT_INTRO = #{projectIntro}</if>
+            <if test="@Ognl@isNotEmpty(addTime)">AND T.ADD_TIME = #{addTime}</if>
+            <if test="@Ognl@isNotEmpty(status)">AND T.STATUS = #{status}</if>
+        </where>
+        ORDER BY T.ID DESC
+    </select>
+
+    <select id="findList3" resultMap="RM_crowdResp">
+        SELECT T.*,AA.*,cast((AA.REAL_MONEY/T.TARGET_AMOUNT) as decimal(10,2)) AS PERCENTAGE,HCAT.NAME AS CAT_NAME FROM HQ_CROWD  T
+        LEFT JOIN (SELECT HOC.CROWD_ID,SUM(HO.ACTUAL_PAYMENTS ) AS REAL_MONEY,COUNT(HO.ID) AS PEOPLE_NUM FROM
+        HQ_ORDER_CROWD HOC
+        LEFT JOIN HQ_CROWD_ORDER HO ON HO.ID = HOC.ORDER_ID AND HO.ORDER_STATUS!=0
+        GROUP BY HOC.CROWD_ID) AA ON AA.CROWD_ID = T.ID
+        LEFT JOIN HQ_CAT HCAT on HCAT.ID = T.CAT_ID
+        WHERE
+            T.CAT_ID = #{catId}
+            AND T.STATUS = 1
+        ORDER BY T.ID DESC
+        LIMIT 3
+    </select>
+
+    <select id="findHome" resultMap="RM_crowdResp">
+        SELECT T.*,AA.*,cast((AA.REAL_MONEY/T.TARGET_AMOUNT) as decimal(10,2)) AS PERCENTAGE,HCAT.NAME AS CAT_NAME FROM HQ_CROWD  T
+        LEFT JOIN (SELECT HOC.CROWD_ID,SUM(HO.ACTUAL_PAYMENTS ) AS REAL_MONEY,COUNT(HO.ID) AS PEOPLE_NUM FROM
+        HQ_ORDER_CROWD HOC
+        LEFT JOIN HQ_CROWD_ORDER HO ON HO.ID = HOC.ORDER_ID AND HO.ORDER_STATUS!=0
+        GROUP BY HOC.CROWD_ID) AA ON AA.CROWD_ID = T.ID
+        LEFT JOIN HQ_CAT HCAT on HCAT.ID = T.CAT_ID
+        WHERE
+        T.STATUS = 1
+        ORDER BY T.ID DESC
+        LIMIT 6
+    </select>
+    <select id="findHotList" resultMap="RM_crowdResp">
+        SELECT T.*,AA.*,cast((AA.REAL_MONEY/T.TARGET_AMOUNT) as decimal(10,2)) AS PERCENTAGE,HCAT.NAME AS CAT_NAME FROM HQ_CROWD  T
+        LEFT JOIN (SELECT HOC.CROWD_ID,SUM(HO.ACTUAL_PAYMENTS ) AS REAL_MONEY,COUNT(HO.ID) AS PEOPLE_NUM FROM
+        HQ_ORDER_CROWD HOC
+        LEFT JOIN HQ_CROWD_ORDER HO ON HO.ID = HOC.ORDER_ID AND HO.ORDER_STATUS!=0
+        GROUP BY HOC.CROWD_ID) AA ON AA.CROWD_ID = T.ID
+        LEFT JOIN HQ_CAT HCAT on HCAT.ID = T.CAT_ID
+        WHERE
+        T.CAT_ID = #{catId}
+        AND T.STATUS = 1
+        ORDER BY PERCENTAGE DESC
+        LIMIT 4
+    </select>
+
+</mapper>

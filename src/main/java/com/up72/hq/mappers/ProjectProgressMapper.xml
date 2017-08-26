@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.ProjectProgressMapper">
+    <resultMap id="RM_projectProgress" type="com.up72.hq.model.ProjectProgress">
+        <result property="id" column="ID" />
+        <result property="crowdId" column="CROWD_ID" />
+        <result property="img" column="IMG" />
+        <result property="projectOverview" column="PROJECT_OVERVIEW" />
+        <result property="addTime" column="ADD_TIME" />
+    </resultMap>
+    <resultMap id="RM_projectProgressResp" type="com.up72.hq.dto.resp.ProjectProgressResp" extends="RM_projectProgress">
+
+    </resultMap>
+    <sql id="projectProgress_columns">
+        T.ID,T.CROWD_ID,T.IMG,T.PROJECT_OVERVIEW,T.ADD_TIME
+    </sql>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_PROJECT_PROGRESS (
+         ID, CROWD_ID, IMG, PROJECT_OVERVIEW ,ADD_TIME
+        ) VALUES (
+         #{id}, #{crowdId}, #{img}, #{projectOverview} ,#{addTime}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_PROJECT_PROGRESS  T SET
+            T.CROWD_ID = #{crowdId} , T.IMG = #{img} , T.PROJECT_OVERVIEW = #{projectOverview}  ,T.ADD_TIME = #{addTime}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_PROJECT_PROGRESS WHERE  ID = #{id}  
+    </delete>
+    <delete id="deleteByCrowdId">
+        DELETE FROM HQ_PROJECT_PROGRESS WHERE  CROWD_ID = #{crowdId}
+    </delete>
+
+    <select id="findById" resultMap="RM_projectProgressResp">
+        SELECT <include refid="projectProgress_columns" /> FROM HQ_PROJECT_PROGRESS  T WHERE  T.ID = #{id}  
+    </select>
+    <select id="findId" resultMap="RM_projectProgress">
+        SELECT <include refid="projectProgress_columns" /> FROM HQ_PROJECT_PROGRESS  T WHERE  T.ID = #{id}
+    </select>
+    <select id="findByCrowdId" resultMap="RM_projectProgressResp">
+        SELECT <include refid="projectProgress_columns" /> FROM HQ_PROJECT_PROGRESS  T WHERE  T.CROWD_ID = #{crowdId}
+    </select>
+    
+    <select id="findPage" parameterType="map" resultMap="RM_projectProgressResp">
+     SELECT <include refid="projectProgress_columns" />  FROM HQ_PROJECT_PROGRESS  T
+        <where>                          
+           <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+           <if test="@Ognl@isNotEmpty(crowdId)"> AND T.CROWD_ID = #{crowdId} </if>
+           <if test="@Ognl@isNotEmpty(img)"> AND T.IMG = #{img} </if>
+           <if test="@Ognl@isNotEmpty(projectOverview)"> AND T.PROJECT_OVERVIEW = #{projectOverview} </if>
+        </where>
+    </select>
+
+    
+</mapper>

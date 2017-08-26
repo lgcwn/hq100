@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.up72.hq.dao.RoleManagerMapper">
+    <resultMap id="RM_roleManager" type="com.up72.hq.model.RoleManager">
+        <result property="id" column="ID" />
+        <result property="roleSelectId" column="ROLE_SELECT_ID" />
+        <result property="name" column="NAME" />
+        <result property="actorCnt" column="ACTOR_CNT" />
+        <result property="gender" column="GENDER" />
+        <result property="img" column="IMG" />
+        <result property="rules" column="RULES" />
+        <result property="remark" column="REMARK" />
+        <result property="intro" column="INTRO" />
+        <result property="details" column="DETAILS" />
+        <result property="addTime" column="ADD_TIME" />
+        <result property="sortId" column="SORT_ID" />
+        <result property="isDelete" column="IS_DELETE" />
+        <result property="signMoney" column="SIGN_MONEY" />
+        <result property="givePoints" column="GIVE_POINTS" />
+    </resultMap>
+    
+    <sql id="roleManager_columns">
+        T.ID,T.ROLE_SELECT_ID,T.NAME,T.ACTOR_CNT,T.GENDER,T.IMG,T.RULES,T.REMARK,T.INTRO,T.ADD_TIME,T.SORT_ID,T.IS_DELETE,T.DETAILS,T.SIGN_MONEY,T.GIVE_POINTS
+    </sql>
+
+    <resultMap id="RM_roleManagerResp" type="com.up72.hq.dto.resp.RoleManagerResp" extends="RM_roleManager">
+        <result property="signPeoples" column="SIGN_PEOPLES" />
+        <result property="loginuserIsSignUp" column="lOGIN_USER_IS_SIGN_UP" />
+        <collection property="ruleManagerOrderRespList" column="ID" javaType="ArrayList" ofType="com.up72.hq.dto.resp.RuleManagerOrderResp"
+                    select="com.up72.hq.dao.RuleManagerOrderMapper.findListByRoleManagerId" />
+    </resultMap>
+
+    <sql id="where_sql">
+        <where>
+            <if test="@Ognl@isNotEmpty(id)"> AND T.ID = #{id} </if>
+            <if test="@Ognl@isNotEmpty(roleSelectId)"> AND T.ROLE_SELECT_ID = #{roleSelectId} </if>
+            <if test="@Ognl@isNotEmpty(name)"> AND T.NAME LIKE CONCAT('%',#{name},'%')</if>
+            <if test="@Ognl@isNotEmpty(actorCnt)"> AND T.ACTOR_CNT = #{actorCnt} </if>
+            <if test="@Ognl@isNotEmpty(gender)"> AND T.GENDER = #{gender} </if>
+            <if test="@Ognl@isNotEmpty(img)"> AND T.IMG = #{img} </if>
+            <if test="@Ognl@isNotEmpty(rules)"> AND T.RULES = #{rules} </if>
+            <if test="@Ognl@isNotEmpty(remark)"> AND T.REMARK = #{remark} </if>
+            <if test="@Ognl@isNotEmpty(intro)"> AND T.INTRO = #{intro} </if>
+            <if test="@Ognl@isNotEmpty(sortId)"> AND T.SORT_ID = #{sortId} </if>
+            <if test="@Ognl@isNotEmpty(isDelete)"> AND T.IS_DELETE = #{isDelete} </if>
+        </where>
+    </sql>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HQ_ROLE_MANAGER (
+         ID, ROLE_SELECT_ID, NAME, ACTOR_CNT, GENDER, IMG, RULES, REMARK, INTRO,ADD_TIME,SORT_ID,IS_DELETE,DETAILS,SIGN_MONEY,GIVE_POINTS
+        ) VALUES (
+         #{id}, #{roleSelectId}, #{name}, #{actorCnt}, #{gender}, #{img}, #{rules}, #{remark}, #{intro}, #{addTime}, #{sortId}, #{isDelete}, #{details}, #{signMoney},#{givePoints}
+        )
+    </insert>
+    
+    <update id="update" >
+        UPDATE HQ_ROLE_MANAGER AS T SET
+            T.ROLE_SELECT_ID = #{roleSelectId} , T.NAME = #{name} , T.ACTOR_CNT = #{actorCnt} , T.GENDER = #{gender}
+             , T.IMG = #{img} , T.RULES = #{rules} , T.REMARK = #{remark} , T.INTRO = #{intro} , T.ADD_TIME = #{addTime},
+              T.SORT_ID = #{sortId},T.IS_DELETE = #{isDelete},T.DETAILS = #{details},T.SIGN_MONEY = #{signMoney},T.GIVE_POINTS = #{givePoints}
+        WHERE T.ID = #{id}  
+    </update>
+
+    <delete id="delete">
+        DELETE FROM HQ_ROLE_MANAGER WHERE  ID = #{id}  
+    </delete>
+    <delete id="deleteByRoleSelectId">
+        DELETE FROM HQ_ROLE_MANAGER WHERE  ROLE_SELECT_ID = #{roleSelectId}
+    </delete>
+
+    <select id="findById" resultMap="RM_roleManagerResp"  parameterType="Long">
+        SELECT <include refid="roleManager_columns" />
+        ,IFNULL((SELECT COUNT(*) FROM  HQ_RULE_MANAGER_ORDER AS  O WHERE  O.ROLE_MANAGER_ID=T.ID   AND  O.ORDER_STATUS=3),0) AS SIGN_PEOPLES
+        FROM HQ_ROLE_MANAGER AS T WHERE  T.ID = #{id}
+    </select>
+    <select id="findId" resultMap="RM_roleManager"  parameterType="Long">
+        SELECT <include refid="roleManager_columns" /> FROM HQ_ROLE_MANAGER AS T WHERE  T.ID = #{id}
+    </select>
+
+    <select id="findPage" parameterType="map" resultMap="RM_roleManagerResp">
+        SELECT <include refid="roleManager_columns" />
+        ,IFNULL((SELECT COUNT(*) FROM  HQ_RULE_MANAGER_ORDER AS  O WHERE  O.ROLE_MANAGER_ID=T.ID AND O.ROLE_SELECT_ID = #{roleSelectId} AND  O.ORDER_STATUS=3),0) AS SIGN_PEOPLES
+        <if test="@Ognl@isNotEmpty(memberId)"> ,IFNULL((SELECT COUNT(*) FROM  HQ_RULE_MANAGER_ORDER AS  RO WHERE  RO.ROLE_MANAGER_ID=T.ID AND RO.ROLE_SELECT_ID = #{roleSelectId} AND RO.MEMBER_ID = #{memberId}),0) AS lOGIN_USER_IS_SIGN_UP </if>
+        FROM HQ_ROLE_MANAGER AS T
+        <include refid="where_sql" />
+    </select>
+
+</mapper>
